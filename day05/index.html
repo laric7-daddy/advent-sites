@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>День 5 — Терминал</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  body{margin:0;background:#0a0f0a;color:#33ff66;font:15px/1.5 "Courier New",monospace;padding:14px}
+  #out{white-space:pre-wrap;word-break:break-word}
+  #line{display:flex;gap:8px;margin-top:8px}
+  #cmd{flex:1;background:transparent;border:none;outline:none;color:#33ff66;font:inherit}
+  .dim{color:#1f9944}
+</style>
+</head>
+<body>
+<div id="out"></div>
+<div id="line"><span>&gt;</span><input id="cmd" autocomplete="off" autofocus></div>
+<script>
+const DAY = 5;
+const ANSWER = "камин"; // видно в исходнике — для подарка ок, позже заменим на хэш
+const API_URL = "https://api.ТВОЙ-ДОМЕН.ru/api/solve"; // шаг 6; для пути A не нужен
+
+const tg = window.Telegram && window.Telegram.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+const out = document.getElementById("out");
+const cmd = document.getElementById("cmd");
+const norm = s => s.toLowerCase().replace(/ё/g,"е").replace(/[^a-zа-я0-9]/g,"");
+const print = (t, cls) => {
+  const d = document.createElement("div");
+  if (cls) d.className = cls;
+  d.textContent = t;
+  out.appendChild(d);
+  window.scrollTo(0, document.body.scrollHeight);
+};
+
+const FILES = {
+  "readme.txt": "Система взломана. Команды: help, ls, cat <файл>, answer <слово>.",
+  "hint.txt": "В доме есть место, где живёт огонь, но это не плита.\nТам танцуют языки пламени и греются руки.\nЧто это? Ответь: answer <слово>",
+  ".secret": "Доступ запрещён. Но подсказка рядом: cat hint.txt"
+};
+
+async function win(answer){
+  print("✔ Кодовое слово принято: " + answer.toUpperCase());
+  if (tg && tg.initData) {                 // открыто как Mini App
+    try {
+      const r = await fetch(API_URL, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({day: DAY, answer, initData: tg.initData})
+      });
+      if ((await r.json()).ok) {
+        tg.showAlert("🎉 Разгадано! Подарок уже ждёт в боте");
+        tg.close();
+        return;
+      }
+    } catch(e) { /* API не настроен — запасной путь ниже */ }
+  }
+  print("Отправь это слово боту в чат — он выдаст подарок 🎁", "dim");
+}
+
+function handle(line){
+  print("> " + line);
+  const [c, ...rest] = line.trim().split(/\s+/);
+  const arg = rest.join(" ");
+  if (c === "help") print("Команды: help | ls | cat <файл> | answer <слово>", "dim");
+  else if (c === "ls") print(Object.keys(FILES).join("   "));
+  else if (c === "cat") print(FILES[arg] || "Файл не найден: " + arg);
+  else if (c === "answer") {
+    if (norm(arg) === norm(ANSWER)) win(arg.trim());
+    else print("✘ Неверно. Попробуй ещё.", "dim");
+  }
+  else if (c) print("Неизвестная команда: " + c + ". Набери help", "dim");
+}
+
+cmd.addEventListener("keydown", e => {
+  if (e.key === "Enter") { handle(cmd.value); cmd.value = ""; }
+});
+
+print("ADVENT TERMINAL v1.0 — день " + DAY, "dim");
+print("Набери help, чтобы начать.");
+</script>
+</body>
+</html>
