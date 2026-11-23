@@ -1,85 +1,647 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>День 5 — Терминал</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Адвент · День 5 · Загадка</title>
+<meta name="theme-color" content="#0b3d2e" />
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-  body{margin:0;background:#0a0f0a;color:#33ff66;font:15px/1.5 "Courier New",monospace;padding:14px}
-  #out{white-space:pre-wrap;word-break:break-word}
-  #line{display:flex;gap:8px;margin-top:8px}
-  #cmd{flex:1;background:transparent;border:none;outline:none;color:#33ff66;font:inherit}
-  .dim{color:#1f9944}
+/*
+  ASSET SLOTS — положи файлы рядом с index.html.
+  Все картинки опциональны: если файла нет, встроенная анимация заменяет его без битых изображений.
+  Подробное ТЗ открывается по ссылке внизу страницы или через ?spec=1.
+
+  assets/hero.gif     1200×675, GIF, ≤ 2.5 MB, бесшовный loop, без текста, центр безопасен 70%.
+  assets/idle.gif     640×640,  GIF, ≤ 1.5 MB, прозрачный фон желателен, спокойный loop.
+  assets/success.gif  640×640,  GIF, ≤ 1.8 MB, яркий праздник, 1–2 сек, loop.
+  assets/wrong.gif    640×640,  GIF, ≤ 1.2 MB, мягкая ошибка без агрессии, loop.
+  assets/hint.gif     640×640,  GIF, ≤ 1.2 MB, лампочка/искра/подсказка, loop.
+  assets/bg.webp      1920×1080, WebP/JPG, ≤ 350 KB, тёмный фон, контраст текста сохраняется.
+*/
+:root{
+  --pine:#0b3d2e;
+  --holly:#14532d;
+  --moss:#1f6f4a;
+  --cranberry:#e11d48;
+  --amber:#f59e0b;
+  --ice:#38bdf8;
+  --plum:#7c3aed;
+  --snow:#fff7ed;
+  --ink:#0d1f18;
+  --success:#22c55e;
+  --warning:#f59e0b;
+  --danger:#ef4444;
+  --info:#38bdf8;
+  --surface:rgba(255,247,237,.08);
+  --surface-2:rgba(255,247,237,.13);
+  --line:rgba(255,247,237,.18);
+  --text:#fff7ed;
+  --muted:rgba(255,247,237,.72);
+  --radius:26px;
+  --shadow:0 24px 70px rgba(4,18,13,.45);
+  --bg-image:none;
+  --mx:50%;
+  --my:30%;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:
+    radial-gradient(900px 600px at var(--mx) var(--my), rgba(245,158,11,.18), transparent 60%),
+    radial-gradient(800px 520px at 12% 8%, rgba(56,189,248,.20), transparent 60%),
+    radial-gradient(900px 700px at 88% 20%, rgba(225,29,72,.20), transparent 62%),
+    linear-gradient(145deg,#071f17 0%, var(--pine) 38%, #123c2c 68%, #2a1420 100%);
+  overflow-x:hidden;
+}
+body::before{
+  content:"";
+  position:fixed; inset:0; z-index:-3;
+  background-image:var(--bg-image);
+  background-size:cover; background-position:center;
+  opacity:0; transition:opacity .6s ease;
+}
+body.has-bg::before{opacity:.28}
+body::after{
+  content:"";
+  position:fixed; inset:0; z-index:-2; pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  opacity:.10; mix-blend-mode:overlay;
+}
+::selection{background:var(--cranberry);color:var(--snow)}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:#071f17}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--cranberry),var(--amber));border-radius:99px;border:2px solid #071f17}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(var(--amber),var(--ice))}
+*{scrollbar-width:thin;scrollbar-color:var(--cranberry) #071f17}
+
+.snow{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.snow i{position:absolute;top:-8vh;display:block;border-radius:50%;background:rgba(255,247,237,.85);filter:blur(.3px);animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(115vh) rotate(360deg)}}
+
+.topbar{
+  position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;gap:12px;
+  padding:12px clamp(14px,4vw,32px);
+  background:rgba(7,31,23,.72);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
+.brand-mark{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--cranberry),var(--amber));box-shadow:0 8px 24px rgba(225,29,72,.35)}
+.chip{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.pill{padding:6px 11px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:13px;color:var(--muted);white-space:nowrap}
+.pill strong{color:var(--text)}
+.icon-btn{
+  min-height:40px;min-width:40px;padding:8px 12px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface-2);color:var(--text);cursor:pointer;font-weight:700;
+  transition:transform .15s ease, background .2s ease, border-color .2s ease;
+}
+.icon-btn:hover{transform:translateY(-1px);border-color:rgba(245,158,11,.6)}
+.icon-btn:active{transform:translateY(0) scale(.98)}
+.icon-btn[aria-pressed="false"]{opacity:.75}
+
+.wrap{width:min(1060px,100% - 28px);margin:26px auto 60px;display:grid;grid-template-columns:1.25fr .85fr;gap:18px;align-items:start}
+.card{
+  position:relative;border:1px solid var(--line);border-radius:var(--radius);
+  background:linear-gradient(180deg,var(--surface-2),var(--surface));
+  box-shadow:var(--shadow);overflow:hidden;
+  animation:rise .6s cubic-bezier(.2,.8,.2,1) both;
+}
+.card:nth-child(2){animation-delay:.08s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.card-inner{padding:clamp(18px,3vw,28px)}
+.eyebrow{display:flex;align-items:center;gap:10px;color:var(--amber);font-weight:800;text-transform:uppercase;letter-spacing:.14em;font-size:12px}
+.eyebrow::before{content:"";width:26px;height:2px;background:linear-gradient(90deg,var(--cranberry),var(--amber));border-radius:2px}
+h1{margin:10px 0 8px;font-size:clamp(26px,4vw,40px);line-height:1.1;letter-spacing:-.02em}
+.lede{margin:0 0 18px;color:var(--muted);max-width:56ch}
+
+.media-frame{position:relative;aspect-ratio:16/9;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:radial-gradient(400px 220px at 50% 80%, rgba(245,158,11,.28), transparent 70%), linear-gradient(160deg,#0e2c22,#1b1030)}
+.media-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .35s ease}
+.media-frame.has-img img{opacity:1}
+.media-frame.has-img .fallback{opacity:0}
+.fallback{position:absolute;inset:0;display:grid;place-items:center;transition:opacity .35s ease}
+.flame{width:min(46%,180px);filter:drop-shadow(0 12px 30px rgba(245,158,11,.45));animation:flicker 1.6s ease-in-out infinite}
+@keyframes flicker{0%,100%{transform:scale(1) rotate(-1deg)}50%{transform:scale(1.05) rotate(1.5deg)}}
+
+.riddle{margin:18px 0;padding:18px;border-radius:18px;border:1px dashed rgba(245,158,11,.45);background:rgba(245,158,11,.08);white-space:pre-line;font-size:clamp(17px,2.2vw,20px)}
+.answer-form{display:grid;gap:12px}
+.field{position:relative;display:flex;align-items:center}
+.field input{
+  width:100%;min-height:56px;padding:14px 52px 14px 16px;border-radius:16px;
+  border:1.5px solid var(--line);background:rgba(7,31,23,.55);color:var(--text);
+  font-size:17px;outline:none;transition:border-color .2s, box-shadow .2s;
+}
+.field input::placeholder{color:rgba(255,247,237,.45)}
+.field input:focus{border-color:var(--ice);box-shadow:0 0 0 4px rgba(56,189,248,.18)}
+.clear-btn{position:absolute;right:8px;width:38px;height:38px;border-radius:12px;border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:18px}
+.clear-btn:hover{background:var(--surface-2);color:var(--text)}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{
+  min-height:52px;padding:12px 20px;border-radius:16px;border:0;cursor:pointer;font-weight:800;font-size:16px;
+  color:#1b0b10;background:linear-gradient(135deg,var(--amber),#fbbf24 45%,var(--cranberry));
+  box-shadow:0 14px 30px rgba(225,29,72,.28);transition:transform .15s ease, filter .2s ease, opacity .2s;
+}
+.btn:hover{transform:translateY(-2px);filter:saturate(1.1)}
+.btn:active{transform:translateY(0) scale(.98)}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.btn.secondary{background:var(--surface-2);color:var(--text);border:1px solid var(--line);box-shadow:none}
+.feedback{min-height:26px;margin:2px 0 0;font-weight:600;color:var(--muted)}
+.feedback.ok{color:var(--success)}
+.feedback.bad{color:#fda4af}
+.feedback.hint{color:var(--amber)}
+.shake{animation:shake .4s ease}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+
+.side{display:grid;gap:18px}
+.gif-frame{position:relative;aspect-ratio:1/1;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:radial-gradient(300px 220px at 50% 30%, rgba(124,58,237,.25), transparent 70%), linear-gradient(160deg,#102c22,#251233)}
+.gif-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .3s ease}
+.gif-frame.has-img img{opacity:1}
+.gif-frame.has-img .gif-fallback{opacity:0}
+.gif-fallback{position:absolute;inset:0;display:grid;place-items:center;font-size:clamp(56px,10vw,88px);transition:opacity .3s ease;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.05)}}
+.reaction-label{text-align:center;margin-top:10px;color:var(--muted);font-size:14px}
+
+.hint-box{display:grid;gap:14px}
+.timer-row{display:flex;align-items:center;gap:14px}
+.timer-ring{
+  --p:0;
+  width:74px;height:74px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;
+  background:conic-gradient(var(--amber) calc(var(--p)*1%), rgba(255,247,237,.14) 0);
+  box-shadow:inset 0 0 0 1px var(--line);
+}
+.timer-ring span{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;background:#0a241b;font-weight:800;font-variant-numeric:tabular-nums}
+.hint-btn{width:100%}
+.hints{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.hints li{padding:12px 14px;border-radius:14px;background:rgba(56,189,248,.10);border:1px solid rgba(56,189,248,.28);animation:rise .35s ease both}
+.meta{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:13px;margin-top:14px;flex-wrap:wrap}
+.linklike{background:none;border:0;color:var(--ice);cursor:pointer;text-decoration:underline;padding:0;font:inherit}
+
+.success{display:grid;gap:14px;text-align:center;padding:10px 0}
+.success h2{margin:0;font-size:clamp(24px,3vw,32px)}
+.codebox{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:16px;border-radius:18px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.4)}
+.codebox strong{font-size:clamp(24px,4vw,34px);letter-spacing:.12em;color:var(--success)}
+.hidden{display:none !important}
+
+.spec{margin-top:18px;border:1px solid var(--line);border-radius:18px;background:rgba(7,31,23,.5);overflow:hidden}
+.spec summary{cursor:pointer;padding:14px 16px;font-weight:700;color:var(--amber)}
+.spec-body{padding:0 16px 16px;color:var(--muted);font-size:14px}
+.spec-body table{width:100%;border-collapse:collapse;margin-top:8px}
+.spec-body th,.spec-body td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.spec-body th{color:var(--text)}
+footer{width:min(1060px,100% - 28px);margin:0 auto 40px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+
+@media (max-width:860px){
+  .wrap{grid-template-columns:1fr}
+  .gif-frame{aspect-ratio:16/10}
+  .chip .pill.mode{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s !important;animation-iteration-count:1 !important;transition-duration:.001s !important}
+  .snow{display:none}
+}
 </style>
 </head>
 <body>
-<div id="out"></div>
-<div id="line"><span>&gt;</span><input id="cmd" autocomplete="off" autofocus></div>
+<div class="snow" id="snow" aria-hidden="true"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<header class="topbar">
+  <div class="brand"><span class="brand-mark">🎄</span><span>Адвент-загадка</span></div>
+  <div class="chip">
+    <span class="pill">День <strong id="dayChip">5</strong>/31</span>
+    <span class="pill mode" id="modeChip">Браузер</span>
+    <button class="icon-btn" id="soundToggle" type="button" aria-pressed="true" title="Звук">🔊 Звук</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card" id="puzzleCard">
+    <div class="card-inner">
+      <div class="eyebrow">Загадка дня</div>
+      <h1 id="title">Тепло без плиты</h1>
+      <p class="lede">Прочитай загадку, впиши ответ одним словом и нажми «Проверить». Подсказка откроется по таймеру.</p>
+
+      <figure class="media-frame" id="heroFrame">
+        <img id="heroImg" alt="Атмосферная анимация дня" />
+        <div class="fallback" aria-hidden="true">
+          <svg class="flame" viewBox="0 0 120 140" fill="none">
+            <path d="M60 8C74 34 96 48 96 82a36 36 0 1 1-72 0C24 52 46 38 60 8Z" fill="url(#g1)"/>
+            <path d="M60 52c8 14 20 22 20 38a20 20 0 1 1-40 0c0-16 12-24 20-38Z" fill="url(#g2)"/>
+            <defs>
+              <linearGradient id="g1" x1="24" y1="8" x2="96" y2="126"><stop stop-color="#fbbf24"/><stop offset=".55" stop-color="#f59e0b"/><stop offset="1" stop-color="#e11d48"/></linearGradient>
+              <linearGradient id="g2" x1="40" y1="52" x2="80" y2="118"><stop stop-color="#fff7ed"/><stop offset="1" stop-color="#fbbf24"/></linearGradient>
+            </defs>
+          </svg>
+        </div>
+      </figure>
+
+      <div class="riddle" id="riddle"></div>
+
+      <form class="answer-form" id="answerForm" autocomplete="off">
+        <label class="eyebrow" for="answerInput" style="letter-spacing:.08em">Твой ответ</label>
+        <div class="field">
+          <input id="answerInput" name="answer" type="text" inputmode="text" enterkeyhint="go" placeholder="Напиши одно слово…" aria-describedby="feedback" />
+          <button class="clear-btn" id="clearBtn" type="button" aria-label="Очистить">×</button>
+        </div>
+        <div class="actions">
+          <button class="btn" id="checkBtn" type="submit">Проверить</button>
+          <button class="btn secondary" id="focusHintBtn" type="button">К подсказке</button>
+        </div>
+        <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
+      </form>
+
+      <div class="success hidden" id="successPanel">
+        <h2>🎉 Разгадано!</h2>
+        <p id="successText">Кодовое слово принято.</p>
+        <div class="codebox" id="codeBox">
+          <strong id="codeWord">КАМИН</strong>
+          <button class="btn secondary" id="copyBtn" type="button">Скопировать</button>
+        </div>
+        <p class="feedback ok" id="successHint">Отправь кодовое слово боту — он пришлёт подарок и фото места.</p>
+      </div>
+
+      <div class="meta">
+        <span>Попытки: <strong id="attemptCount">0</strong></span>
+        <button class="linklike" id="resetBtn" type="button">Сбросить прогресс дня</button>
+      </div>
+    </div>
+  </section>
+
+  <aside class="side">
+    <section class="card">
+      <div class="card-inner">
+        <div class="eyebrow">Реакция</div>
+        <div class="gif-frame" id="reactionFrame" style="margin-top:12px">
+          <img id="reactionImg" alt="Реакция на твоё действие" />
+          <div class="gif-fallback" id="reactionFallback" aria-hidden="true">🎄</div>
+        </div>
+        <div class="reaction-label" id="reactionLabel">Жду твой ответ…</div>
+      </div>
+    </section>
+
+    <section class="card" id="hintCard">
+      <div class="card-inner hint-box">
+        <div class="eyebrow">Подсказка по таймеру</div>
+        <div class="timer-row">
+          <div class="timer-ring" id="timerRing"><span id="timerText">00:30</span></div>
+          <div>
+            <strong id="hintStatus">Подсказка готовится</strong>
+            <div class="feedback" style="min-height:auto">Откроется автоматически, когда таймер дойдёт до нуля.</div>
+          </div>
+        </div>
+        <button class="btn hint-btn" id="hintBtn" type="button" disabled>Подсказка через 00:30</button>
+        <ul class="hints" id="hintsList"></ul>
+      </div>
+    </section>
+  </aside>
+</main>
+
+<footer>
+  <span>Скелет готов к оформлению: замени GIF/WebP в папке <code>assets/</code>.</span>
+  <a class="linklike" href="?spec=1" id="specLink">Критерии для картинок</a>
+</footer>
+
+<details class="spec wrap hidden" id="assetSpec" style="display:block">
+  <summary>ТЗ для картинок и GIF</summary>
+  <div class="spec-body">
+    <p>Положи файлы в <code>assets/</code> рядом с этим HTML. Имена должны совпадать с конфигом. Если файла нет — сайт покажет встроенную анимацию, ничего не сломается.</p>
+    <table>
+      <thead><tr><th>Файл</th><th>Размер</th><th>Вес</th><th>Требования</th></tr></thead>
+      <tbody id="specRows"></tbody>
+    </table>
+    <p><strong>Общие правила:</strong> GIF без звука, бесшовный loop, не больше 2–3 секунд для реакций; текст на картинках не нужен — весь текст уже в интерфейсе. Для реакций желателен прозрачный фон. Держи центр композиции в безопасной зоне 70%, чтобы кадрирование на телефоне не резало главное. Палитра: хвойный зелёный, клюквенный красный, янтарный, ледяной голубой, тёплый снежный.</p>
+  </div>
+</details>
+
 <script>
-const DAY = 5;
-const ANSWER = "камин"; // видно в исходнике — для подарка ок, позже заменим на хэш
-const API_URL = "https://api.ТВОЙ-ДОМЕН.ru/api/solve"; // шаг 6; для пути A не нужен
+const CONFIG = {
+  day: 5,
+  title: "Тепло без плиты",
+  riddle: "В доме есть место, где живёт огонь, но это не плита.\nТам танцуют языки пламени и греются руки.\nЧто это?",
+  answer: "камин",
+  codeWord: "КАМИН",
+  apiUrl: "", // укажи https://твой-домен/api/solve для автоматической отправки в бота из Mini App
+  hints: [
+    "Это не электрический прибор.",
+    "Слово из 5 букв, начинается на «К»."
+  ],
+  hintCooldowns: [30, 45],
+  assets: {
+    hero: "assets/hero.gif",
+    idle: "assets/idle.gif",
+    success: "assets/success.gif",
+    wrong: "assets/wrong.gif",
+    hint: "assets/hint.gif",
+    bg: "assets/bg.webp"
+  }
+};
+
+const SPEC = [
+  ["assets/hero.gif","1200×675 (16:9)","≤ 2.5 MB","Главная атмосфера дня. Бесшовный loop, без текста, центр безопасен 70%. Допустим JPG/WebP, если не нужна анимация."],
+  ["assets/idle.gif","640×640 (1:1)","≤ 1.5 MB","Спокойное ожидание. Прозрачный фон желателен. Мягкий loop 2–3 сек."],
+  ["assets/success.gif","640×640 (1:1)","≤ 1.8 MB","Победа: конфетти, искры, праздник. Яркая, но не мигающая резко."],
+  ["assets/wrong.gif","640×640 (1:1)","≤ 1.2 MB","Ошибка: мягкое «не то», без агрессии и красного креста на весь экран."],
+  ["assets/hint.gif","640×640 (1:1)","≤ 1.2 MB","Подсказка: лампочка, искра, лупа. Читается на тёмном фоне."],
+  ["assets/bg.webp","1920×1080","≤ 350 KB","Фон страницы. Тёмный, не спорит с текстом. WebP или JPG."]
+];
 
 const tg = window.Telegram && window.Telegram.WebApp;
-if (tg) { tg.ready(); tg.expand(); }
+const $ = s => document.querySelector(s);
+const KEY = `advent_day_${CONFIG.day}_simple_v1`;
+const norm = s => String(s).toLowerCase().replace(/ё/g,"е").replace(/[^a-zа-я0-9]/g,"");
+const pad = n => String(n).padStart(2,"0");
+const fmt = ms => { const s=Math.ceil(ms/1000); return `${pad(Math.floor(s/60))}:${pad(s%60)}`; };
 
-const out = document.getElementById("out");
-const cmd = document.getElementById("cmd");
-const norm = s => s.toLowerCase().replace(/ё/g,"е").replace(/[^a-zа-я0-9]/g,"");
-const print = (t, cls) => {
-  const d = document.createElement("div");
-  if (cls) d.className = cls;
-  d.textContent = t;
-  out.appendChild(d);
-  window.scrollTo(0, document.body.scrollHeight);
+let state = loadState();
+let soundOn = localStorage.getItem("advent_sound") !== "0";
+let audioCtx = null;
+let confettiParts = [];
+let confettiRunning = false;
+
+function loadState(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(KEY) || "{}");
+    return {
+      attempts: raw.attempts || 0,
+      hintsShown: raw.hintsShown || 0,
+      hintReadyAt: raw.hintReadyAt || null,
+      solved: !!raw.solved
+    };
+  }catch{ return {attempts:0,hintsShown:0,hintReadyAt:null,solved:false}; }
+}
+function saveState(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch{} }
+
+function init(){
+  if (tg){ tg.ready(); tg.expand(); $("#modeChip").textContent = tg.initData ? "Mini App" : "Telegram"; }
+  $("#dayChip").textContent = CONFIG.day;
+  $("#title").textContent = CONFIG.title;
+  $("#riddle").textContent = CONFIG.riddle;
+  $("#codeWord").textContent = CONFIG.codeWord;
+  document.title = `Адвент · День ${CONFIG.day} · Загадка`;
+
+  bindImage($("#heroImg"), CONFIG.assets.hero, $("#heroFrame"));
+  loadBackground(CONFIG.assets.bg);
+  setReaction("idle");
+  buildSnow();
+  buildSpec();
+  updateSoundButton();
+  renderHints();
+  $("#attemptCount").textContent = state.attempts;
+
+  if (!state.solved && state.hintsShown < CONFIG.hints.length && !state.hintReadyAt){
+    state.hintReadyAt = Date.now() + (CONFIG.hintCooldowns[state.hintsShown] || 30) * 1000;
+    saveState();
+  }
+  if (state.solved) showSuccess(false);
+  updateTimer();
+  setInterval(updateTimer, 250);
+}
+
+function bindImage(img, src, frame){
+  frame.classList.remove("has-img");
+  if (!src) return;
+  img.onload = () => frame.classList.add("has-img");
+  img.onerror = () => frame.classList.remove("has-img");
+  img.src = src;
+  if (img.complete && img.naturalWidth) frame.classList.add("has-img");
+}
+function loadBackground(src){
+  if (!src) return;
+  const im = new Image();
+  im.onload = () => { document.body.style.setProperty("--bg-image", `url("${src}")`); document.body.classList.add("has-bg"); };
+  im.src = src;
+}
+
+const REACTIONS = {
+  idle:   {emoji:"🎄", label:"Жду твой ответ…"},
+  wrong:  {emoji:"🙈", label:"Почти! Попробуй ещё."},
+  hint:   {emoji:"💡", label:"Подсказка открыта."},
+  success:{emoji:"🎉", label:"Есть! Загадка решена."}
 };
+function setReaction(name){
+  const r = REACTIONS[name] || REACTIONS.idle;
+  $("#reactionFallback").textContent = r.emoji;
+  $("#reactionLabel").textContent = r.label;
+  bindImage($("#reactionImg"), CONFIG.assets[name], $("#reactionFrame"));
+}
 
-const FILES = {
-  "readme.txt": "Система взломана. Команды: help, ls, cat <файл>, answer <слово>.",
-  "hint.txt": "В доме есть место, где живёт огонь, но это не плита.\nТам танцуют языки пламени и греются руки.\nЧто это? Ответь: answer <слово>",
-  ".secret": "Доступ запрещён. Но подсказка рядом: cat hint.txt"
-};
+function buildSnow(){
+  const box = $("#snow");
+  for (let i=0;i<36;i++){
+    const f = document.createElement("i");
+    const size = 2 + Math.random()*5;
+    f.style.left = Math.random()*100 + "vw";
+    f.style.width = f.style.height = size + "px";
+    f.style.opacity = .25 + Math.random()*.6;
+    f.style.animationDuration = 9 + Math.random()*12 + "s";
+    f.style.animationDelay = -Math.random()*20 + "s";
+    box.appendChild(f);
+  }
+}
+function buildSpec(){
+  $("#specRows").innerHTML = SPEC.map(r => `<tr><td><code>${r[0]}</code></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("");
+  if (new URLSearchParams(location.search).has("spec")) $("#assetSpec").classList.remove("hidden");
+  $("#specLink").addEventListener("click", e => { e.preventDefault(); $("#assetSpec").classList.toggle("hidden"); $("#assetSpec").scrollIntoView({behavior:"smooth",block:"start"}); });
+}
 
-async function win(answer){
-  print("✔ Кодовое слово принято: " + answer.toUpperCase());
-  if (tg && tg.initData) {                 // открыто как Mini App
-    try {
-      const r = await fetch(API_URL, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({day: DAY, answer, initData: tg.initData})
+function updateTimer(){
+  const btn = $("#hintBtn"), ring = $("#timerRing"), text = $("#timerText"), status = $("#hintStatus");
+  if (state.solved){
+    btn.disabled = true; btn.textContent = "День разгадан"; ring.style.setProperty("--p",100); text.textContent = "✓"; status.textContent = "Подсказки больше не нужны";
+    return;
+  }
+  if (state.hintsShown >= CONFIG.hints.length){
+    btn.disabled = true; btn.textContent = "Подсказки закончились"; ring.style.setProperty("--p",100); text.textContent = "—"; status.textContent = "Все подсказки открыты";
+    return;
+  }
+  const now = Date.now();
+  const total = (CONFIG.hintCooldowns[state.hintsShown] || 30) * 1000;
+  const remain = Math.max(0, (state.hintReadyAt || now) - now);
+  const p = total ? Math.min(100, Math.max(0, (1 - remain/total) * 100)) : 100;
+  ring.style.setProperty("--p", p.toFixed(1));
+  if (remain > 0){
+    btn.disabled = true;
+    btn.textContent = `Подсказка через ${fmt(remain)}`;
+    text.textContent = fmt(remain);
+    status.textContent = `Подсказка ${state.hintsShown+1}/${CONFIG.hints.length} готовится`;
+  } else {
+    btn.disabled = false;
+    btn.textContent = `Открыть подсказку ${state.hintsShown+1}/${CONFIG.hints.length}`;
+    text.textContent = "00:00";
+    status.textContent = "Подсказка готова";
+  }
+}
+function renderHints(){
+  $("#hintsList").innerHTML = CONFIG.hints.slice(0, state.hintsShown).map((h,i) => `<li><strong>Подсказка ${i+1}.</strong> ${h}</li>`).join("");
+}
+function openHint(){
+  if (state.solved || state.hintsShown >= CONFIG.hints.length) return;
+  if (Date.now() < (state.hintReadyAt || 0)) return;
+  state.hintsShown++;
+  state.hintReadyAt = state.hintsShown < CONFIG.hints.length ? Date.now() + (CONFIG.hintCooldowns[state.hintsShown] || 30)*1000 : null;
+  saveState(); renderHints(); updateTimer(); setReaction("hint");
+  feedback(`Подсказка ${state.hintsShown}: ${CONFIG.hints[state.hintsShown-1]}`, "hint");
+  playHint();
+}
+
+function feedback(msg, kind=""){
+  const el = $("#feedback");
+  el.textContent = msg;
+  el.className = "feedback " + kind;
+}
+
+async function checkAnswer(e){
+  e.preventDefault();
+  if (state.solved) return;
+  const input = $("#answerInput");
+  const guess = norm(input.value);
+  if (!guess){ feedback("Сначала впиши ответ 🙂", "bad"); input.focus(); return; }
+  unlockAudio();
+  if (guess === norm(CONFIG.answer)){
+    state.solved = true; saveState();
+    await handleSuccess();
+  } else {
+    state.attempts++; saveState();
+    $("#attemptCount").textContent = state.attempts;
+    setReaction("wrong");
+    feedback(state.attempts >= 3 ? "Не то. Загляни в подсказку — она уже почти готова." : "Не то! Попробуй другое слово.", "bad");
+    const card = $("#puzzleCard");
+    card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake");
+    playWrong();
+  }
+}
+
+async function handleSuccess(){
+  $("#answerForm").classList.add("hidden");
+  $("#successPanel").classList.remove("hidden");
+  setReaction("success");
+  feedback("Верно!", "ok");
+  playSuccess();
+  burstConfetti();
+  let sent = false;
+  if (tg && tg.initData && CONFIG.apiUrl){
+    const btn = $("#checkBtn"); btn.disabled = true;
+    try{
+      const res = await fetch(CONFIG.apiUrl, {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({day:CONFIG.day, answer:CONFIG.answer, initData:tg.initData})
       });
-      if ((await r.json()).ok) {
-        tg.showAlert("🎉 Разгадано! Подарок уже ждёт в боте");
-        tg.close();
-        return;
+      const data = await res.json();
+      if (data.ok){
+        sent = true;
+        $("#codeBox").classList.add("hidden");
+        $("#successText").textContent = "Ответ улетел боту.";
+        $("#successHint").textContent = "Подарок и фото места уже ждут в чате 🎁";
+        if (tg.showAlert) tg.showAlert("🎉 Разгадано! Подарок уже ждёт в боте");
+        setTimeout(() => tg.close && tg.close(), 1100);
       }
-    } catch(e) { /* API не настроен — запасной путь ниже */ }
+    }catch{}
+    btn.disabled = false;
   }
-  print("Отправь это слово боту в чат — он выдаст подарок 🎁", "dim");
+  if (!sent){
+    $("#codeBox").classList.remove("hidden");
+    $("#successText").textContent = "Кодовое слово принято.";
+    $("#successHint").textContent = "Отправь кодовое слово боту — он пришлёт подарок и фото места.";
+  }
+}
+function showSuccess(animate){
+  $("#answerForm").classList.add("hidden");
+  $("#successPanel").classList.remove("hidden");
+  $("#codeBox").classList.remove("hidden");
+  setReaction("success");
+  if (animate) burstConfetti();
 }
 
-function handle(line){
-  print("> " + line);
-  const [c, ...rest] = line.trim().split(/\s+/);
-  const arg = rest.join(" ");
-  if (c === "help") print("Команды: help | ls | cat <файл> | answer <слово>", "dim");
-  else if (c === "ls") print(Object.keys(FILES).join("   "));
-  else if (c === "cat") print(FILES[arg] || "Файл не найден: " + arg);
-  else if (c === "answer") {
-    if (norm(arg) === norm(ANSWER)) win(arg.trim());
-    else print("✘ Неверно. Попробуй ещё.", "dim");
+function burstConfetti(){
+  const canvas = $("#confetti"), ctx = canvas.getContext("2d");
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr;
+  canvas.style.width = innerWidth+"px"; canvas.style.height = innerHeight+"px";
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  const colors = ["#e11d48","#f59e0b","#38bdf8","#22c55e","#7c3aed","#fff7ed"];
+  for (let i=0;i<140;i++){
+    confettiParts.push({
+      x: innerWidth/2 + (Math.random()-.5)*120,
+      y: innerHeight*0.35,
+      vx:(Math.random()-.5)*11,
+      vy:-6-Math.random()*9,
+      g:.22+Math.random()*.12,
+      s:5+Math.random()*7,
+      r:Math.random()*Math.PI,
+      vr:(Math.random()-.5)*.3,
+      c:colors[i%colors.length],
+      life:90+Math.random()*50
+    });
   }
-  else if (c) print("Неизвестная команда: " + c + ". Набери help", "dim");
+  if (!confettiRunning){ confettiRunning = true; requestAnimationFrame(confettiLoop); }
+}
+function confettiLoop(){
+  const canvas = $("#confetti"), ctx = canvas.getContext("2d");
+  ctx.clearRect(0,0,innerWidth,innerHeight);
+  confettiParts = confettiParts.filter(p => p.life > 0 && p.y < innerHeight + 40);
+  for (const p of confettiParts){
+    p.vy += p.g; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life--;
+    ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r);
+    ctx.globalAlpha = Math.min(1, p.life/40);
+    ctx.fillStyle = p.c; ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6);
+    ctx.restore();
+  }
+  if (confettiParts.length) requestAnimationFrame(confettiLoop);
+  else { confettiRunning = false; ctx.clearRect(0,0,innerWidth,innerHeight); }
 }
 
-cmd.addEventListener("keydown", e => {
-  if (e.key === "Enter") { handle(cmd.value); cmd.value = ""; }
+function unlockAudio(){
+  if (!soundOn) return;
+  try{
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+  }catch{}
+}
+function tone(freq, dur=0.12, type="sine", gain=0.05, when=0){
+  if (!soundOn || !audioCtx) return;
+  const t = audioCtx.currentTime + when;
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.type = type; o.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(gain,t+0.015);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g).connect(audioCtx.destination);
+  o.start(t); o.stop(t+dur+0.03);
+}
+function playWrong(){ unlockAudio(); tone(180,.16,"sawtooth",.035); tone(140,.18,"sawtooth",.03,.08); }
+function playHint(){ unlockAudio(); tone(660,.12,"sine",.05); tone(880,.16,"sine",.05,.1); }
+function playSuccess(){ unlockAudio(); [523,659,784,1047].forEach((f,i)=>tone(f,.18,"triangle",.06,i*.09)); }
+function updateSoundButton(){
+  const b = $("#soundToggle");
+  b.setAttribute("aria-pressed", String(soundOn));
+  b.textContent = soundOn ? "🔊 Звук" : "🔇 Тихо";
+}
+
+$("#answerForm").addEventListener("submit", checkAnswer);
+$("#clearBtn").addEventListener("click", () => { $("#answerInput").value=""; $("#answerInput").focus(); feedback(""); });
+$("#hintBtn").addEventListener("click", openHint);
+$("#focusHintBtn").addEventListener("click", () => $("#hintCard").scrollIntoView({behavior:"smooth",block:"center"}));
+$("#soundToggle").addEventListener("click", () => { soundOn = !soundOn; localStorage.setItem("advent_sound", soundOn?"1":"0"); updateSoundButton(); if(soundOn){ unlockAudio(); tone(700,.1,"sine",.04);} });
+$("#resetBtn").addEventListener("click", () => { if(confirm("Сбросить прогресс этого дня?")){ localStorage.removeItem(KEY); location.reload(); } });
+$("#copyBtn").addEventListener("click", async () => {
+  try{ await navigator.clipboard.writeText(CONFIG.codeWord); $("#copyBtn").textContent="Скопировано ✓"; }
+  catch{ $("#copyBtn").textContent="Выдели и скопируй"; }
+  setTimeout(()=>$("#copyBtn").textContent="Скопировать",1400);
 });
+document.addEventListener("pointermove", e => {
+  document.body.style.setProperty("--mx", (e.clientX/innerWidth*100).toFixed(1)+"%");
+  document.body.style.setProperty("--my", (e.clientY/innerHeight*100).toFixed(1)+"%");
+}, {passive:true});
+window.addEventListener("resize", () => { if(confettiRunning){ const c=$("#confetti"); c.width=innerWidth; c.height=innerHeight; } });
 
-print("ADVENT TERMINAL v1.0 — день " + DAY, "dim");
-print("Набери help, чтобы начать.");
+init();
 </script>
 </body>
 </html>
