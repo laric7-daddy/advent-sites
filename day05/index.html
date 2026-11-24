@@ -676,7 +676,7 @@ function todayDay(){
   const n = new Date();
   return (n.getFullYear()===CONFIG.year && n.getMonth()===11) ? n.getDate() : null;
 }
-const forceAll = new URLSearchParams(location.search).has("all");
+const forceAll = false;
 const training = todayDay() === null || forceAll;
 function unlocked(d){ return training ? true : d <= todayDay(); }
 function statusOf(d){
