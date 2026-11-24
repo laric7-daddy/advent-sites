@@ -9,9 +9,9 @@
 :root{--bg:#0b1410;--card:#13241b;--gold:#e8c37a;--green:#3ddc84;--dim:#6f8f7d}
 *{box-sizing:border-box}
 body{margin:0;padding:18px 14px 40px;background:var(--bg);color:#eaf5ee;
-     font:16px/1.45 -apple-system,Segoe UI,Roboto,sans-serif}
+     font:16px/1.45 -apple-system,Segoe UI,Roboto,sans-serif;overflow-x:hidden}
 h1{margin:0 0 4px;font-size:22px;text-align:center}
-.sub{text-align:center;color:var(--dim);font-size:14px;margin-bottom:16px}
+.sub{text-align:center;color:var(--dim);font-size:14px;margin-bottom:10px}
 .banner{background:var(--card);border:1px solid #24402f;border-radius:14px;
         padding:14px;margin:0 auto 16px;max-width:520px;text-align:center}
 .btn{display:inline-block;margin-top:10px;padding:10px 18px;border-radius:999px;
@@ -28,66 +28,176 @@ h1{margin:0 0 4px;font-size:22px;text-align:center}
 .cell small{font-size:10px;font-weight:400;color:var(--dim);margin-top:2px}
 .cell .mark{position:absolute;top:4px;right:6px;font-size:11px}
 .foot{max-width:520px;margin:18px auto 0;color:var(--dim);font-size:13px;text-align:center}
+
+/* ===== ёлка ===== */
+#treeWrap{max-width:270px;margin:0 auto 6px;text-align:center;position:relative;z-index:1}
+#tree{width:100%;height:auto;display:block}
+.treecap{color:var(--dim);font-size:13px;margin-top:2px}
+.tier{transform-box:view-box;transform-origin:50% 88%;animation:grow .5s ease-out backwards}
+@keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.orn{transform-box:fill-box;transform-origin:center;animation:pop .45s ease-out backwards}
+.star{transform-box:fill-box;transform-origin:center;animation:pop .6s ease-out backwards;
+      filter:drop-shadow(0 0 6px #ffd76a)}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.light{animation:blink 1.6s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.flake{position:fixed;top:-12px;color:#cfe8da;opacity:.65;pointer-events:none;z-index:0;
+       animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(105vh) rotate(360deg)}}
 </style>
 </head>
 <body>
 <h1>Адвент-календарь 🎄</h1>
 <div class="sub">1–31 декабря · один сюрприз каждый день</div>
+
+<div id="treeWrap">
+  <svg id="tree" viewBox="0 0 200 260" aria-label="Новогодняя ёлка"></svg>
+  <div id="treeCap" class="treecap"></div>
+</div>
+
 <div id="banner" class="banner" hidden></div>
 <div class="week" id="week"></div>
 <div class="grid" id="grid"></div>
-<div class="foot">Разгадал загадку? Отправь ответ боту в Telegram — он пришлёт подсказку и 📸 фото тайника.</div>
+<div class="foot">Разгадал загадку? Отправь ответ боту — он пришлёт подсказку и 📸 фото тайника.<br>
+За каждую разгадку на ёлке появляется игрушка 🎁</div>
 
 <script>
 const YEAR = 2026, MONTH = 11, DAYS = 31;
-const OPEN_HOUR = 19;                       // сегодняшний день открывается в 19:00 (как SEND_HOUR бота)
+const OPEN_HOUR = 19;                       // сегодняшний день открывается в 19:00
 const tg = window.Telegram && window.Telegram.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
 
 const q = new URLSearchParams(location.search);
-const preview = q.has("all");               // ?all=1 — открыть всё (для твоих тестов)
+const preview = q.has("all");               // ?all=1 — открыть всё (тесты)
 const focus = parseInt(q.get("day") || "0", 10);
 const now = new Date();
 const inDec = now.getFullYear() === YEAR && now.getMonth() === MONTH;
+const afterDec = now > new Date(YEAR, MONTH, 31, 23, 59);
 const today = inDec ? now.getDate() : 0;
 const isOpen = d => preview || (inDec && (d < today || (d === today && now.getHours() >= OPEN_HOUR)));
 const isSolved = d => localStorage.getItem("advent_solved_" + d) === "1";
 const pad = d => String(d).padStart(2, "0");
 const href = d => `day${pad(d)}/`;
 
+/* ================= ЁЛКА ================= */
+const svg = document.getElementById("tree");
+const NS = "http://www.w3.org/2000/svg";
+const APEX = 40, BASE = 230, HALFBASE = 80, TIERS = 10;
+const halfW = y => HALFBASE * (y - APEX) / (BASE - APEX);
+
+function el(name, attrs, cls){
+  const n = document.createElementNS(NS, name);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (cls) n.setAttribute("class", cls);
+  svg.appendChild(n);
+  return n;
+}
+
+function buildTree(grownDays, solvedSet){
+  svg.innerHTML = "";
+  el("ellipse", {cx:100, cy:BASE+8, rx:88, ry:10, fill:"#eaf5ee", opacity:.12});   // снег под ёлкой
+  el("path", {d:"M78 232 L122 232 L116 254 L84 254 Z", fill:"#8a4b2d"});          // горшок
+  el("rect", {x:76, y:228, width:48, height:8, rx:3, fill:"#a05a37"});
+
+  if (grownDays <= 0){                                                            // росток до 1 декабря
+    el("path", {d:"M100 228 C100 216 100 210 100 204", stroke:"#3ddc84", "stroke-width":3, fill:"none", "stroke-linecap":"round"});
+    el("path", {d:"M100 216 C92 212 88 208 86 202",  stroke:"#3ddc84", "stroke-width":2.5, fill:"none", "stroke-linecap":"round"});
+    el("path", {d:"M100 212 C108 208 112 204 114 198", stroke:"#3ddc84", "stroke-width":2.5, fill:"none", "stroke-linecap":"round"});
+    return;
+  }
+
+  el("rect", {x:95, y:BASE-6, width:10, height:10, fill:"#6d4426"});              // ствол
+  const tiers = Math.max(1, Math.min(TIERS, Math.ceil(grownDays * TIERS / 31)));  // рост по дням
+  for (let i = 0; i < tiers; i++){
+    const baseY = BASE - i * 17;
+    const topY  = Math.max(APEX, baseY - 48);
+    const hw = halfW(baseY);
+    const p = el("polygon",
+      {points:`${100-hw},${baseY} ${100+hw},${baseY} 100,${topY}`,
+       fill: i % 2 ? "#1d5c38" : "#227047"}, "tier");
+    p.style.animationDelay = (i * 0.08) + "s";
+  }
+
+  const lights = Math.min(36, Math.floor(grownDays * 1.2));                       // гирлянда по дням
+  for (let i = 0; i < lights; i++){
+    const t = (i + 1) / 37;
+    const y = BASE - 8 - t * (BASE - APEX - 20);
+    const x = 100 + (i % 2 ? 1 : -1) * halfW(y) * 0.62;
+    const c = el("circle", {cx:x.toFixed(1), cy:y.toFixed(1), r:2, fill:"#ffe9a8"}, "light");
+    c.style.animationDelay = (i * 0.13) + "s";
+  }
+
+  const COLORS = ["#e74c3c","#f1c40f","#3498db","#e67e22","#9b59b6","#2ecc71","#ff7eb0"];
+  for (let d = 1; d <= 31; d++){                                                  // игрушка за разгадку
+    if (!solvedSet.has(d)) continue;
+    const t = (d - 0.5) / 31;
+    const y = BASE - 10 - t * (BASE - APEX - 26);
+    const off = (((d * 37) % 100) / 100 - 0.5) * 1.3;
+    const x = 100 + off * halfW(y) * 0.8;
+    el("circle", {cx:x.toFixed(1), cy:y.toFixed(1), r:4.2, fill:COLORS[d % COLORS.length]}, "orn");
+    el("circle", {cx:(x-1.4).toFixed(1), cy:(y-1.4).toFixed(1), r:1.2, fill:"#fff", opacity:.7});
+  }
+
+  if (grownDays >= 31){                                                           // звезда в финале
+    el("polygon", {points:"100,18 104,30 116,30 106,37 110,49 100,41 90,49 94,37 84,30 96,30",
+                   fill:"#ffd76a"}, "star");
+  }
+}
+
+const solvedSet = new Set();
+for (let d = 1; d <= 31; d++) if (isSolved(d)) solvedSet.add(d);
+const grownDays = preview ? 31 : (afterDec ? 31 : (inDec ? today : 0));
+buildTree(grownDays, solvedSet);
+document.getElementById("treeCap").textContent =
+  grownDays <= 0 ? "Ёлка спит до 1 декабря 💤"
+  : `🌲 выросла на ${Math.round(grownDays / 31 * 100)}% · игрушек: ${solvedSet.size}/31`
+    + (grownDays >= 31 ? " · звезда на месте! ⭐" : "");
+
+/* ================= снегопад ================= */
+for (let i = 0; i < 16; i++){
+  const f = document.createElement("div");
+  f.className = "flake";
+  f.textContent = "❄";
+  f.style.left = Math.random() * 100 + "vw";
+  f.style.fontSize = 8 + Math.random() * 10 + "px";
+  f.style.animationDuration = 7 + Math.random() * 8 + "s";
+  f.style.animationDelay = -Math.random() * 10 + "s";
+  document.body.appendChild(f);
+}
+
+/* ================= календарь ================= */
 document.getElementById("week").innerHTML =
   ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"].map(w => `<div>${w}</div>`).join("");
 
 const grid = document.getElementById("grid");
 const offset = (new Date(YEAR, MONTH, 1).getDay() + 6) % 7;   // 1 дек 2026 — вторник
-for (let i = 0; i < offset; i++) {
+for (let i = 0; i < offset; i++){
   const e = document.createElement("div"); e.className = "cell empty"; grid.appendChild(e);
 }
-for (let d = 1; d <= DAYS; d++) {
+for (let d = 1; d <= DAYS; d++){
   const open = isOpen(d), done = isSolved(d);
-  const el = document.createElement(open ? "a" : "div");
-  el.className = "cell" + (open ? "" : " locked") + (d === today ? " today" : "") + (done ? " solved" : "");
-  if (open) el.href = href(d);
+  const cell = document.createElement(open ? "a" : "div");
+  cell.className = "cell" + (open ? "" : " locked") + (d === today ? " today" : "") + (done ? " solved" : "");
+  if (open) cell.href = href(d);
   const label = open ? (done ? "готово" : "открыт") : (d === today ? `в ${OPEN_HOUR}:00` : "🔒");
-  el.innerHTML = `${d}<small>${label}</small>` + (done ? '<span class="mark">✅</span>' : "");
-  grid.appendChild(el);
+  cell.innerHTML = `${d}<small>${label}</small>` + (done ? '<span class="mark">✅</span>' : "");
+  grid.appendChild(cell);
 }
 
 const b = document.getElementById("banner");
 const show = html => { b.hidden = false; b.innerHTML = html; };
-if (preview) {
+if (preview){
   show("👀 Предпросмотр: открыты все дни.");
-} else if (!inDec) {
+} else if (!inDec && !afterDec){
   const left = Math.ceil((new Date(YEAR, MONTH, 1) - now) / 86400000);
-  show(left > 0 ? `✨ Откроется 1 декабря. Осталось дней: <b>${left}</b>.`
-                : "🎄 Декабрь закончился — спасибо за игру!");
-} else if (focus && isOpen(focus)) {
+  show(`✨ Откроется 1 декабря. Осталось дней: <b>${left}</b>.`);
+} else if (focus && isOpen(focus)){
   show(`Сегодня открыт <b>день ${focus}</b> 🎁<br><a class="btn" href="${href(focus)}">Открыть задание</a>`);
-} else if (focus === today) {
+} else if (focus === today){
   show(`День ${focus} откроется сегодня в <b>${OPEN_HOUR}:00</b> ⏳`);
-} else if (focus) {
+} else if (focus){
   show(`День ${focus} ещё закрыт — откроется ${focus} декабря 🔒`);
-} else if (today && !isOpen(today)) {
+} else if (today && !isOpen(today)){
   show(`Сегодняшний день ${today} откроется в <b>${OPEN_HOUR}:00</b> ⏳`);
 }
 </script>
