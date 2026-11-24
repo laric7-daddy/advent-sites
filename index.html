@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Адвент-календарь 🎄</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#0b1410;--card:#13241b;--gold:#e8c37a;--green:#3ddc84;--dim:#6f8f7d}
+*{box-sizing:border-box}
+body{margin:0;padding:18px 14px 40px;background:var(--bg);color:#eaf5ee;
+     font:16px/1.45 -apple-system,Segoe UI,Roboto,sans-serif}
+h1{margin:0 0 4px;font-size:22px;text-align:center}
+.sub{text-align:center;color:var(--dim);font-size:14px;margin-bottom:16px}
+.banner{background:var(--card);border:1px solid #24402f;border-radius:14px;
+        padding:14px;margin:0 auto 16px;max-width:520px;text-align:center}
+.btn{display:inline-block;margin-top:10px;padding:10px 18px;border-radius:999px;
+     background:var(--gold);color:#20180a;font-weight:700;text-decoration:none}
+.week,.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;max-width:520px;margin:0 auto}
+.week div{text-align:center;color:var(--dim);font-size:12px;padding-bottom:4px}
+.cell{aspect-ratio:1;border-radius:12px;background:var(--card);border:1px solid #223a2c;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      font-size:18px;font-weight:700;color:#eaf5ee;text-decoration:none;position:relative}
+.cell.empty{background:transparent;border:none}
+.cell.locked{opacity:.35}
+.cell.today{border-color:var(--gold);box-shadow:0 0 0 2px #e8c37a33,0 0 18px #e8c37a22}
+.cell.solved{border-color:var(--green)}
+.cell small{font-size:10px;font-weight:400;color:var(--dim);margin-top:2px}
+.cell .mark{position:absolute;top:4px;right:6px;font-size:11px}
+.foot{max-width:520px;margin:18px auto 0;color:var(--dim);font-size:13px;text-align:center}
+</style>
+</head>
+<body>
+<h1>Адвент-календарь 🎄</h1>
+<div class="sub">1–31 декабря · один сюрприз каждый день</div>
+<div id="banner" class="banner" hidden></div>
+<div class="week" id="week"></div>
+<div class="grid" id="grid"></div>
+<div class="foot">Разгадал загадку? Отправь ответ боту в Telegram — он пришлёт подсказку и 📸 фото тайника.</div>
+
+<script>
+const YEAR = 2026, MONTH = 11, DAYS = 31;
+const OPEN_HOUR = 19;                       // сегодняшний день открывается в 19:00 (как SEND_HOUR бота)
+const tg = window.Telegram && window.Telegram.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+const q = new URLSearchParams(location.search);
+const preview = q.has("all");               // ?all=1 — открыть всё (для твоих тестов)
+const focus = parseInt(q.get("day") || "0", 10);
+const now = new Date();
+const inDec = now.getFullYear() === YEAR && now.getMonth() === MONTH;
+const today = inDec ? now.getDate() : 0;
+const isOpen = d => preview || (inDec && (d < today || (d === today && now.getHours() >= OPEN_HOUR)));
+const isSolved = d => localStorage.getItem("advent_solved_" + d) === "1";
+const pad = d => String(d).padStart(2, "0");
+const href = d => `day${pad(d)}/`;
+
+document.getElementById("week").innerHTML =
+  ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"].map(w => `<div>${w}</div>`).join("");
+
+const grid = document.getElementById("grid");
+const offset = (new Date(YEAR, MONTH, 1).getDay() + 6) % 7;   // 1 дек 2026 — вторник
+for (let i = 0; i < offset; i++) {
+  const e = document.createElement("div"); e.className = "cell empty"; grid.appendChild(e);
+}
+for (let d = 1; d <= DAYS; d++) {
+  const open = isOpen(d), done = isSolved(d);
+  const el = document.createElement(open ? "a" : "div");
+  el.className = "cell" + (open ? "" : " locked") + (d === today ? " today" : "") + (done ? " solved" : "");
+  if (open) el.href = href(d);
+  const label = open ? (done ? "готово" : "открыт") : (d === today ? `в ${OPEN_HOUR}:00` : "🔒");
+  el.innerHTML = `${d}<small>${label}</small>` + (done ? '<span class="mark">✅</span>' : "");
+  grid.appendChild(el);
+}
+
+const b = document.getElementById("banner");
+const show = html => { b.hidden = false; b.innerHTML = html; };
+if (preview) {
+  show("👀 Предпросмотр: открыты все дни.");
+} else if (!inDec) {
+  const left = Math.ceil((new Date(YEAR, MONTH, 1) - now) / 86400000);
+  show(left > 0 ? `✨ Откроется 1 декабря. Осталось дней: <b>${left}</b>.`
+                : "🎄 Декабрь закончился — спасибо за игру!");
+} else if (focus && isOpen(focus)) {
+  show(`Сегодня открыт <b>день ${focus}</b> 🎁<br><a class="btn" href="${href(focus)}">Открыть задание</a>`);
+} else if (focus === today) {
+  show(`День ${focus} откроется сегодня в <b>${OPEN_HOUR}:00</b> ⏳`);
+} else if (focus) {
+  show(`День ${focus} ещё закрыт — откроется ${focus} декабря 🔒`);
+} else if (today && !isOpen(today)) {
+  show(`Сегодняшний день ${today} откроется в <b>${OPEN_HOUR}:00</b> ⏳`);
+}
+</script>
+</body>
+</html>
