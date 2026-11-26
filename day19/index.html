@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>День 19 — ребусы Деда Мороза</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&family=Manrope:wght@400;600;800&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1410; --card:#13241b; --card2:#0f1f17; --line:#24402f; --line2:#3a5a46;
+  --gold:#e8c37a; --amber:#ffb347; --green:#3ddc84; --red:#ff6b6b; --blue:#7fb4ff;
+  --magenta:#ff7eb0; --cyan:#4dd0e1; --ink:#eaf5ee; --dim:#7fa08c;
+  --paper:#f4e8cf; --paper2:#e6d7b6; --pink:#2a2118; --wood1:#5a4022; --wood2:#33240f;
+}
+*{box-sizing:border-box}
+html{scrollbar-color:var(--line2) #0d1a13;scrollbar-width:thin}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#0d1a13}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:9px;border:2px solid #0d1a13}
+::-webkit-scrollbar-thumb:hover{background:#4d7a5f}
+body{margin:0;padding:0 14px 54px;color:var(--ink);overflow-x:hidden;
+  background:radial-gradient(1200px 560px at 50% -14%,#16302240,transparent 70%),var(--bg);
+  font:16px/1.5 Manrope,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:620px;margin:0 auto;position:relative;z-index:1}
+
+.garland{display:flex;justify-content:center;gap:14px;border-top:2px solid var(--line2);overflow:hidden}
+.gbulb{width:9px;height:13px;border-radius:50% 50% 45% 45%;position:relative;margin-top:7px;flex:none;
+ background:currentColor;transform-origin:top center;animation:sway 3s ease-in-out infinite alternate,glowblink 2s infinite}
+.gbulb::before{content:"";position:absolute;top:-7px;left:3.5px;width:2px;height:7px;background:var(--line2)}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+@keyframes glowblink{0%,100%{filter:brightness(1);box-shadow:0 0 8px currentColor}50%{filter:brightness(.5);box-shadow:0 0 2px currentColor}}
+.flake{position:fixed;top:-14px;color:#cfe8da;opacity:.5;pointer-events:none;z-index:0;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(106vh) rotate(360deg)}}
+
+.back{color:var(--dim);font-size:13px;text-decoration:none}
+.back:hover{color:var(--gold)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0}
+h1{font-family:Unbounded,sans-serif;font-size:clamp(18px,4.6vw,23px);margin:0;line-height:1.25}
+h1 .gold{color:var(--gold)}
+.sndbtn{flex:none;padding:9px 13px;border-radius:999px;border:1px solid var(--line2);background:var(--card);
+ color:var(--ink);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+.sndbtn:hover{border-color:var(--gold);color:var(--gold)}
+.sndbtn.off{color:var(--dim);border-color:var(--line)}
+
+.card{background:linear-gradient(165deg,var(--card),var(--card2));border:1px solid var(--line);
+ border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 10px 30px #0006}
+.rules{border-color:var(--line2);background:linear-gradient(165deg,#10241a,#0d1c14)}
+.rules b{color:var(--gold)}
+.rules ul{margin:6px 0 0;padding-left:18px;color:#bcd8c6;font-size:13.5px}
+.rules li{margin-bottom:3px}
+.task{color:#bcd8c6;font-size:14px;margin:0 0 12px}
+.note{color:var(--dim);font-size:12.5px;margin:10px 0 0}
+
+.hud{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.stat{display:flex;flex-direction:column;gap:1px;padding:7px 12px;border-radius:12px;
+ border:1px solid var(--line);background:#0f1f17;min-width:72px}
+.stat i{font:700 10px/1 Manrope,sans-serif;letter-spacing:.12em;color:var(--dim);font-style:normal}
+.stat b{font:800 16px/1.2 Manrope,sans-serif;color:var(--gold)}
+.stat.g b{color:var(--green)} .stat.d b{color:var(--red)} .stat.m b{color:var(--magenta)} .stat.b b{color:var(--blue)}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-left:auto}
+.seg button{padding:9px 11px;border:none;background:none;color:var(--dim);font:700 12px Manrope,sans-serif;cursor:pointer;transition:.15s}
+.seg button:hover{color:var(--ink)}
+.seg button.on{background:#1d5c38;color:#eaf5ee}
+
+.progress{height:7px;border-radius:99px;background:#0d1a13;border:1px solid var(--line);overflow:hidden;margin-bottom:12px}
+.progress i{display:block;height:100%;width:0;border-radius:99px;transition:width .4s ease;
+ background:linear-gradient(90deg,#227047,var(--green),var(--gold));box-shadow:0 0 10px #3ddc8455}
+
+.desk{position:relative;border-radius:18px;padding:16px 14px 18px;
+ background:linear-gradient(160deg,var(--wood1),var(--wood2) 55%,#4a3419);
+ box-shadow:0 18px 40px #000a,inset 0 1px 0 #ffffff1f}
+.desk::before{content:"";position:absolute;inset:0;border-radius:18px;pointer-events:none;
+ background:repeating-linear-gradient(96deg,#00000018 0 3px,transparent 3px 11px);opacity:.5}
+.desk.shake{animation:shk .42s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shk{10%,90%{transform:translateX(-3px)}20%,80%{transform:translateX(5px)}30%,50%,70%{transform:translateX(-8px)}40%,60%{transform:translateX(8px)}}
+.desk.good{animation:good .7s ease-out}
+@keyframes good{0%{box-shadow:0 18px 40px #000a}45%{box-shadow:0 18px 46px #000a,inset 0 0 60px #3ddc8455,0 0 40px #3ddc8444}100%{box-shadow:0 18px 40px #000a}}
+
+.paper{position:relative;border-radius:10px;padding:18px 16px 16px;color:var(--pink);
+ background:linear-gradient(168deg,var(--paper),var(--paper2));
+ box-shadow:0 10px 26px #0008,inset 0 0 0 1px #ffffff55;transform:rotate(-.5deg)}
+.paper::after{content:"";position:absolute;inset:0;border-radius:10px;pointer-events:none;
+ background:repeating-linear-gradient(0deg,#00000008 0 1px,transparent 1px 5px)}
+.phead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.stamp{font:700 9.5px/1.25 Manrope,sans-serif;letter-spacing:.16em;color:#8a6a3a;
+ border:1.5px solid #b89a63;border-radius:6px;padding:5px 8px;transform:rotate(-3deg);opacity:.85}
+.tier{font:700 10px/1 Manrope,sans-serif;letter-spacing:.1em;padding:5px 9px;border-radius:999px;
+ background:#2a211814;border:1px solid #b89a63;color:#6d5326}
+.glyphs{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;min-height:96px;padding:6px 0 10px}
+.gl{position:relative;display:flex;align-items:center;justify-content:center;
+ width:clamp(58px,17vw,78px);height:clamp(58px,17vw,78px);border-radius:14px;
+ background:linear-gradient(160deg,#fffdf6,#efe2c6);box-shadow:0 5px 12px #0004,inset 0 1px 0 #fff;
+ font-size:clamp(30px,9vw,42px);line-height:1;animation:glin .4s ease-out backwards}
+.gl.txt{font-family:Unbounded,sans-serif;font-weight:700;font-size:clamp(20px,6vw,28px);color:#2a2118;
+ background:linear-gradient(160deg,#ffe9b8,#f0d79a)}
+@keyframes glin{from{opacity:0;transform:translateY(12px) scale(.8)}to{opacity:1;transform:none}}
+.plus{font:800 22px/1 Manrope,sans-serif;color:#a8874d}
+.phint{font-family:Caveat,cursive;font-size:19px;color:#6d5326;text-align:center;margin:2px 0 0}
+
+.timer{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:10px}
+.timer .bar{width:min(240px,70%);height:7px;border-radius:99px;background:#2a211822;overflow:hidden}
+.timer .bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--green),var(--amber));transition:width .3s linear}
+.timer.warn .bar i{background:linear-gradient(90deg,var(--amber),var(--red))}
+.timer b{font:800 13px Manrope,sans-serif;color:#6d5326;min-width:34px;text-align:right}
+
+.slots{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:16px 0 4px}
+.slots .gap{width:12px}
+.slot{width:34px;height:42px;border-radius:9px;border:1px solid var(--line2);background:#0d1a13;
+ display:flex;align-items:center;justify-content:center;font:800 19px/1 Manrope,sans-serif;color:var(--gold);
+ box-shadow:inset 0 1px 0 #ffffff10}
+.slot.empty{color:#2f4a3c}
+.slot.rev{background:#12301f;border-color:var(--green);color:var(--green);animation:sl .3s ease-out}
+.slot.done{background:#1d3a2a;border-color:var(--gold);color:#fff3cf}
+@keyframes sl{from{transform:scale(.7);filter:brightness(2)}to{transform:scale(1)}}
+
+.answer{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+#inp{flex:1;min-width:170px;padding:13px 15px;border-radius:13px;border:1px solid var(--line2);
+ background:#0d1a13;color:var(--ink);font:700 16px Manrope,sans-serif;outline:none;transition:.15s}
+#inp:focus{border-color:var(--gold);box-shadow:0 0 0 3px #e8c37a22}
+#inp::placeholder{color:#4f6d5c;font-weight:600}
+button.act{padding:13px 20px;border-radius:13px;border:none;cursor:pointer;font:800 14px Manrope,sans-serif;
+ background:linear-gradient(90deg,var(--gold),#f6dfae);color:#20180a;box-shadow:0 4px 16px #e8c37a2e;transition:.15s}
+button.act:hover{transform:translateY(-1px);box-shadow:0 7px 20px #e8c37a44}
+button.act:active{transform:translateY(0)}
+button.act:disabled{opacity:.45;cursor:not-allowed;transform:none}
+button.act.pulse{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 4px 16px #e8c37a2e}50%{box-shadow:0 0 0 7px #e8c37a22,0 4px 22px #e8c37a66}}
+
+.explain{margin-top:12px;padding:12px 14px;border-radius:13px;border:1px solid var(--green);
+ background:#12301f;color:#cfe9d8;font-size:13.5px;display:none}
+.explain.on{display:block;animation:fadein .35s ease-out}
+.explain b{color:var(--green)}
+.explain.skip{border-color:var(--amber);background:#2a2110}
+.explain.skip b{color:var(--amber)}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+button.ghost{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:none;
+ color:var(--dim);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+button.ghost:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+button.ghost:disabled{opacity:.4;cursor:not-allowed}
+#msg{min-height:22px;margin-top:10px;font-size:13.5px;text-align:center;color:var(--dim)}
+#msg.ok{color:var(--green)} #msg.err{color:var(--red)} #msg.warn{color:var(--amber)}
+
+.overlay{position:absolute;inset:0;z-index:8;display:none;flex-direction:column;align-items:center;justify-content:center;
+ gap:10px;padding:22px;text-align:center;background:#06121ae8;backdrop-filter:blur(5px);border-radius:18px}
+.overlay.on{display:flex;animation:fadein .35s ease-out}
+.overlay h3{font-family:Unbounded,sans-serif;font-size:19px;margin:0;color:var(--gold)}
+.overlay p{margin:0;font-size:13.5px;color:#bcd8c6;max-width:360px}
+.badge{padding:5px 12px;border-radius:999px;border:1px solid var(--green);color:var(--green);
+ background:#12301f;font:700 12px Manrope,sans-serif}
+#riddle{font-size:16px;white-space:pre-wrap}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:40}
+@media (max-width:430px){
+  .stat{min-width:62px;padding:6px 9px}
+  .stat b{font-size:15px}
+  .seg{margin-left:0;width:100%;justify-content:center}
+  .slot{width:29px;height:38px;font-size:17px}
+  .answer{gap:7px}
+  button.act{padding:12px 16px}
+}
+</style>
+</head>
+<body>
+<div class="garland" id="garland"></div>
+<div class="wrap">
+  <a class="back" href="../">← календарь</a>
+  <div class="top">
+    <h1>День <span class="gold">19</span> · ребусы Деда Мороза</h1>
+    <button class="sndbtn" id="snd">🔊 Звук</button>
+  </div>
+
+  <div class="card rules">
+    📜 <b>Как играть:</b> цель — разгадать головоломку и добыть загадку, а ответ принести боту: он выдаст подарок и фото тайника.
+    <ul>
+      <li>На карточке зашифровано слово: картинки складываются в смысл, а цифры читаются как слова — «100» это СТО, «2» это ДВА, «7» это СЕМЬ.</li>
+      <li>Впиши ответ в поле и жми «Проверить». Клетки ниже показывают длину слова.</li>
+      <li>Подсказка открывает одну букву, пропуск стоит жизни. В «Метели» на ребус даётся 45 секунд.</li>
+      <li>Разгадай все ребусы режима — день откроет загадку 🎁</li>
+    </ul>
+  </div>
+
+  <div id="game" class="card"></div>
+
+  <div id="riddleCard" class="card" hidden>
+    <h3 id="rTitle" style="margin:0 0 8px;font-size:16px;color:var(--gold)"></h3>
+    <p id="riddle"></p>
+    <p class="note">Отправь ответ боту в Telegram 🤖 Застрянешь — кнопка 💡 Подсказка у бота (раз в 2 минуты).</p>
+  </div>
+</div>
+<canvas id="fx"></canvas>
+
+<script>
+/* ===== настройки дня ===== */
+const DAY = 19;
+const RIDDLE = "Второй портал в другой мир, п-п-гэг-приключение на 5 минут, зашли вышли, п-по-погнали";
+
+const REBUSES = [
+  { g:["🎄"], a:["ёлка","елка","ёлочка","елочка"], tier:1, ex:"Просто ёлка — с неё и начинается декабрь." },
+  { g:["🎁"], a:["подарок","подарки","дар"], tier:1, ex:"Коробка с лентой — подарок." },
+  { g:["⛄"], a:["снеговик","снеговика"], tier:1, ex:"Три кома снега и морковка — снеговик." },
+  { g:["🍊"], a:["мандарин","мандарины","мандаринка"], tier:1, ex:"Главный новогодний фрукт — мандарин." },
+  { g:["🕯️"], a:["свечка","свеча"], tier:1, ex:"Огонёк на столе — свечка." },
+  { g:["👴","❄️","🎒"], a:["дед мороз","дедушка мороз","дедмороз"], tier:2, ex:"Дед + снег + мешок = Дед Мороз." },
+  { g:["👧","❄️"], a:["снегурочка"], tier:2, ex:"Девочка и снег — Снегурочка." },
+  { g:["❄️","🌧️"], a:["снегопад"], tier:2, ex:"Снег вместо дождя — снегопад." },
+  { g:["🧊","⛸️"], a:["каток"], tier:2, ex:"Лёд и коньки — каток." },
+  { g:["🎆","🌃"], a:["салют","фейерверк"], tier:2, ex:"Огни над ночным городом — салют." },
+  { g:["ПО","2","Л"], a:["подвал"], tier:3, ex:"ПО + ДВА + Л = ПОДВАЛ. Классическое место для тайника." },
+  { g:["100","Л"], a:["стол"], tier:3, ex:"СТО + Л = СТОЛ. Тот самый праздничный." },
+  { g:["7","Я"], a:["семья","семью"], tier:3, ex:"СЕМЬ + Я = СЕМЬЯ." },
+  { g:["ВИ","3","НА"], a:["витрина"], tier:3, ex:"ВИ + ТРИ + НА = ВИТРИНА. Новогодняя, с огоньками." },
+  { g:["40","А"], a:["сорока"], tier:3, ex:"СОРОК + А = СОРОКА." }
+];
+const TIERN = { 1:"разминка", 2:"связка", 3:"шифр" };
+const MODES = [
+  { key:"calm", label:"Спокойно", ids:[0,1,2,3,4,5,6,7], lives:5, hints:4, time:0, shuffle:false },
+  { key:"classic", label:"Классика", ids:[0,1,2,3,4,5,6,7,8,9,10,11], lives:3, hints:3, time:0, shuffle:false },
+  { key:"blizzard", label:"Метель", ids:[5,6,7,8,9,10,11,12,13,14,0,2], lives:3, hints:2, time:45, shuffle:true }
+];
+
+/* ===== антураж ===== */
+const GC=["#e74c3c","#f1c40f","#3498db","#e67e22","#9b59b6","#2ecc71","#ff7eb0"];
+for(let i=0;i<17;i++){
+  const b=document.createElement("span");
+  b.className="gbulb"; b.style.color=GC[i%GC.length];
+  b.style.animationDelay=(i*.17)+"s, "+(i*.23)+"s";
+  document.getElementById("garland").appendChild(b);
+}
+for(let i=0;i<12;i++){
+  const f=document.createElement("div");
+  f.className="flake"; f.textContent="❄";
+  f.style.left=Math.random()*100+"vw";
+  f.style.fontSize=8+Math.random()*9+"px";
+  f.style.animationDuration=7+Math.random()*8+"s";
+  f.style.animationDelay=-Math.random()*10+"s";
+  document.body.appendChild(f);
+}
+
+/* ===== служебное ===== */
+const $=id=>document.getElementById(id);
+const q=new URLSearchParams(location.search);
+const now=new Date();
+const PREP = now < new Date(2026, 11, 1, 19, 0, 0); // режим подготовки: замки сняты
+const inDec=now.getFullYear()===2026&&now.getMonth()===11;
+const today=inDec?now.getDate():0;
+const open = q.has("all") || PREP || (inDec && (DAY < today || (DAY === today && now.getHours() >= 19)));
+const past = !q.has("all") && (inDec && DAY < today);
+const daySolved=()=>!!localStorage.getItem("advent_solved_"+DAY);
+const norm=s=>s.toLowerCase().replace(/ё/g,"е").replace(/[^a-zа-я0-9]/g,"");
+
+/* ===== звук ===== */
+let snd=localStorage.getItem("advent_snd")!=="0";
+let AC=null, live=[];
+function ac(){
+  if(!AC){ const C=window.AudioContext||window.webkitAudioContext; if(C) AC=new C(); }
+  if(AC&&AC.state==="suspended") AC.resume();
+  return AC;
+}
+function tone(freq,ms,delay=0,vol=.13,type="sine"){
+  if(!snd) return; const c=ac(); if(!c) return;
+  const t=c.currentTime+delay/1000, d=ms/1000;
+  const o=c.createOscillator(), g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,t);
+  g.gain.setValueAtTime(.0001,t);
+  g.gain.linearRampToValueAtTime(vol,t+.01);
+  g.gain.setValueAtTime(vol,t+Math.max(.015,d-.04));
+  g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g); g.connect(c.destination);
+  o.start(t); o.stop(t+d+.03);
+  live.push(o); o.onended=()=>{ live=live.filter(x=>x!==o); };
+}
+function sweep(f1,f2,ms,vol=.13,type="sawtooth"){
+  if(!snd) return; const c=ac(); if(!c) return;
+  const t=c.currentTime,d=ms/1000;
+  const o=c.createOscillator(),g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(f1,t);
+  o.frequency.exponentialRampToValueAtTime(Math.max(30,f2),t+d);
+  g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+d+.02);
+  live.push(o); o.onended=()=>{ live=live.filter(x=>x!==o); };
+}
+function killSound(){ live.forEach(o=>{try{o.stop();}catch(e){}}); live=[]; }
+function paintSnd(){
+  const b=$("snd");
+  b.textContent=snd?"🔊 Звук":"🔇 Тихо";
+  b.classList.toggle("off",!snd);
+}
+$("snd").onclick=()=>{
+  snd=!snd; localStorage.setItem("advent_snd",snd?"1":"0");
+  paintSnd();
+  if(snd){ ac(); tone(880,90,0,.12); } else killSound();
+};
+paintSnd();
+
+/* ===== частицы ===== */
+const fx=$("fx"), fctx=fx.getContext("2d");
+let parts=[], fxRun=false;
+function sizeFx(){
+  const r=Math.min(devicePixelRatio||1,2);
+  fx.width=innerWidth*r; fx.height=innerHeight*r;
+  fx.style.width=innerWidth+"px"; fx.style.height=innerHeight+"px";
+  fctx.setTransform(r,0,0,r,0,0);
+}
+sizeFx(); addEventListener("resize",sizeFx);
+function spawn(p){ parts.push(p); if(!fxRun){ fxRun=true; requestAnimationFrame(stepFx); } }
+function sparks(x,y,n,col){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2, sp=.8+Math.random()*3.6;
+    spawn({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,g:.09,s:1.4+Math.random()*2.8,
+      c:col||["#ffd76a","#ffb347","#fff3cf"][(Math.random()*3)|0],life:1,dec:.026,round:true});
+  }
+}
+function confetti(){
+  const cols=["#e8c37a","#3ddc84","#ffb347","#7fb4ff","#ff7eb0","#4dd0e1"];
+  for(let i=0;i<170;i++){
+    spawn({x:innerWidth/2+(Math.random()-.5)*210,y:innerHeight*.34,
+      vx:(Math.random()-.5)*8,vy:-Math.random()*9-2,g:.22,
+      w:4+Math.random()*6,h:3+Math.random()*5,a:Math.random()*Math.PI,va:(Math.random()-.5)*.3,
+      c:cols[(Math.random()*cols.length)|0],life:1,dec:.0072});
+  }
+}
+function stepFx(){
+  fctx.clearRect(0,0,innerWidth,innerHeight);
+  parts.forEach(p=>{
+    p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.life-=p.dec;
+    fctx.globalAlpha=Math.max(0,p.life); fctx.fillStyle=p.c;
+    if(p.round){ fctx.beginPath(); fctx.arc(p.x,p.y,p.s,0,7); fctx.fill(); }
+    else { p.a+=p.va; fctx.save(); fctx.translate(p.x,p.y); fctx.rotate(p.a);
+      fctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); fctx.restore(); }
+  });
+  fctx.globalAlpha=1;
+  parts=parts.filter(p=>p.life>0&&p.y<innerHeight+50);
+  if(parts.length) requestAnimationFrame(stepFx);
+  else { fxRun=false; fctx.clearRect(0,0,innerWidth,innerHeight); }
+}
+
+/* ===== игра ===== */
+let tick=null;
+function stopTick(){ if(tick){ clearInterval(tick); tick=null; } }
+function showRiddle(fresh,extra){
+  stopTick(); killSound();
+  $("game").innerHTML="";
+  $("riddleCard").hidden=false;
+  $("rTitle").textContent=fresh?"🎉 "+(extra||"Готово!")+" Вот загадка дня:":"Загадка дня:";
+  $("riddle").textContent=RIDDLE;
+}
+
+if(!open){
+  $("game").innerHTML=`<p class="task">День откроется 19 декабря в 19:00 🔒</p>`;
+}
+else if(daySolved()||past){
+  showRiddle(false);
+}
+else {
+  $("game").innerHTML=`
+    <p class="task">Северный почтамт прислал карточки с ребусами. Дед Мороз шифрует слова картинками и цифрами — прочитай каждую и верни ответ.</p>
+    <div class="hud">
+      <div class="stat"><i>РЕБУС</i><b id="rd">0/12</b></div>
+      <div class="stat d"><i>ЖИЗНИ</i><b id="lv">❄❄❄</b></div>
+      <div class="stat g"><i>СЧЁТ</i><b id="sc">0</b></div>
+      <div class="stat m"><i>СЕРИЯ</i><b id="st">0</b></div>
+      <div class="stat b"><i>РЕКОРД</i><b id="best">—</b></div>
+      <div class="seg" id="seg"></div>
+    </div>
+    <div class="progress"><i id="pbar"></i></div>
+    <div class="desk" id="desk">
+      <div class="paper" id="paper">
+        <div class="phead">
+          <span class="stamp">СЕВЕРНЫЙ ПОЧТАМТ · ВЕЛИКИЙ УСТЮГ</span>
+          <span class="tier" id="tier">разминка</span>
+        </div>
+        <div class="glyphs" id="glyphs"></div>
+        <p class="phint" id="phint">Что здесь зашифровано?</p>
+        <div class="timer" id="timer" style="display:none"><div class="bar"><i id="tbar"></i></div><b id="tnum">45</b></div>
+      </div>
+      <div class="slots" id="slots"></div>
+      <div class="answer">
+        <input id="inp" placeholder="Твой ответ…" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="done">
+        <button class="act" id="go">Проверить</button>
+      </div>
+      <div class="explain" id="exp"></div>
+      <div class="overlay" id="ov">
+        <h3 id="ovt">Ребусы Деда Мороза</h3>
+        <p id="ovp">Выбери режим и начни. Картинки складываются в слово, цифры читаются как слова.</p>
+        <div id="ovb"></div>
+        <button class="act pulse" id="ovbtn">▶ Начать</button>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="ghost" id="hint">💡 Подсказка · 3</button>
+      <button class="ghost" id="skip">⏭ Пропустить</button>
+      <button class="ghost" id="again">↻ Заново</button>
+    </div>
+    <div id="msg"></div>
+    <p class="note">Enter — проверить ответ, а после разгадки — перейти к следующей карточке. Регистр, пробелы и буква ё не важны.</p>`;
+
+  let M=1, mode=MODES[1];
+  let queue=[], pos=0, lives=3, hints=3, score=0, streak=0, bestStreak=0;
+  let cur=null, revealed=[], phase="idle", hintsUsed=0, timeLeft=0, solvedCount=0;
+
+  const desk=$("desk"), glyphs=$("glyphs"), slots=$("slots"), inp=$("inp");
+  const setMsg=(t,cls)=>{ const m=$("msg"); if(m){ m.textContent=t; m.className=cls||""; } };
+  const bestKey=()=>`advent_rebus_best_${mode.key}`;
+
+  MODES.forEach((m,i)=>{
+    const b=document.createElement("button");
+    b.textContent=m.label; b.dataset.i=i;
+    if(i===M) b.classList.add("on");
+    b.onclick=()=>{
+      if(M===i) return;
+      M=i; mode=MODES[i];
+      $("seg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",+x.dataset.i===i));
+      reset();
+      tone(620,70,0,.07,"triangle");
+    };
+    $("seg").appendChild(b);
+  });
+
+  function overlay(on,title,text,btn,extra,handler){
+    const ov=$("ov");
+    ov.classList.toggle("on",on);
+    if(on){
+      $("ovt").textContent=title;
+      $("ovp").textContent=text;
+      $("ovbtn").textContent=btn;
+      $("ovb").innerHTML=extra||"";
+      $("ovbtn").onclick=handler;
+    }
+  }
+  function hud(){
+    $("rd").textContent=Math.min(pos+ (phase==="play"||phase==="solved"?1:0), queue.length||mode.ids.length)+"/"+(queue.length||mode.ids.length);
+    $("lv").textContent="❄".repeat(Math.max(0,lives))+"·".repeat(Math.max(0,mode.lives-lives));
+    $("sc").textContent=score;
+    $("st").textContent=streak;
+    $("hint").textContent="💡 Подсказка · "+hints;
+    $("hint").disabled=hints<=0||phase!=="play";
+    $("skip").disabled=phase!=="play";
+    $("go").disabled=phase==="over"||phase==="idle";
+    $("go").textContent=phase==="solved"?"Дальше →":"Проверить";
+    inp.disabled=phase!=="play";
+    const b=localStorage.getItem(bestKey());
+    $("best").textContent=b?b:"—";
+    const total=queue.length||mode.ids.length;
+    $("pbar").style.width=(total?Math.round(solvedCount/total*100):0)+"%";
+  }
+  function renderGlyphs(){
+    glyphs.innerHTML="";
+    cur.g.forEach((s,i)=>{
+      if(i>0){
+        const p=document.createElement("span");
+        p.className="plus"; p.textContent="+";
+        p.style.animationDelay=(i*.09)+"s";
+        glyphs.appendChild(p);
+      }
+      const d=document.createElement("div");
+      const isTxt=/[0-9А-Яа-я]/.test(s);
+      d.className="gl"+(isTxt?" txt":"");
+      d.textContent=s;
+      d.style.animationDelay=(i*.09)+"s";
+      glyphs.appendChild(d);
+    });
+    $("tier").textContent=TIERN[cur.tier];
+    $("phint").textContent = cur.tier===3 ? "Цифры читаются как слова" : "Сложи картинки в одно слово";
+  }
+  function renderSlots(){
+    const word=cur.a[0].toUpperCase();
+    slots.innerHTML="";
+    [...word].forEach((ch,i)=>{
+      if(ch===" "){ const g=document.createElement("span"); g.className="gap"; slots.appendChild(g); return; }
+      const d=document.createElement("div");
+      const done=phase==="solved";
+      d.className="slot"+(done?" done":(revealed[i]?" rev":" empty"));
+      d.textContent=(done||revealed[i])?ch:"•";
+      slots.appendChild(d);
+    });
+  }
+  function showExplain(text,skip){
+    const e=$("exp");
+    e.className="explain on"+(skip?" skip":"");
+    e.innerHTML=`<b>${skip?"Ответ":"Верно"}:</b> ${cur.a[0].toUpperCase()} — ${text}`;
+  }
+  function hideExplain(){ $("exp").className="explain"; }
+
+  function startTimer(){
+    stopTick();
+    if(!mode.time){ $("timer").style.display="none"; return; }
+    timeLeft=mode.time;
+    $("timer").style.display="flex";
+    $("timer").classList.remove("warn");
+    $("tbar").style.width="100%";
+    $("tnum").textContent=timeLeft;
+    tick=setInterval(()=>{
+      if(phase!=="play") return;
+      timeLeft--;
+      $("tnum").textContent=Math.max(0,timeLeft);
+      $("tbar").style.width=Math.max(0,timeLeft/mode.time*100)+"%";
+      if(timeLeft<=10) $("timer").classList.add("warn");
+      if(timeLeft<=5&&timeLeft>0) tone(880,60,0,.07,"square");
+      if(timeLeft<=0){ stopTick(); timeUp(); }
+    },1000);
+  }
+
+  function loadRebus(){
+    cur=queue[pos];
+    revealed=new Array(cur.a[0].length).fill(false);
+    hintsUsed=0; phase="play";
+    inp.value=""; hideExplain();
+    renderGlyphs(); renderSlots(); hud(); startTimer();
+    setMsg(`Карточка ${pos+1} из ${queue.length}. Читай ребус ❄`);
+    setTimeout(()=>{ if(phase==="play") inp.focus(); },80);
+    tone(520,80,0,.07,"triangle"); tone(760,100,.08,.06,"triangle");
+  }
+
+  function start(){
+    ac(); stopTick(); killSound();
+    queue=mode.ids.map(i=>REBUSES[i]);
+    if(mode.shuffle){
+      for(let i=queue.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [queue[i],queue[j]]=[queue[j],queue[i]]; }
+    }
+    pos=0; lives=mode.lives; hints=mode.hints; score=0; streak=0; bestStreak=0; solvedCount=0;
+    overlay(false);
+    loadRebus();
+  }
+
+  function correct(){
+    phase="solved"; stopTick();
+    solvedCount++;
+    const bonus=mode.time?Math.max(0,timeLeft)*2:0;
+    const gain=Math.max(20, 100 + streak*20 + bonus - hintsUsed*40);
+    score+=gain; streak++; bestStreak=Math.max(bestStreak,streak);
+    revealed=revealed.map(()=>true);
+    renderSlots(); showExplain(cur.ex,false); hud();
+    desk.classList.add("good"); setTimeout(()=>desk.classList.remove("good"),720);
+    const r=$("paper").getBoundingClientRect();
+    sparks(r.left+r.width/2, r.top+r.height/2, 26, "#3ddc84");
+    tone(660,120,0,.14,"triangle"); tone(880,120,.1,.13,"triangle"); tone(1174,170,.2,.12,"sine");
+    setMsg(`+${gain} очков${streak>1?` · серия ${streak} 🔥`:""}`,"ok");
+    inp.blur();
+    $("go").focus();
+  }
+  function wrong(){
+    lives--; streak=0;
+    desk.classList.add("shake"); setTimeout(()=>desk.classList.remove("shake"),440);
+    sweep(300,90,260,.15,"sawtooth");
+    const r=$("paper").getBoundingClientRect();
+    sparks(r.left+r.width/2, r.top+r.height*.7, 14, "#ff6b6b");
+    hud();
+    if(lives<=0){ lose("Жизни закончились на неверных ответах."); return; }
+    setMsg(`Не то слово. Осталось жизней: ${lives}. Попробуй ещё раз.`,"err");
+    inp.select();
+  }
+  function reveal(costLife,reason){
+    phase="solved"; stopTick();
+    if(costLife){ lives--; streak=0; }
+    revealed=revealed.map(()=>true);
+    renderSlots(); showExplain(cur.ex,true); hud();
+    sweep(420,220,240,.1,"triangle");
+    if(lives<=0){ lose(reason||"Жизни закончились."); return; }
+    setMsg(reason||`Ответ открыт. Осталось жизней: ${lives}.`,"warn");
+    $("go").focus();
+  }
+  function timeUp(){ reveal(true,"⏱ Время вышло — карточка открыта."); }
+
+  function next(){
+    if(pos+1>=queue.length){ win(); return; }
+    pos++;
+    loadRebus();
+  }
+
+  function win(){
+    phase="over"; stopTick(); killSound();
+    localStorage.setItem("advent_solved_"+DAY,new Date().toISOString());
+    const prev=+(localStorage.getItem(bestKey())||0);
+    const record=score>prev;
+    if(record) localStorage.setItem(bestKey(),String(score));
+    hud(); confetti();
+    tone(660,150,0,.16); tone(880,150,.16,.16); tone(1174,190,.32,.16); tone(1568,340,.5,.15);
+    const perfect=lives===mode.lives;
+    overlay(true,"📜 Все ребусы прочитаны!",
+      `Режим «${mode.label}»: ${queue.length} карточек, счёт ${score}, лучшая серия ${bestStreak}. Почтамт пропускает тебя к загадке дня.`,
+      "🎁 Открыть загадку",
+      (perfect?`<div class="badge">Без потерь жизней</div>`:"")+(record?`<div class="badge">Новый рекорд счёта</div>`:""),
+      ()=>showRiddle(true,`${queue.length} ребусов, счёт ${score}${perfect?" и ни одной потерянной жизни":""}`));
+    setMsg("✨ Почтамт доволен!","ok");
+  }
+  function lose(reason){
+    phase="over"; stopTick(); killSound();
+    const prev=+(localStorage.getItem(bestKey())||0);
+    if(score>prev) localStorage.setItem(bestKey(),String(score));
+    hud();
+    sweep(420,80,620,.16,"triangle");
+    overlay(true,"Чернила замёрзли",
+      `${reason} Прочитано карточек: ${solvedCount} из ${queue.length}, счёт ${score}. Начни заново — порядок ребусов в «Метели» каждый раз новый.`,
+      "↻ Ещё раз","",()=>start());
+    setMsg("Жизни закончились. Попробуй снова.","err");
+  }
+  function reset(){
+    stopTick(); killSound();
+    phase="idle"; queue=[]; pos=0; cur=null;
+    lives=mode.lives; hints=mode.hints; score=0; streak=0; solvedCount=0;
+    glyphs.innerHTML=""; slots.innerHTML=""; hideExplain();
+    $("timer").style.display="none";
+    $("phint").textContent="Что здесь зашифровано?";
+    $("tier").textContent="режим";
+    inp.value="";
+    overlay(true,"Ребусы Деда Мороза",
+      `Режим «${mode.label}»: ${mode.ids.length} карточек, ${mode.lives} жизни, ${mode.hints} подсказки${mode.time?`, ${mode.time} секунд на ребус`:""}.`,
+      "▶ Начать","",()=>start());
+    hud();
+    setMsg(`Режим «${mode.label}» выбран. Нажми «Начать».`);
+  }
+
+  $("go").onclick=()=>{
+    if(phase==="solved"){ next(); return; }
+    if(phase!=="play") return;
+    const v=norm(inp.value);
+    if(!v){ setMsg("Сначала впиши ответ.","err"); tone(200,80,0,.07,"square"); return; }
+    if(cur.a.some(a=>norm(a)===v)) correct(); else wrong();
+  };
+  inp.addEventListener("keydown",e=>{
+    if(e.key==="Enter"){ e.preventDefault(); $("go").click(); }
+  });
+  $("hint").onclick=()=>{
+    if(phase!=="play"||hints<=0) return;
+    const word=cur.a[0].toUpperCase();
+    const i=revealed.findIndex((r,k)=>!r&&word[k]!==" ");
+    if(i<0){ setMsg("Все буквы уже открыты."); return; }
+    hints--; hintsUsed++; revealed[i]=true;
+    renderSlots(); hud();
+    tone(1320,110,0,.1,"triangle"); tone(1760,130,.1,.08,"sine");
+    const el=slots.children[i];
+    if(el){ const r=el.getBoundingClientRect(); sparks(r.left+r.width/2,r.top+r.height/2,10,"#4dd0e1"); }
+    setMsg("Подсказка открыла одну букву 💡");
+    inp.focus();
+  };
+  $("skip").onclick=()=>{ if(phase==="play") reveal(true); };
+  $("again").onclick=()=>{ if(phase==="idle") start(); else reset(); };
+
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Enter"&&phase==="solved"&&document.activeElement!==inp){ e.preventDefault(); next(); }
+    if(e.key==="Enter"&&(phase==="idle"||phase==="over")){ e.preventDefault(); $("ovbtn").click(); }
+  });
+
+  reset();
+}
+</script>
+</body>
+</html>

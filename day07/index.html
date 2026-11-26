@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>День 7 — снежный лабиринт</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1410;--card:#13241b;--gold:#e8c37a;--green:#3ddc84;--dim:#6f8f7d}
+*{box-sizing:border-box}
+body{margin:0;padding:0 14px 46px;background:var(--bg);color:#eaf5ee;
+     font:16px/1.5 Manrope,sans-serif;overflow-x:hidden}
+.wrap{max-width:560px;margin:0 auto;position:relative;z-index:1}
+.garland{display:flex;justify-content:center;gap:14px;border-top:2px solid #3a5a46;overflow:hidden}
+.bulb{width:9px;height:13px;border-radius:50% 50% 45% 45%;position:relative;margin-top:7px;flex:none;
+ background:currentColor;transform-origin:top center;
+ animation:sway 3s ease-in-out infinite alternate, glowblink 2s infinite}
+.bulb::before{content:"";position:absolute;top:-7px;left:3.5px;width:2px;height:7px;background:#3a5a46}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+@keyframes glowblink{0%,100%{filter:brightness(1);box-shadow:0 0 8px currentColor}50%{filter:brightness(.5);box-shadow:0 0 2px currentColor}}
+.flake{position:fixed;top:-12px;color:#cfe8da;opacity:.6;pointer-events:none;z-index:0;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(105vh) rotate(360deg)}}
+.back{color:var(--dim);font-size:13px;text-decoration:none}
+h1{font-family:Unbounded,sans-serif;font-size:22px;margin:12px 0 12px}
+h1 .gold{color:var(--gold)}
+.card{background:var(--card);border:1px solid #24402f;border-radius:16px;padding:16px;margin-bottom:12px}
+.rules{border-color:#3a5a46;background:#10241a}
+.rules b{color:var(--gold)}
+.rules ul{margin:6px 0 0;padding-left:18px;color:#bcd8c6;font-size:13.5px}
+.rules li{margin-bottom:3px}
+.task{color:#bcd8c6;font-size:14px;margin:0 0 12px}
+.note{color:var(--dim);font-size:13px;text-align:center}
+#mz{width:100%;border-radius:12px;background:#0d1a13;touch-action:none;display:block}
+.dpad{display:grid;grid-template-columns:repeat(3,64px);gap:6px;justify-content:center;margin:12px auto 0}
+.dpad button{height:48px;border-radius:12px;border:1px solid #24402f;background:#1d5c38;
+ color:#eaf5ee;font-size:20px;cursor:pointer}
+.dpad button:active{background:#227047}
+.dpad .sp{visibility:hidden}
+#riddle{font-size:16px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="garland" id="garland"></div>
+<div class="wrap">
+<a class="back" href="../">← календарь</a>
+<h1>День <span class="gold">7</span> · снежный лабиринт</h1>
+
+<div class="card rules">
+  📜 <b>Как играть:</b> цель — разгадать головоломку и добыть загадку, а ответ принести боту: он выдаст подарок и фото тайника.
+  <ul>
+    <li>Веди снеговика ⛄ к подарку 🎁 через снежные стены.</li>
+    <li>Управление: стрелки на клавиатуре, кнопки ниже или свайпы по лабиринту.</li>
+    <li>Сквозь стены нельзя. Дойдёшь до подарка — день откроет загадку ❄</li>
+  </ul>
+</div>
+
+<div id="game" class="card"></div>
+<div id="riddleCard" class="card" hidden>
+  <h3 id="rTitle" style="margin:0 0 8px;font-size:16px;color:var(--gold)"></h3>
+  <p id="riddle"></p>
+  <p class="note">Отправь ответ боту в Telegram 🤖 Застрянешь — кнопка 💡 Подсказка у бота (раз в 2 минуты).</p>
+</div>
+</div>
+
+<script>
+/* ====== НАСТРОЙКИ ДНЯ ====== */
+const DAY = 7;
+const N = 11;
+const RIDDLE = "Молчит, но рассказывает; бумага, а живая. Откроешь — и ты уже не здесь.";
+
+/* ====== антураж ====== */
+const GC = ["#e74c3c","#f1c40f","#3498db","#e67e22","#9b59b6","#2ecc71","#ff7eb0"];
+for (let i = 0; i < 17; i++){
+  const b = document.createElement("span");
+  b.className = "bulb"; b.style.color = GC[i % GC.length];
+  b.style.animationDelay = (i*.17)+"s, "+(i*.23)+"s";
+  document.getElementById("garland").appendChild(b);
+}
+for (let i = 0; i < 12; i++){
+  const f = document.createElement("div");
+  f.className = "flake"; f.textContent = "❄";
+  f.style.left = Math.random()*100+"vw";
+  f.style.fontSize = 8+Math.random()*9+"px";
+  f.style.animationDuration = 7+Math.random()*8+"s";
+  f.style.animationDelay = -Math.random()*10+"s";
+  document.body.appendChild(f);
+}
+
+/* ====== служебное ====== */
+const $ = id => document.getElementById(id);
+const q = new URLSearchParams(location.search);
+const now = new Date();
+const PREP = now < new Date(2026, 11, 1, 19, 0, 0); // режим подготовки: замки сняты
+const inDec = now.getFullYear() === 2026 && now.getMonth() === 11;
+const today = inDec ? now.getDate() : 0;
+const open = q.has("all") || PREP || (inDec && (DAY < today || (DAY === today && now.getHours() >= 19)));
+const past = !q.has("all") && (inDec && DAY < today);
+const solved = () => !!localStorage.getItem("advent_solved_" + DAY);
+
+function showRiddle(fresh, extra){
+  $("game").innerHTML = "";
+  $("riddleCard").hidden = false;
+  $("rTitle").textContent = (fresh ? "🎉 " + (extra || "Готово!") + " Вот загадка дня:" : "Загадка дня:");
+  $("riddle").textContent = RIDDLE;
+}
+
+if (!open){
+  $("game").innerHTML = `<p class="task">День откроется 7 декабря в 19:00 🔒</p>`;
+}
+else if (!q.has("all") && (solved() || past)){
+  showRiddle(false);
+}
+else {
+  /* генерация лабиринта (обход в глубину) */
+  const cells = Array.from({length: N*N}, () => ({w:[true,true,true,true], v:false}));
+  const stack = [0]; cells[0].v = true;
+  while (stack.length){
+    const cur = stack[stack.length-1];
+    const x = cur % N, y = (cur / N) | 0, nb = [];
+    if (y > 0     && !cells[cur-N].v) nb.push([cur-N, 0, 2]);
+    if (x < N-1   && !cells[cur+1].v) nb.push([cur+1, 1, 3]);
+    if (y < N-1   && !cells[cur+N].v) nb.push([cur+N, 2, 0]);
+    if (x > 0     && !cells[cur-1].v) nb.push([cur-1, 3, 1]);
+    if (!nb.length){ stack.pop(); continue; }
+    const [next, a, b] = nb[(Math.random()*nb.length)|0];
+    cells[cur].w[a] = false; cells[next].w[b] = false;
+    cells[next].v = true; stack.push(next);
+  }
+
+  $("game").innerHTML = `<p class="task">Метель запутала все дорожки. Проведи снеговика к подарку!</p>
+    <canvas id="mz" width="440" height="440"></canvas>
+    <p class="note" id="st"></p>
+    <div class="dpad">
+      <button class="sp"></button><button data-d="0,-1">▲</button><button class="sp"></button>
+      <button data-d="-1,0">◀</button><button class="sp"></button><button data-d="1,0">▶</button>
+      <button class="sp"></button><button data-d="0,1">▼</button><button class="sp"></button>
+    </div>`;
+
+  const cv = $("mz"), ctx = cv.getContext("2d"), C = cv.width / N;
+  let px = 0, py = 0, steps = 0, done = false;
+
+  const draw = () => {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    ctx.strokeStyle = "#cfe8da"; ctx.lineWidth = 2; ctx.lineCap = "round";
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++){
+      const w = cells[y*N+x].w, X = x*C, Y = y*C;
+      ctx.beginPath();
+      if (w[0]){ ctx.moveTo(X, Y);   ctx.lineTo(X+C, Y); }
+      if (w[1]){ ctx.moveTo(X+C, Y); ctx.lineTo(X+C, Y+C); }
+      if (w[2]){ ctx.moveTo(X, Y+C); ctx.lineTo(X+C, Y+C); }
+      if (w[3]){ ctx.moveTo(X, Y);   ctx.lineTo(X, Y+C); }
+      ctx.stroke();
+    }
+    ctx.font = (C*.66)+"px serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("🎁", (N-1+.5)*C, (N-1+.5)*C);
+    ctx.fillText("⛄", (px+.5)*C, (py+.5)*C);
+    $("st").textContent = "Шагов: " + steps;
+  };
+
+  const move = (dx, dy) => {
+    if (done) return;
+    const w = cells[py*N+px].w;
+    if (dx ===  1 && w[1]) return;
+    if (dx === -1 && w[3]) return;
+    if (dy ===  1 && w[2]) return;
+    if (dy === -1 && w[0]) return;
+    px += dx; py += dy; steps++; draw();
+    if (px === N-1 && py === N-1){
+      done = true;
+      localStorage.setItem("advent_solved_" + DAY, new Date().toISOString());
+      setTimeout(() => showRiddle(true, `Путь найден за ${steps} шагов!`), 500);
+    }
+  };
+
+  document.addEventListener("keydown", e => {
+    const m = {ArrowUp:[0,-1], ArrowDown:[0,1], ArrowLeft:[-1,0], ArrowRight:[1,0]}[e.key];
+    if (m){ e.preventDefault(); move(...m); }
+  });
+  document.querySelectorAll(".dpad button[data-d]").forEach(b =>
+    b.onclick = () => move(...b.dataset.d.split(",").map(Number)));
+  let tx = 0, ty = 0;
+  cv.addEventListener("touchstart", e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; });
+  cv.addEventListener("touchend", e => {
+    const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
+    Math.abs(dx) > Math.abs(dy) ? move(Math.sign(dx), 0) : move(0, Math.sign(dy));
+  });
+  draw();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>День 6 — колесо шифра</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1410;--card:#13241b;--gold:#e8c37a;--green:#3ddc84;--dim:#6f8f7d}
+*{box-sizing:border-box}
+body{margin:0;padding:0 14px 46px;background:var(--bg);color:#eaf5ee;
+     font:16px/1.5 Manrope,sans-serif;overflow-x:hidden}
+.wrap{max-width:560px;margin:0 auto;position:relative;z-index:1}
+.garland{display:flex;justify-content:center;gap:14px;border-top:2px solid #3a5a46;overflow:hidden}
+.bulb{width:9px;height:13px;border-radius:50% 50% 45% 45%;position:relative;margin-top:7px;flex:none;
+ background:currentColor;transform-origin:top center;
+ animation:sway 3s ease-in-out infinite alternate, glowblink 2s infinite}
+.bulb::before{content:"";position:absolute;top:-7px;left:3.5px;width:2px;height:7px;background:#3a5a46}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+@keyframes glowblink{0%,100%{filter:brightness(1);box-shadow:0 0 8px currentColor}50%{filter:brightness(.5);box-shadow:0 0 2px currentColor}}
+.flake{position:fixed;top:-12px;color:#cfe8da;opacity:.6;pointer-events:none;z-index:0;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(105vh) rotate(360deg)}}
+.back{color:var(--dim);font-size:13px;text-decoration:none}
+h1{font-family:Unbounded,sans-serif;font-size:22px;margin:12px 0 12px}
+h1 .gold{color:var(--gold)}
+.card{background:var(--card);border:1px solid #24402f;border-radius:16px;padding:16px;margin-bottom:12px}
+.rules{border-color:#3a5a46;background:#10241a}
+.rules b{color:var(--gold)}
+.rules ul{margin:6px 0 0;padding-left:18px;color:#bcd8c6;font-size:13.5px}
+.rules li{margin-bottom:3px}
+.task{color:#bcd8c6;font-size:14px;margin:0 0 12px}
+.note{color:var(--dim);font-size:13px}
+.enc{font-family:"Courier New",monospace;font-size:26px;letter-spacing:6px;color:var(--gold);
+     text-align:center;margin:10px 0 4px;text-shadow:0 0 12px #e8c37a33}
+.dec{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:14px 0 6px}
+.lc{display:flex;flex-direction:column;align-items:center;gap:2px;width:34px}
+.lc b{font-family:"Courier New",monospace;font-size:18px;color:var(--dim)}
+.lc span{font-family:"Courier New",monospace;font-size:22px;font-weight:800;color:var(--green);
+ width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+ border:1px solid #24402f;border-radius:8px;background:#0d1a13}
+.keyrow{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:10px}
+.keyrow input{width:70%}
+#shv{font-weight:800;color:var(--gold);min-width:24px;text-align:center}
+#riddle{font-size:16px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="garland" id="garland"></div>
+<div class="wrap">
+<a class="back" href="../">← календарь</a>
+<h1>День <span class="gold">6</span> · колесо шифра</h1>
+
+<div class="card rules">
+  📜 <b>Как играть:</b> цель — разгадать головоломку и добыть загадку, а ответ принести боту: он выдаст подарок и фото тайника.
+  <ul>
+    <li>Перед тобой перехваченная телеграмма Деда Мороза — буквы сдвинуты по алфавиту.</li>
+    <li>Крути ключ: нижний ряд букв будет поворачиваться вместе с ним.</li>
+    <li>Как только внизу соберётся осмысленное слово — телеграмма расшифрована, и день откроет загадку 🎁</li>
+  </ul>
+</div>
+
+<div id="game" class="card"></div>
+<div id="riddleCard" class="card" hidden>
+  <h3 id="rTitle" style="margin:0 0 8px;font-size:16px;color:var(--gold)"></h3>
+  <p id="riddle"></p>
+  <p class="note">Отправь ответ боту в Telegram 🤖 Застрянешь — кнопка 💡 Подсказка у бота (раз в 2 минуты).</p>
+</div>
+</div>
+
+<script>
+/* ====== НАСТРОЙКИ ДНЯ ====== */
+const DAY = 6;
+const WORD = "МИШУРА";
+const SHIFT = 8;
+const RIDDLE = "Невидимые, но незабываемые: в флаконе, но не вода; исчезают, но остаются в памяти.";
+
+/* ====== антураж ====== */
+const GC = ["#e74c3c","#f1c40f","#3498db","#e67e22","#9b59b6","#2ecc71","#ff7eb0"];
+for (let i = 0; i < 17; i++){
+  const b = document.createElement("span");
+  b.className = "bulb"; b.style.color = GC[i % GC.length];
+  b.style.animationDelay = (i*.17)+"s, "+(i*.23)+"s";
+  document.getElementById("garland").appendChild(b);
+}
+for (let i = 0; i < 12; i++){
+  const f = document.createElement("div");
+  f.className = "flake"; f.textContent = "❄";
+  f.style.left = Math.random()*100+"vw";
+  f.style.fontSize = 8+Math.random()*9+"px";
+  f.style.animationDuration = 7+Math.random()*8+"s";
+  f.style.animationDelay = -Math.random()*10+"s";
+  document.body.appendChild(f);
+}
+
+/* ====== служебное ====== */
+const $ = id => document.getElementById(id);
+const q = new URLSearchParams(location.search);
+const now = new Date();
+const PREP = now < new Date(2026, 11, 1, 19, 0, 0); // режим подготовки: замки сняты
+const inDec = now.getFullYear() === 2026 && now.getMonth() === 11;
+const today = inDec ? now.getDate() : 0;
+const open = q.has("all") || PREP || (inDec && (DAY < today || (DAY === today && now.getHours() >= 19)));
+const past = !q.has("all") && (inDec && DAY < today);
+const solved = () => !!localStorage.getItem("advent_solved_" + DAY);
+
+function showRiddle(fresh, extra){
+  $("game").innerHTML = "";
+  $("riddleCard").hidden = false;
+  $("rTitle").textContent = (fresh ? "🎉 " + (extra || "Готово!") + " Вот загадка дня:" : "Загадка дня:");
+  $("riddle").textContent = RIDDLE;
+}
+
+if (!open){
+  $("game").innerHTML = `<p class="task">День откроется 6 декабря в 19:00 🔒</p>`;
+}
+else if (!q.has("all") && (solved() || past)){
+  showRiddle(false);
+}
+else {
+  const A = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
+  const enc = [...WORD].map(ch => {
+    const i = A.indexOf(ch); return i < 0 ? ch : A[(i + SHIFT) % A.length];
+  }).join("");
+
+  $("game").innerHTML = `<p class="task">Радист ёлки перехватил шифровку, но ключ потерян. Верни буквы на место!</p>
+    <div class="enc">${enc}</div>
+    <div class="keyrow">🔑 <input type="range" id="sh" min="0" max="32" value="0"> <span id="shv">0</span></div>
+    <div class="dec" id="dec"></div>
+    <p class="note" style="text-align:center">Верхняя буква — из шифровки, нижняя — как её читает ключ.</p>`;
+
+  const render = v => {
+    $("shv").textContent = v;
+    const dec = [...enc].map(ch => {
+      const i = A.indexOf(ch); return i < 0 ? ch : A[(i - v + A.length) % A.length];
+    }).join("");
+    $("dec").innerHTML = [...enc].map((ch, i) =>
+      `<div class="lc"><b>${ch}</b><span>${dec[i]}</span></div>`).join("");
+    if (dec === WORD){
+      $("sh").disabled = true;
+      localStorage.setItem("advent_solved_" + DAY, new Date().toISOString());
+      setTimeout(() => showRiddle(true, "Телеграмма расшифрована!"), 700);
+    }
+  };
+  $("sh").addEventListener("input", e => render(+e.target.value));
+  render(0);
+}
+</script>
+</body>
+</html>

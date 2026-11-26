@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>День 16 — гирлянда Деда Мороза</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1410; --card:#13241b; --card2:#0f1f17; --line:#24402f; --line2:#3a5a46;
+  --gold:#e8c37a; --amber:#ffb347; --green:#3ddc84; --red:#ff6b6b; --blue:#7fb4ff;
+  --magenta:#ff7eb0; --cyan:#4dd0e1; --ink:#eaf5ee; --dim:#7fa08c;
+  --wire:#2b4a3c; --brass:#6b5327;
+}
+*{box-sizing:border-box}
+html{scrollbar-color:var(--line2) #0d1a13;scrollbar-width:thin}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#0d1a13}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:9px;border:2px solid #0d1a13}
+::-webkit-scrollbar-thumb:hover{background:#4d7a5f}
+body{margin:0;padding:0 14px 54px;color:var(--ink);overflow-x:hidden;
+  background:radial-gradient(1200px 560px at 50% -14%,#16302240,transparent 70%),var(--bg);
+  font:16px/1.5 Manrope,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:620px;margin:0 auto;position:relative;z-index:1}
+
+.garland{display:flex;justify-content:center;gap:14px;border-top:2px solid var(--line2);overflow:hidden}
+.gbulb{width:9px;height:13px;border-radius:50% 50% 45% 45%;position:relative;margin-top:7px;flex:none;
+ background:currentColor;transform-origin:top center;animation:sway 3s ease-in-out infinite alternate,glowblink 2s infinite}
+.gbulb::before{content:"";position:absolute;top:-7px;left:3.5px;width:2px;height:7px;background:var(--line2)}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+@keyframes glowblink{0%,100%{filter:brightness(1);box-shadow:0 0 8px currentColor}50%{filter:brightness(.5);box-shadow:0 0 2px currentColor}}
+.flake{position:fixed;top:-14px;color:#cfe8da;opacity:.5;pointer-events:none;z-index:0;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(106vh) rotate(360deg)}}
+
+.back{color:var(--dim);font-size:13px;text-decoration:none}
+.back:hover{color:var(--gold)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0}
+h1{font-family:Unbounded,sans-serif;font-size:clamp(18px,4.6vw,23px);margin:0;line-height:1.25}
+h1 .gold{color:var(--gold)}
+.sndbtn{flex:none;padding:9px 13px;border-radius:999px;border:1px solid var(--line2);background:var(--card);
+ color:var(--ink);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+.sndbtn:hover{border-color:var(--gold);color:var(--gold)}
+.sndbtn.off{color:var(--dim);border-color:var(--line)}
+
+.card{background:linear-gradient(165deg,var(--card),var(--card2));border:1px solid var(--line);
+ border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 10px 30px #0006}
+.rules{border-color:var(--line2);background:linear-gradient(165deg,#10241a,#0d1c14)}
+.rules b{color:var(--gold)}
+.rules ul{margin:6px 0 0;padding-left:18px;color:#bcd8c6;font-size:13.5px}
+.rules li{margin-bottom:3px}
+.task{color:#bcd8c6;font-size:14px;margin:0 0 12px}
+.note{color:var(--dim);font-size:12.5px;margin:10px 0 0}
+
+.hud{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.stat{display:flex;flex-direction:column;gap:1px;padding:7px 12px;border-radius:12px;
+ border:1px solid var(--line);background:#0f1f17;min-width:74px}
+.stat i{font:700 10px/1 Manrope,sans-serif;letter-spacing:.12em;color:var(--dim);font-style:normal}
+.stat b{font:800 16px/1.2 Manrope,sans-serif;color:var(--gold)}
+.stat.g b{color:var(--green)} .stat.b b{color:var(--cyan)} .stat.m b{color:var(--magenta)}
+
+.levels{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.lv{position:relative;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);
+ background:#0f1f17;color:var(--dim);cursor:pointer;font:800 14px/1 Manrope,sans-serif;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:.15s}
+.lv:hover:not(:disabled){border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+.lv.cur{border-color:var(--gold);background:#1d3a2a;color:var(--gold);box-shadow:0 0 0 2px #e8c37a22,0 0 16px #e8c37a33}
+.lv.done{border-color:var(--green);color:var(--green);background:#12301f}
+.lv:disabled{opacity:.35;cursor:not-allowed}
+.lv u{display:flex;gap:1.5px;text-decoration:none}
+.lv u s{width:4px;height:4px;border-radius:50%;background:#2a4a3a;text-decoration:none}
+.lv u s.f{background:var(--gold);box-shadow:0 0 5px #e8c37a99}
+.lv em{position:absolute;top:-6px;right:-4px;font-style:normal;font-size:10px}
+
+.boardbox{position:relative;border-radius:16px;padding:12px;border:1px solid var(--line2);
+ background:radial-gradient(120% 100% at 50% 0%,#1a3226,#08130d 70%);
+ box-shadow:0 14px 34px #0008,inset 0 1px 0 #ffffff0d;overflow:hidden}
+.boardbox.pulse{animation:bpulse .6s ease-out}
+@keyframes bpulse{0%{box-shadow:0 14px 34px #0008,inset 0 0 0 2px #3ddc8400}
+ 40%{box-shadow:0 14px 40px #0008,inset 0 0 60px #3ddc8455,0 0 40px #3ddc8444}
+ 100%{box-shadow:0 14px 34px #0008,inset 0 1px 0 #ffffff0d}}
+.board{position:relative;margin:0 auto;display:grid}
+.wires{position:absolute;inset:0;pointer-events:none;z-index:0}
+.spot{position:relative;display:flex;align-items:center;justify-content:center;z-index:1}
+.spot::before{content:"";position:absolute;top:calc(50% - var(--bs) * .72);width:calc(var(--bs)*.3);
+ height:calc(var(--bs)*.22);border-radius:3px 3px 1px 1px;background:linear-gradient(180deg,#8a6d33,var(--brass));
+ box-shadow:0 1px 2px #0008}
+.bulb{width:var(--bs);height:var(--bs);border-radius:50%;border:none;padding:0;cursor:pointer;position:relative;
+ background:radial-gradient(circle at 36% 30%,#33454a,#1a2724 62%,#0d1512);
+ box-shadow:inset 0 2px 5px #ffffff14,inset 0 -7px 12px #0009,0 3px 9px #0007;
+ transition:transform .14s,box-shadow .2s,background .2s;outline:none}
+.bulb::after{content:"";position:absolute;left:30%;top:24%;width:22%;height:16%;border-radius:50%;
+ background:#ffffff2e;filter:blur(1px)}
+.bulb:hover{transform:translateY(-2px) scale(1.04)}
+.bulb:active{transform:scale(.93)}
+.bulb:focus-visible{box-shadow:0 0 0 3px var(--gold),0 3px 9px #0007}
+.bulb.on{background:radial-gradient(circle at 36% 30%,#fff8de,#ffc247 52%,#e07a12);
+ box-shadow:0 0 18px #ffb347aa,0 0 44px #ffb34733,inset 0 2px 7px #ffffffaa}
+.bulb.on::after{background:#fffdf2cc}
+.bulb.flip{animation:flip .34s ease-out}
+@keyframes flip{0%{transform:scale(.68)}55%{transform:scale(1.14)}100%{transform:scale(1)}}
+.spot.aff .bulb{box-shadow:0 0 0 2px #7fb4ff88,inset 0 2px 5px #ffffff14,0 3px 9px #0007}
+.spot.aff .bulb.on{box-shadow:0 0 0 2px #7fb4ffaa,0 0 18px #ffb347aa}
+.spot.hintz .bulb{animation:hintz 1s ease-out 2}
+@keyframes hintz{0%,100%{box-shadow:0 0 0 0 #4dd0e100,inset 0 2px 5px #ffffff14}
+ 50%{box-shadow:0 0 0 5px #4dd0e166,0 0 26px #4dd0e1aa}}
+.ripples{position:absolute;inset:0;pointer-events:none;z-index:2}
+.rip{position:absolute;border:2px solid #ffd76a;border-radius:50%;transform:translate(-50%,-50%);
+ animation:rip .55s ease-out forwards}
+@keyframes rip{from{width:8px;height:8px;opacity:.9}to{width:150px;height:150px;opacity:0}}
+.wrapbadge{position:absolute;top:10px;right:12px;z-index:3;padding:5px 10px;border-radius:999px;
+ border:1px solid #4dd0e166;background:#0d2229cc;color:var(--cyan);font:700 11px Manrope,sans-serif}
+
+.done{position:absolute;inset:0;z-index:6;display:none;flex-direction:column;align-items:center;justify-content:center;
+ gap:10px;padding:20px;text-align:center;background:#08130dee;backdrop-filter:blur(4px)}
+.done.on{display:flex;animation:fadein .35s ease-out}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.done h3{font-family:Unbounded,sans-serif;font-size:18px;margin:0;color:var(--gold)}
+.done p{margin:0;font-size:13.5px;color:#bcd8c6}
+.stars{display:flex;gap:8px;font-size:30px;line-height:1}
+.stars span{opacity:.22;transform:scale(.7);transition:.3s}
+.stars span.f{opacity:1;transform:scale(1);text-shadow:0 0 16px #e8c37a}
+
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+button.act{padding:11px 18px;border-radius:999px;border:none;cursor:pointer;font:800 14px Manrope,sans-serif;
+ background:linear-gradient(90deg,var(--gold),#f6dfae);color:#20180a;box-shadow:0 4px 16px #e8c37a2e;transition:.15s}
+button.act:hover{transform:translateY(-1px);box-shadow:0 7px 20px #e8c37a44}
+button.act:active{transform:translateY(0)}
+button.ghost{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:none;
+ color:var(--dim);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+button.ghost:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+button.ghost:disabled{opacity:.4;cursor:not-allowed}
+#msg{min-height:22px;margin-top:10px;font-size:13.5px;text-align:center;color:var(--dim)}
+#msg.ok{color:var(--green)} #msg.err{color:var(--red)}
+#riddle{font-size:16px;white-space:pre-wrap}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:40}
+@media (max-width:430px){
+  .stat{min-width:64px;padding:6px 10px}
+  .stat b{font-size:15px}
+  .lv{width:38px;height:38px;font-size:13px}
+}
+</style>
+</head>
+<body>
+<div class="garland" id="garland"></div>
+<div class="wrap">
+  <a class="back" href="../">← календарь</a>
+  <div class="top">
+    <h1>День <span class="gold">16</span> · гирлянда Деда Мороза</h1>
+    <button class="sndbtn" id="snd">🔊 Звук</button>
+  </div>
+
+  <div class="card rules">
+    📜 <b>Как играть:</b> цель — разгадать головоломку и добыть загадку, а ответ принести боту: он выдаст подарок и фото тайника.
+    <ul>
+      <li>Нажми на лампочку — переключатся она сама и соседи сверху, снизу, слева и справа.</li>
+      <li>Зажги все лампочки на поле. На уровнях с «тором» края соединены — сосед через край тоже переключается.</li>
+      <li>Ходов меньше нормы — три звезды. Пройди 8 уровней, и гирлянда откроет загадку 🎁</li>
+    </ul>
+  </div>
+
+  <div id="game" class="card"></div>
+
+  <div id="riddleCard" class="card" hidden>
+    <h3 id="rTitle" style="margin:0 0 8px;font-size:16px;color:var(--gold)"></h3>
+    <p id="riddle"></p>
+    <p class="note">Отправь ответ боту в Telegram 🤖 Застрянешь — кнопка 💡 Подсказка у бота (раз в 2 минуты).</p>
+  </div>
+</div>
+<canvas id="fx"></canvas>
+
+<script>
+/* ===== настройки дня ===== */
+const DAY = 16;
+const RIDDLE = "Держатся за ухо и взбираются по нему, как альпинисты, но я не про свой губы";
+const LEVELS = [
+  { n:3, wrap:false, clicks:3,  min:3 },
+  { n:3, wrap:false, clicks:6,  min:4 },
+  { n:4, wrap:false, clicks:7,  min:5 },
+  { n:4, wrap:false, clicks:11, min:7 },
+  { n:5, wrap:false, clicks:9,  min:6 },
+  { n:5, wrap:true,  clicks:11, min:7 },
+  { n:5, wrap:false, clicks:16, min:9 },
+  { n:6, wrap:true,  clicks:16, min:10 }
+];
+const PKEY = "advent_lights16_progress";
+
+/* ===== антураж ===== */
+const GC = ["#e74c3c","#f1c40f","#3498db","#e67e22","#9b59b6","#2ecc71","#ff7eb0"];
+for (let i = 0; i < 17; i++){
+  const b = document.createElement("span");
+  b.className = "gbulb"; b.style.color = GC[i % GC.length];
+  b.style.animationDelay = (i*.17)+"s, "+(i*.23)+"s";
+  document.getElementById("garland").appendChild(b);
+}
+for (let i = 0; i < 12; i++){
+  const f = document.createElement("div");
+  f.className = "flake"; f.textContent = "❄";
+  f.style.left = Math.random()*100+"vw";
+  f.style.fontSize = 8+Math.random()*9+"px";
+  f.style.animationDuration = 7+Math.random()*8+"s";
+  f.style.animationDelay = -Math.random()*10+"s";
+  document.body.appendChild(f);
+}
+
+/* ===== служебное ===== */
+const $ = id => document.getElementById(id);
+const q = new URLSearchParams(location.search);
+const now = new Date();
+const PREP = now < new Date(2026, 11, 1, 19, 0, 0); // режим подготовки: замки сняты
+const inDec = now.getFullYear() === 2026 && now.getMonth() === 11;
+const today = inDec ? now.getDate() : 0;
+const open = q.has("all") || PREP || (inDec && (DAY < today || (DAY === today && now.getHours() >= 19)));
+const past = !q.has("all") && (inDec && DAY < today);
+const daySolved = () => !!localStorage.getItem("advent_solved_" + DAY);
+
+/* ===== звук ===== */
+let snd = localStorage.getItem("advent_snd") !== "0";
+let AC = null, live = [];
+function ac(){
+  if (!AC){ const C = window.AudioContext || window.webkitAudioContext; if (C) AC = new C(); }
+  if (AC && AC.state === "suspended") AC.resume();
+  return AC;
+}
+function tone(freq, ms, delay = 0, vol = .13, type = "sine"){
+  if (!snd) return; const c = ac(); if (!c) return;
+  const t = c.currentTime + delay/1000, d = ms/1000;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, t);
+  g.gain.setValueAtTime(.0001, t);
+  g.gain.linearRampToValueAtTime(vol, t + .008);
+  g.gain.setValueAtTime(vol, t + Math.max(.012, d - .02));
+  g.gain.linearRampToValueAtTime(.0001, t + d);
+  o.connect(g); g.connect(c.destination);
+  o.start(t); o.stop(t + d + .03);
+  live.push(o); o.onended = () => { live = live.filter(x => x !== o); };
+}
+function sweep(f1,f2,ms,vol=.12,type="sine"){
+  if (!snd) return; const c = ac(); if (!c) return;
+  const t = c.currentTime, d = ms/1000;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type; o.frequency.setValueAtTime(f1,t);
+  o.frequency.exponentialRampToValueAtTime(Math.max(30,f2), t+d);
+  g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+d+.02);
+  live.push(o); o.onended = () => { live = live.filter(x => x !== o); };
+}
+function killSound(){ live.forEach(o=>{ try{ o.stop(); }catch(e){} }); live=[]; }
+function paintSnd(){
+  const b=$("snd");
+  b.textContent = snd ? "🔊 Звук" : "🔇 Тихо";
+  b.classList.toggle("off", !snd);
+}
+$("snd").onclick = () => {
+  snd = !snd; localStorage.setItem("advent_snd", snd ? "1" : "0");
+  paintSnd();
+  if (snd){ ac(); tone(880,90,0,.12); } else killSound();
+};
+paintSnd();
+
+/* ===== частицы ===== */
+const fx=$("fx"), fctx=fx.getContext("2d");
+let parts=[], fxRun=false;
+function sizeFx(){
+  const r=Math.min(devicePixelRatio||1,2);
+  fx.width=innerWidth*r; fx.height=innerHeight*r;
+  fx.style.width=innerWidth+"px"; fx.style.height=innerHeight+"px";
+  fctx.setTransform(r,0,0,r,0,0);
+}
+sizeFx(); addEventListener("resize", sizeFx);
+function spawn(p){ parts.push(p); if(!fxRun){ fxRun=true; requestAnimationFrame(stepFx); } }
+function sparks(x,y,n=10,col){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2, sp=.7+Math.random()*3;
+    spawn({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,g:.09,s:1.4+Math.random()*2.6,
+      c:col||["#ffd76a","#ffb347","#fff3cf"][(Math.random()*3)|0],life:1,dec:.026,round:true});
+  }
+}
+function confetti(){
+  const cols=["#e8c37a","#3ddc84","#ffb347","#7fb4ff","#ff7eb0","#4dd0e1","#f2e6cb"];
+  for(let i=0;i<160;i++){
+    spawn({x:innerWidth/2+(Math.random()-.5)*200,y:innerHeight*.34,
+      vx:(Math.random()-.5)*8,vy:-Math.random()*9-2,g:.22,
+      w:4+Math.random()*6,h:3+Math.random()*5,a:Math.random()*Math.PI,va:(Math.random()-.5)*.3,
+      c:cols[(Math.random()*cols.length)|0],life:1,dec:.0075});
+  }
+}
+function stepFx(){
+  fctx.clearRect(0,0,innerWidth,innerHeight);
+  parts.forEach(p=>{
+    p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.life-=p.dec;
+    fctx.globalAlpha=Math.max(0,p.life); fctx.fillStyle=p.c;
+    if(p.round){ fctx.beginPath(); fctx.arc(p.x,p.y,p.s,0,7); fctx.fill(); }
+    else { p.a+=p.va; fctx.save(); fctx.translate(p.x,p.y); fctx.rotate(p.a);
+      fctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); fctx.restore(); }
+  });
+  fctx.globalAlpha=1;
+  parts=parts.filter(p=>p.life>0&&p.y<innerHeight+50);
+  if(parts.length) requestAnimationFrame(stepFx);
+  else { fxRun=false; fctx.clearRect(0,0,innerWidth,innerHeight); }
+}
+
+/* ===== прогресс ===== */
+function loadProgress(){
+  try{
+    const p=JSON.parse(localStorage.getItem(PKEY)||"null");
+    if(p && typeof p.unlocked==="number") return { unlocked:p.unlocked, stars:p.stars||{}, best:p.best||{} };
+  }catch(e){}
+  return { unlocked:0, stars:{}, best:{} };
+}
+function saveProgress(){ localStorage.setItem(PKEY, JSON.stringify(prog)); }
+let prog = loadProgress();
+const totalStars = () => Object.values(prog.stars).reduce((a,b)=>a+b,0);
+
+/* ===== игра ===== */
+let hintTimer=null;
+function showRiddle(fresh,extra){
+  if(hintTimer){ clearTimeout(hintTimer); hintTimer=null; }
+  killSound();
+  $("game").innerHTML="";
+  $("riddleCard").hidden=false;
+  $("rTitle").textContent = fresh ? "🎉 "+(extra||"Готово!")+" Вот загадка дня:" : "Загадка дня:";
+  $("riddle").textContent = RIDDLE;
+}
+
+if(!open){
+  $("game").innerHTML = `<p class="task">День откроется 16 декабря в 19:00 🔒</p>`;
+}
+else if (!q.has("all") && (daySolved() || past)){
+  showRiddle(false);
+}
+else {
+  $("game").innerHTML = `
+    <p class="task">Метель погасила гирлянду на ёлке Деда Мороза. Каждый выключатель тянет за собой соседей — зажги всё поле целиком.</p>
+    <div class="hud">
+      <div class="stat"><i>УРОВЕНЬ</i><b id="lvl">1/8</b></div>
+      <div class="stat"><i>ХОДЫ</i><b id="mv">0</b></div>
+      <div class="stat b"><i>НОРМА</i><b id="par">3</b></div>
+      <div class="stat g"><i>ЗВЁЗДЫ</i><b id="ts">0/24</b></div>
+      <div class="stat m"><i>ПОДСКАЗКИ</i><b id="hc">3</b></div>
+    </div>
+    <div class="levels" id="levels"></div>
+    <div class="boardbox" id="box">
+      <div class="board" id="board"><svg class="wires" id="wires"></svg><div class="ripples" id="rips"></div></div>
+      <div class="done" id="done">
+        <h3 id="dtitle">Уровень пройден!</h3>
+        <div class="stars" id="dstars"><span>★</span><span>★</span><span>★</span></div>
+        <p id="dinfo"></p>
+        <button class="act" id="dnext">Следующий уровень →</button>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="act" id="again">↻ Заново</button>
+      <button class="ghost" id="undo">↶ Отменить ход</button>
+      <button class="ghost" id="hint">💡 Подсказка · 3</button>
+      <button class="ghost" id="wipe">↺ Сбросить прогресс</button>
+    </div>
+    <div id="msg"></div>
+    <p class="note">Наведи курсор на лампочку — подсветятся те, что переключатся. Клавиатура: стрелки — выбор, Enter — нажать, Z — отмена, H — подсказка, R — заново.</p>`;
+
+  let li = Math.min(prog.unlocked, LEVELS.length-1);
+  let n=3, wrap=false, state=[], sol=[], initial=[], initialSol=[], par=3;
+  let moves=0, hints=3, history=[], spots=[], bulbs=[], solved=false, focus=0, px=0, cell=0;
+
+  const board=$("board"), box=$("box"), wires=$("wires"), rips=$("rips");
+  const setMsg=(t,cls)=>{ const m=$("msg"); if(m){ m.textContent=t; m.className=cls||""; } };
+
+  function idx(x,y){ return y*n+x; }
+  function affected(i){
+    const x=i%n, y=(i/n)|0, out=[i];
+    const push=(xx,yy)=>{
+      if(wrap){ out.push(idx((xx+n)%n,(yy+n)%n)); }
+      else if(xx>=0&&yy>=0&&xx<n&&yy<n) out.push(idx(xx,yy));
+    };
+    push(x,y-1); push(x,y+1); push(x-1,y); push(x+1,y);
+    return out;
+  }
+  function toggle(i){ affected(i).forEach(j=>state[j]^=1); }
+  function litCount(){ return state.reduce((a,b)=>a+b,0); }
+
+  function buildLevelChips(){
+    const host=$("levels"); host.innerHTML="";
+    LEVELS.forEach((lv,i)=>{
+      const b=document.createElement("button");
+      b.className="lv"; b.dataset.i=i;
+      const st=prog.stars[i]||0;
+      b.innerHTML=`${i+1}<u><s class="${st>0?"f":""}"></s><s class="${st>1?"f":""}"></s><s class="${st>2?"f":""}"></s></u>`
+        + (lv.wrap?`<em>🔄</em>`:"");
+      b.disabled = i>prog.unlocked;
+      b.classList.toggle("cur", i===li);
+      b.classList.toggle("done", st>0);
+      b.title = `Уровень ${i+1}: ${lv.n}×${lv.n}${lv.wrap?", тор":""}`;
+      b.onclick=()=>{ if(i<=prog.unlocked && i!==li){ li=i; startLevel(); tone(620,70,0,.07,"triangle"); } };
+      host.appendChild(b);
+    });
+  }
+
+  function layout(){
+    px = Math.min(box.clientWidth-24, 430);
+    cell = px/n;
+    const bs = Math.round(cell*0.6);
+    board.style.width=px+"px"; board.style.height=px+"px";
+    board.style.gridTemplateColumns=`repeat(${n}, ${cell}px)`;
+    board.style.gridTemplateRows=`repeat(${n}, ${cell}px)`;
+    board.style.setProperty("--bs", bs+"px");
+    wires.setAttribute("viewBox",`0 0 ${px} ${px}`);
+    wires.setAttribute("width",px); wires.setAttribute("height",px);
+    let s="";
+    for(let k=0;k<n;k++){
+      const c=(k+.5)*cell;
+      s+=`<line x1="${c}" y1="${cell*.5}" x2="${c}" y2="${px-cell*.5}" stroke="var(--wire)" stroke-width="3" stroke-linecap="round"/>`;
+      s+=`<line x1="${cell*.5}" y1="${c}" x2="${px-cell*.5}" y2="${c}" stroke="var(--wire)" stroke-width="3" stroke-linecap="round"/>`;
+    }
+    if(wrap){
+      s+=`<rect x="2" y="2" width="${px-4}" height="${px-4}" rx="10" fill="none" stroke="#4dd0e1" stroke-width="2" stroke-dasharray="7 7" opacity=".55"/>`;
+    }
+    wires.innerHTML=s;
+  }
+
+  function paint(){
+    for(let i=0;i<n*n;i++) bulbs[i].classList.toggle("on", !!state[i]);
+  }
+  function hud(){
+    $("lvl").textContent=(li+1)+"/"+LEVELS.length;
+    $("mv").textContent=moves;
+    $("par").textContent=par;
+    $("ts").textContent=totalStars()+"/"+(LEVELS.length*3);
+    $("hc").textContent=hints;
+    $("hint").textContent="💡 Подсказка · "+hints;
+    $("hint").disabled=hints<=0||solved;
+    $("undo").disabled=!history.length||solved;
+  }
+  function centerOf(i){
+    const r=bulbs[i].getBoundingClientRect();
+    return { x:r.left+r.width/2, y:r.top+r.height/2 };
+  }
+  function ripple(i){
+    const br=board.getBoundingClientRect(), b=bulbs[i].getBoundingClientRect();
+    const d=document.createElement("div");
+    d.className="rip";
+    d.style.left=(b.left-br.left+b.width/2)+"px";
+    d.style.top=(b.top-br.top+b.height/2)+"px";
+    rips.appendChild(d);
+    d.addEventListener("animationend",()=>d.remove());
+  }
+  function clearAff(){ spots.forEach(s=>s.classList.remove("aff")); }
+
+  function startLevel(){
+    if(hintTimer){ clearTimeout(hintTimer); hintTimer=null; }
+    killSound();
+    const lv=LEVELS[li];
+    n=lv.n; wrap=lv.wrap;
+    state=new Array(n*n).fill(1);
+    sol=new Array(n*n).fill(0);
+    let guard=0;
+    do{
+      state.fill(1); sol.fill(0);
+      for(let k=0;k<lv.clicks;k++){
+        const i=(Math.random()*n*n)|0;
+        toggle(i); sol[i]^=1;
+      }
+      guard++;
+    } while((litCount()===n*n || sol.reduce((a,b)=>a+b,0)<lv.min) && guard<400);
+    par=Math.max(lv.min, sol.reduce((a,b)=>a+b,0));
+    initial=state.slice(); initialSol=sol.slice();
+    moves=0; hints=3; history=[]; solved=false; focus=0;
+    $("done").classList.remove("on");
+    box.classList.remove("pulse");
+    rips.innerHTML="";
+    board.querySelectorAll(".spot").forEach(e=>e.remove());
+    spots=[]; bulbs=[];
+    for(let i=0;i<n*n;i++){
+      const sp=document.createElement("div"); sp.className="spot";
+      const b=document.createElement("button");
+      b.type="button"; b.className="bulb"; b.tabIndex=i===0?0:-1;
+      b.setAttribute("aria-label","лампочка "+(i+1));
+      b.addEventListener("click",()=>hit(i));
+      b.addEventListener("pointerenter",e=>{ if(e.pointerType==="mouse"&&!solved) affected(i).forEach(j=>spots[j].classList.add("aff")); });
+      b.addEventListener("pointerleave",clearAff);
+      b.addEventListener("focus",()=>{ focus=i; });
+      sp.appendChild(b); board.appendChild(sp);
+      spots.push(sp); bulbs.push(b);
+    }
+    layout(); paint(); hud(); buildLevelChips();
+    setMsg(`Уровень ${li+1}: ${n}×${n}${wrap?" · края соединены 🔄":""}. Зажги все ${n*n} лампочек.`);
+  }
+
+  function hit(i){
+    if(solved) return;
+    ac();
+    const before=litCount();
+    toggle(i); sol[i]^=1;
+    history.push(i); moves++;
+    affected(i).forEach(j=>{
+      bulbs[j].classList.remove("flip");
+      void bulbs[j].offsetWidth;
+      bulbs[j].classList.add("flip");
+    });
+    paint(); ripple(i); clearAff(); hud();
+    const after=litCount();
+    const x=i%n, y=(i/n)|0;
+    tone(300 + x*55 + y*38, 90, 0, .1, "triangle");
+    if(after>before){
+      const p=centerOf(i); sparks(p.x,p.y,10);
+      tone(1040+after*8, 90, .04, .07, "sine");
+      setMsg(`Горит ${after} из ${n*n}.`);
+    } else {
+      setMsg(`Горит ${after} из ${n*n}.`);
+    }
+    if(after===n*n) complete();
+  }
+
+  function undo(){
+    if(solved||!history.length) return;
+    const i=history.pop();
+    toggle(i); sol[i]^=1; moves=Math.max(0,moves-1);
+    paint(); hud(); clearAff();
+    sweep(520,300,140,.09,"triangle");
+    setMsg("Ход отменён.");
+  }
+
+  function hint(){
+    if(solved||hints<=0) return;
+    const cand=[];
+    for(let i=0;i<n*n;i++) if(sol[i]) cand.push(i);
+    if(!cand.length){ setMsg("Поле уже зажжено ✨","ok"); return; }
+    const i=cand[(Math.random()*cand.length)|0];
+    hints--; hud();
+    spots[i].classList.add("hintz");
+    const p=centerOf(i); sparks(p.x,p.y,12,"#4dd0e1");
+    tone(1320,110,0,.1,"triangle"); tone(1760,130,.1,.08,"sine");
+    setMsg("Подсказка: нажми на мигающую лампочку 💡");
+    if(hintTimer) clearTimeout(hintTimer);
+    hintTimer=setTimeout(()=>{ if(spots[i]) spots[i].classList.remove("hintz"); hintTimer=null; },2100);
+  }
+
+  function starsFor(m,p){ return m<=p?3:(m<=Math.ceil(p*1.6)?2:1); }
+
+  function complete(){
+    solved=true; clearAff(); killSound();
+    const st=starsFor(moves,par);
+    prog.stars[li]=Math.max(prog.stars[li]||0, st);
+    if(!prog.best[li]||moves<prog.best[li]) prog.best[li]=moves;
+    if(li+1>prog.unlocked) prog.unlocked=Math.min(li+1, LEVELS.length-1);
+    saveProgress();
+    hud(); buildLevelChips();
+    box.classList.add("pulse");
+    setTimeout(()=>box.classList.remove("pulse"),650);
+    bulbs.forEach((b,i)=>setTimeout(()=>{ const p=centerOf(i); sparks(p.x,p.y,5); }, i*22));
+    tone(660,140,0,.15); tone(880,140,.14,.15); tone(1174,190,.28,.15);
+    const last = li===LEVELS.length-1;
+    const ds=$("dstars").children;
+    for(let k=0;k<3;k++){
+      ds[k].classList.remove("f");
+      setTimeout(()=>{ if(k<st){ ds[k].classList.add("f"); tone(880+k*220,120,0,.12,"triangle"); } }, 320+k*230);
+    }
+    $("dtitle").textContent = last ? "🎄 Гирлянда сияет целиком!" : `Уровень ${li+1} пройден!`;
+    $("dinfo").textContent = `Ходов: ${moves} · норма: ${par} · лучший результат: ${prog.best[li]}`
+      + (last ? " · все 8 уровней позади" : "");
+    $("dnext").textContent = last ? "🎁 Открыть загадку" : "Следующий уровень →";
+    $("done").classList.add("on");
+    if(last){
+      localStorage.setItem("advent_solved_"+DAY, new Date().toISOString());
+      confetti();
+      tone(1568,340,.45,.14);
+      setMsg("✨ Все уровни пройдены — загадка твоя!","ok");
+    } else {
+      setMsg("✨ Уровень пройден!","ok");
+    }
+  }
+
+  $("dnext").onclick=()=>{
+    if(li===LEVELS.length-1){
+      showRiddle(true, `Гирлянда зажжена, звёзд: ${totalStars()}/24`);
+      return;
+    }
+    li++; startLevel();
+    tone(700,90,0,.09,"triangle");
+  };
+  $("again").onclick=()=>{
+    if(hintTimer){ clearTimeout(hintTimer); hintTimer=null; }
+    state=initial.slice(); sol=initialSol.slice();
+    moves=0; hints=3; history=[]; solved=false;
+    $("done").classList.remove("on");
+    paint(); hud(); clearAff();
+    sweep(420,620,160,.09,"triangle");
+    setMsg("Уровень начат заново.");
+  };
+  $("undo").onclick=undo;
+  $("hint").onclick=hint;
+  $("wipe").onclick=()=>{
+    prog={unlocked:0,stars:{},best:{}}; saveProgress();
+    li=0; startLevel();
+    sweep(600,240,220,.1,"triangle");
+    setMsg("Прогресс сброшен. Начинаем с первого уровня.");
+  };
+
+  document.addEventListener("keydown",e=>{
+    if(solved && e.key!=="Enter") return;
+    const x=focus%n, y=(focus/n)|0;
+    let nx=x, ny=y, handled=true;
+    switch(e.key){
+      case "ArrowLeft": nx=(x-1+n)%n; break;
+      case "ArrowRight": nx=(x+1)%n; break;
+      case "ArrowUp": ny=(y-1+n)%n; break;
+      case "ArrowDown": ny=(y+1)%n; break;
+      case "Enter": case " ": solved ? $("dnext").click() : hit(focus); break;
+      case "z": case "Z": case "я": case "Я": undo(); break;
+      case "h": case "H": case "р": case "Р": hint(); break;
+      case "r": case "R": case "к": case "К": $("again").click(); break;
+      default: handled=false;
+    }
+    if(!handled) return;
+    e.preventDefault();
+    const ni=idx(nx,ny);
+    if(ni!==focus){
+      bulbs[focus].tabIndex=-1; focus=ni;
+      bulbs[ni].tabIndex=0; bulbs[ni].focus();
+    }
+  });
+
+  addEventListener("resize",()=>{ if(bulbs.length) layout(); });
+  startLevel();
+}
+</script>
+</body>
+</html>

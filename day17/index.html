@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>День 17 — филворд метели</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1410; --card:#13241b; --card2:#0f1f17; --line:#24402f; --line2:#3a5a46;
+  --gold:#e8c37a; --amber:#ffb347; --green:#3ddc84; --red:#ff6b6b; --blue:#7fb4ff;
+  --magenta:#ff7eb0; --cyan:#4dd0e1; --violet:#b39ddb; --ink:#eaf5ee; --dim:#7fa08c;
+  --ice1:#17332c; --ice2:#102620;
+}
+*{box-sizing:border-box}
+html{scrollbar-color:var(--line2) #0d1a13;scrollbar-width:thin}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#0d1a13}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:9px;border:2px solid #0d1a13}
+::-webkit-scrollbar-thumb:hover{background:#4d7a5f}
+body{margin:0;padding:0 14px 54px;color:var(--ink);overflow-x:hidden;
+  background:radial-gradient(1200px 560px at 50% -14%,#16302240,transparent 70%),var(--bg);
+  font:16px/1.5 Manrope,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:620px;margin:0 auto;position:relative;z-index:1}
+
+.garland{display:flex;justify-content:center;gap:14px;border-top:2px solid var(--line2);overflow:hidden}
+.gbulb{width:9px;height:13px;border-radius:50% 50% 45% 45%;position:relative;margin-top:7px;flex:none;
+ background:currentColor;transform-origin:top center;animation:sway 3s ease-in-out infinite alternate,glowblink 2s infinite}
+.gbulb::before{content:"";position:absolute;top:-7px;left:3.5px;width:2px;height:7px;background:var(--line2)}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+@keyframes glowblink{0%,100%{filter:brightness(1);box-shadow:0 0 8px currentColor}50%{filter:brightness(.5);box-shadow:0 0 2px currentColor}}
+.flake{position:fixed;top:-14px;color:#cfe8da;opacity:.5;pointer-events:none;z-index:0;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(106vh) rotate(360deg)}}
+
+.back{color:var(--dim);font-size:13px;text-decoration:none}
+.back:hover{color:var(--gold)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0}
+h1{font-family:Unbounded,sans-serif;font-size:clamp(18px,4.6vw,23px);margin:0;line-height:1.25}
+h1 .gold{color:var(--gold)}
+.sndbtn{flex:none;padding:9px 13px;border-radius:999px;border:1px solid var(--line2);background:var(--card);
+ color:var(--ink);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+.sndbtn:hover{border-color:var(--gold);color:var(--gold)}
+.sndbtn.off{color:var(--dim);border-color:var(--line)}
+
+.card{background:linear-gradient(165deg,var(--card),var(--card2));border:1px solid var(--line);
+ border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 10px 30px #0006}
+.rules{border-color:var(--line2);background:linear-gradient(165deg,#10241a,#0d1c14)}
+.rules b{color:var(--gold)}
+.rules ul{margin:6px 0 0;padding-left:18px;color:#bcd8c6;font-size:13.5px}
+.rules li{margin-bottom:3px}
+.task{color:#bcd8c6;font-size:14px;margin:0 0 12px}
+.note{color:var(--dim);font-size:12.5px;margin:10px 0 0}
+
+.hud{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.stat{display:flex;flex-direction:column;gap:1px;padding:7px 12px;border-radius:12px;
+ border:1px solid var(--line);background:#0f1f17;min-width:74px}
+.stat i{font:700 10px/1 Manrope,sans-serif;letter-spacing:.12em;color:var(--dim);font-style:normal}
+.stat b{font:800 16px/1.2 Manrope,sans-serif;color:var(--gold)}
+.stat.g b{color:var(--green)} .stat.b b{color:var(--blue)} .stat.m b{color:var(--magenta)}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-left:auto}
+.seg button{padding:9px 12px;border:none;background:none;color:var(--dim);font:700 12px Manrope,sans-serif;cursor:pointer;transition:.15s}
+.seg button:hover{color:var(--ink)}
+.seg button.on{background:#1d5c38;color:#eaf5ee}
+.seg button:disabled{opacity:.45;cursor:wait}
+
+.boardbox{position:relative;border-radius:16px;padding:12px;border:1px solid var(--line2);
+ background:radial-gradient(120% 100% at 50% 0%,#1a3226,#08130d 72%);
+ box-shadow:0 14px 34px #0008,inset 0 1px 0 #ffffff0d}
+.boardbox.shake{animation:shk .38s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shk{10%,90%{transform:translateX(-3px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
+.boardbox.glow{animation:bglow .7s ease-out}
+@keyframes bglow{0%{box-shadow:0 14px 34px #0008}45%{box-shadow:0 14px 40px #0008,inset 0 0 60px #3ddc8455,0 0 40px #3ddc8444}100%{box-shadow:0 14px 34px #0008}}
+.board{position:relative;margin:0 auto;display:grid;gap:4px;touch-action:none;user-select:none}
+.chain{position:absolute;inset:0;pointer-events:none;z-index:3}
+.cell{position:relative;border:1px solid #23453a;border-radius:10px;padding:0;cursor:pointer;
+ background:linear-gradient(160deg,var(--ice1),var(--ice2));color:#dff0e6;
+ font:800 var(--fs,20px)/1 Manrope,sans-serif;display:flex;align-items:center;justify-content:center;
+ box-shadow:inset 0 1px 0 #ffffff12,0 2px 6px #0006;transition:transform .12s,box-shadow .16s,background .2s,color .2s;outline:none}
+.cell:hover{transform:translateY(-2px);border-color:var(--line2)}
+.cell:focus-visible{box-shadow:0 0 0 3px var(--gold),0 2px 6px #0006}
+.cell.sel{background:linear-gradient(160deg,#3a4a2a,#26361c);border-color:var(--gold);color:#fff6d8;
+ box-shadow:0 0 0 2px #e8c37a88,0 0 18px #e8c37a44;transform:translateY(-2px);z-index:2}
+.cell.head{box-shadow:0 0 0 3px var(--gold),0 0 24px #e8c37a66}
+.cell.found{color:#08130d;border-color:transparent;cursor:default;transform:none;
+ background:linear-gradient(160deg,var(--wc),color-mix(in srgb,var(--wc) 62%,#08130d));
+ box-shadow:0 0 14px color-mix(in srgb,var(--wc) 45%,transparent),inset 0 1px 0 #ffffff55}
+.cell.pop{animation:cpop .38s ease-out}
+@keyframes cpop{0%{transform:scale(.6);filter:brightness(2)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+.cell.hintz{animation:hz 1s ease-out 2}
+@keyframes hz{0%,100%{box-shadow:inset 0 1px 0 #ffffff12,0 2px 6px #0006}50%{box-shadow:0 0 0 4px #4dd0e177,0 0 26px #4dd0e1aa}}
+
+.loader{position:absolute;inset:0;z-index:6;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+ background:#08130dee;border-radius:16px;text-align:center;padding:20px}
+.loader.on{display:flex}
+.loader p{margin:0;font-size:14px;color:#bcd8c6}
+.spin{width:34px;height:34px;border-radius:50%;border:3px solid #24402f;border-top-color:var(--gold);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.words{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+.wchip{display:flex;align-items:center;gap:7px;padding:8px 12px;border-radius:999px;
+ border:1px solid var(--line);background:#0f1f17;font:700 13px Manrope,sans-serif;color:#cfe3d6;transition:.18s}
+.wchip s{width:9px;height:9px;border-radius:50%;background:var(--wc);text-decoration:none;flex:none;
+ box-shadow:0 0 8px color-mix(in srgb,var(--wc) 60%,transparent)}
+.wchip em{font-style:normal;font-size:11px;color:var(--dim)}
+.wchip.got{border-color:var(--wc);color:var(--wc);background:color-mix(in srgb,var(--wc) 12%,#0f1f17)}
+.wchip.got span{text-decoration:line-through;opacity:.85}
+.wchip.flash{animation:wflash .6s ease-out}
+@keyframes wflash{0%{transform:scale(1.14);filter:brightness(1.6)}100%{transform:scale(1)}}
+
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+button.act{padding:11px 18px;border-radius:999px;border:none;cursor:pointer;font:800 14px Manrope,sans-serif;
+ background:linear-gradient(90deg,var(--gold),#f6dfae);color:#20180a;box-shadow:0 4px 16px #e8c37a2e;transition:.15s}
+button.act:hover{transform:translateY(-1px);box-shadow:0 7px 20px #e8c37a44}
+button.act:active{transform:translateY(0)}
+button.ghost{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:none;
+ color:var(--dim);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+button.ghost:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+button.ghost:disabled{opacity:.4;cursor:not-allowed}
+#msg{min-height:22px;margin-top:10px;font-size:13.5px;text-align:center;color:var(--dim)}
+#msg.ok{color:var(--green)} #msg.err{color:var(--red)}
+#riddle{font-size:16px;white-space:pre-wrap}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:40}
+@media (max-width:430px){
+  .stat{min-width:64px;padding:6px 10px}
+  .stat b{font-size:15px}
+  .seg{margin-left:0;width:100%;justify-content:center}
+  .wchip{padding:7px 10px;font-size:12px}
+}
+</style>
+</head>
+<body>
+<div class="garland" id="garland"></div>
+<div class="wrap">
+  <a class="back" href="../">← календарь</a>
+  <div class="top">
+    <h1>День <span class="gold">17</span> · филворд метели</h1>
+    <button class="sndbtn" id="snd">🔊 Звук</button>
+  </div>
+
+  <div class="card rules">
+    📜 <b>Как играть:</b> цель — разгадать головоломку и добыть загадку, а ответ принести боту: он выдаст подарок и фото тайника.
+    <ul>
+      <li>Все буквы в сетке belong словам: каждая клетка — часть какого-то слова из списка.</li>
+      <li>Слово идёт змейкой по соседним клеткам — вверх, вниз, влево, вправо, с поворотами.</li>
+      <li>Тяни пальцем или мышью по буквам, либо тапай их по одной. Верное слово засчитается само.</li>
+      <li>Найди все слова — день откроет загадку 🎁</li>
+    </ul>
+  </div>
+
+  <div id="game" class="card"></div>
+
+  <div id="riddleCard" class="card" hidden>
+    <h3 id="rTitle" style="margin:0 0 8px;font-size:16px;color:var(--gold)"></h3>
+    <p id="riddle"></p>
+    <p class="note">Отправь ответ боту в Telegram 🤖 Застрянешь — кнопка 💡 Подсказка у бота (раз в 2 минуты).</p>
+  </div>
+</div>
+<canvas id="fx"></canvas>
+
+<script>
+/* ===== настройки дня ===== */
+const DAY = 17;
+const RIDDLE = "Иногда в них ты видишь чётче, а иногда просто дразнишься";
+const WCOL = ["#e8c37a","#3ddc84","#7fb4ff","#ff7eb0","#ffb347","#4dd0e1","#b39ddb"];
+const LEVELS = [
+  { n:5, snake:true,  label:"5×5", words:["ЁЛКА","СНЕГ","МОРОЗ","САЛЮТ","ПОДАРКИ"] },
+  { n:6, snake:false, label:"6×6", words:["ЁЛКА","СНЕГ","МОРОЗ","ПОДАРОК","МАНДАРИН","ХЛОПУШКА"] },
+  { n:7, snake:false, label:"7×7", words:["ГИРЛЯНДА","СНЕЖИНКА","МАНДАРИН","ПОДАРКИ","ХЛОПУШКА","СВЕЧКА","ЁЛКА"] }
+];
+
+/* ===== антураж ===== */
+const GC=["#e74c3c","#f1c40f","#3498db","#e67e22","#9b59b6","#2ecc71","#ff7eb0"];
+for(let i=0;i<17;i++){
+  const b=document.createElement("span");
+  b.className="gbulb"; b.style.color=GC[i%GC.length];
+  b.style.animationDelay=(i*.17)+"s, "+(i*.23)+"s";
+  document.getElementById("garland").appendChild(b);
+}
+for(let i=0;i<12;i++){
+  const f=document.createElement("div");
+  f.className="flake"; f.textContent="❄";
+  f.style.left=Math.random()*100+"vw";
+  f.style.fontSize=8+Math.random()*9+"px";
+  f.style.animationDuration=7+Math.random()*8+"s";
+  f.style.animationDelay=-Math.random()*10+"s";
+  document.body.appendChild(f);
+}
+
+/* ===== служебное ===== */
+const $=id=>document.getElementById(id);
+const q=new URLSearchParams(location.search);
+const now=new Date();
+const PREP = now < new Date(2026, 11, 1, 19, 0, 0); // режим подготовки: замки сняты
+const inDec=now.getFullYear()===2026&&now.getMonth()===11;
+const today=inDec?now.getDate():0;
+const open = q.has("all") || PREP || (inDec && (DAY < today || (DAY === today && now.getHours() >= 19)));
+const past = !q.has("all") && (inDec && DAY < today);
+const daySolved=()=>!!localStorage.getItem("advent_solved_"+DAY);
+const fmt=s=>String((s/60)|0).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+
+/* ===== звук ===== */
+let snd=localStorage.getItem("advent_snd")!=="0";
+let AC=null, live=[];
+function ac(){
+  if(!AC){ const C=window.AudioContext||window.webkitAudioContext; if(C) AC=new C(); }
+  if(AC&&AC.state==="suspended") AC.resume();
+  return AC;
+}
+function tone(freq,ms,delay=0,vol=.13,type="sine"){
+  if(!snd) return; const c=ac(); if(!c) return;
+  const t=c.currentTime+delay/1000, d=ms/1000;
+  const o=c.createOscillator(), g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,t);
+  g.gain.setValueAtTime(.0001,t);
+  g.gain.linearRampToValueAtTime(vol,t+.008);
+  g.gain.setValueAtTime(vol,t+Math.max(.012,d-.02));
+  g.gain.linearRampToValueAtTime(.0001,t+d);
+  o.connect(g); g.connect(c.destination);
+  o.start(t); o.stop(t+d+.03);
+  live.push(o); o.onended=()=>{ live=live.filter(x=>x!==o); };
+}
+function sweep(f1,f2,ms,vol=.12,type="sine"){
+  if(!snd) return; const c=ac(); if(!c) return;
+  const t=c.currentTime,d=ms/1000;
+  const o=c.createOscillator(),g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(f1,t);
+  o.frequency.exponentialRampToValueAtTime(Math.max(30,f2),t+d);
+  g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+d+.02);
+  live.push(o); o.onended=()=>{ live=live.filter(x=>x!==o); };
+}
+function killSound(){ live.forEach(o=>{try{o.stop();}catch(e){}}); live=[]; }
+function paintSnd(){
+  const b=$("snd");
+  b.textContent=snd?"🔊 Звук":"🔇 Тихо";
+  b.classList.toggle("off",!snd);
+}
+$("snd").onclick=()=>{
+  snd=!snd; localStorage.setItem("advent_snd",snd?"1":"0");
+  paintSnd();
+  if(snd){ ac(); tone(880,90,0,.12); } else killSound();
+};
+paintSnd();
+
+/* ===== частицы ===== */
+const fx=$("fx"), fctx=fx.getContext("2d");
+let parts=[], fxRun=false;
+function sizeFx(){
+  const r=Math.min(devicePixelRatio||1,2);
+  fx.width=innerWidth*r; fx.height=innerHeight*r;
+  fx.style.width=innerWidth+"px"; fx.style.height=innerHeight+"px";
+  fctx.setTransform(r,0,0,r,0,0);
+}
+sizeFx(); addEventListener("resize",sizeFx);
+function spawn(p){ parts.push(p); if(!fxRun){ fxRun=true; requestAnimationFrame(stepFx); } }
+function sparks(x,y,n,col){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2, sp=.7+Math.random()*3.2;
+    spawn({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,g:.09,s:1.4+Math.random()*2.8,
+      c:col||["#ffd76a","#ffb347","#fff3cf"][(Math.random()*3)|0],life:1,dec:.026,round:true});
+  }
+}
+function confetti(){
+  const cols=["#e8c37a","#3ddc84","#ffb347","#7fb4ff","#ff7eb0","#4dd0e1","#b39ddb"];
+  for(let i=0;i<160;i++){
+    spawn({x:innerWidth/2+(Math.random()-.5)*200,y:innerHeight*.34,
+      vx:(Math.random()-.5)*8,vy:-Math.random()*9-2,g:.22,
+      w:4+Math.random()*6,h:3+Math.random()*5,a:Math.random()*Math.PI,va:(Math.random()-.5)*.3,
+      c:cols[(Math.random()*cols.length)|0],life:1,dec:.0075});
+  }
+}
+function stepFx(){
+  fctx.clearRect(0,0,innerWidth,innerHeight);
+  parts.forEach(p=>{
+    p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.life-=p.dec;
+    fctx.globalAlpha=Math.max(0,p.life); fctx.fillStyle=p.c;
+    if(p.round){ fctx.beginPath(); fctx.arc(p.x,p.y,p.s,0,7); fctx.fill(); }
+    else { p.a+=p.va; fctx.save(); fctx.translate(p.x,p.y); fctx.rotate(p.a);
+      fctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); fctx.restore(); }
+  });
+  fctx.globalAlpha=1;
+  parts=parts.filter(p=>p.life>0&&p.y<innerHeight+50);
+  if(parts.length) requestAnimationFrame(stepFx);
+  else { fxRun=false; fctx.clearRect(0,0,innerWidth,innerHeight); }
+}
+
+/* ===== генератор филворда ===== */
+function neighbors(i,n){
+  const x=i%n,y=(i/n)|0,out=[];
+  if(y>0) out.push(i-n);
+  if(y<n-1) out.push(i+n);
+  if(x>0) out.push(i-1);
+  if(x<n-1) out.push(i+1);
+  return out;
+}
+function shuffled(a){
+  const r=a.slice();
+  for(let i=r.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [r[i],r[j]]=[r[j],r[i]]; }
+  return r;
+}
+function snakePaths(n,words){
+  const order=[];
+  for(let y=0;y<n;y++){
+    if(y%2===0) for(let x=0;x<n;x++) order.push(y*n+x);
+    else for(let x=n-1;x>=0;x--) order.push(y*n+x);
+  }
+  const paths=[]; let k=0;
+  words.forEach(w=>{ paths.push(order.slice(k,k+w.length)); k+=w.length; });
+  return paths;
+}
+function randomPaths(n,words){
+  const N=n*n;
+  const owner=new Array(N).fill(-1);
+  const idxs=words.map((w,i)=>i).sort((a,b)=>words[b].length-words[a].length);
+  const paths=new Array(words.length);
+  let nodes=0;
+  const firstFree=()=>{ for(let i=0;i<N;i++) if(owner[i]<0) return i; return -1; };
+  function grow(k,path,L,wi){
+    if(++nodes>180000) return false;
+    if(path.length===L){ paths[wi]=path.slice(); return place(k+1); }
+    for(const j of shuffled(neighbors(path[path.length-1],n))){
+      if(owner[j]>=0) continue;
+      owner[j]=wi; path.push(j);
+      if(grow(k,path,L,wi)) return true;
+      path.pop(); owner[j]=-1;
+      if(nodes>180000) return false;
+    }
+    return false;
+  }
+  function place(k){
+    if(k===idxs.length) return true;
+    const wi=idxs[k], L=words[wi].length, start=firstFree();
+    if(start<0) return false;
+    owner[start]=wi;
+    if(grow(k,[start],L,wi)) return true;
+    owner[start]=-1;
+    return false;
+  }
+  return place(0)?paths:null;
+}
+function buildPuzzle(level){
+  const n=level.n, words=level.words;
+  let paths=null;
+  if(!level.snake){
+    for(let a=0;a<10&&!paths;a++) paths=randomPaths(n,words);
+  }
+  if(!paths) paths=snakePaths(n,words);
+  const letters=new Array(n*n).fill("");
+  const owner=new Array(n*n).fill(-1);
+  words.forEach((w,wi)=>{
+    paths[wi].forEach((cell,k)=>{ letters[cell]=w[k]; owner[cell]=wi; });
+  });
+  return { letters, owner, paths };
+}
+
+/* ===== игра ===== */
+let clock=null, winTimer=null, hintTimer=null, genTimer=null;
+function clearTimers(){
+  if(clock){ clearInterval(clock); clock=null; }
+  if(winTimer){ clearTimeout(winTimer); winTimer=null; }
+  if(hintTimer){ clearTimeout(hintTimer); hintTimer=null; }
+  if(genTimer){ clearTimeout(genTimer); genTimer=null; }
+}
+function showRiddle(fresh,extra){
+  clearTimers(); killSound();
+  $("game").innerHTML="";
+  $("riddleCard").hidden=false;
+  $("rTitle").textContent=fresh?"🎉 "+(extra||"Готово!")+" Вот загадка дня:":"Загадка дня:";
+  $("riddle").textContent=RIDDLE;
+}
+
+if(!open){
+  $("game").innerHTML=`<p class="task">День откроется 17 декабря в 19:00 🔒</p>`;
+}
+else if(daySolved()||past){
+  showRiddle(false);
+}
+else {
+  $("game").innerHTML=`
+    <p class="task">Метель разложила новогодние слова по буквам и спутала их дорожки. Каждая буква здесь — чья-то. Проведи по словам и верни их списку.</p>
+    <div class="hud">
+      <div class="stat"><i>ВРЕМЯ</i><b id="tm">00:00</b></div>
+      <div class="stat g"><i>НАЙДЕНО</i><b id="fc">0/6</b></div>
+      <div class="stat b"><i>РЕКОРД</i><b id="best">—</b></div>
+      <div class="stat m"><i>ПОДСКАЗКИ</i><b id="hc">3</b></div>
+      <div class="seg" id="seg"></div>
+    </div>
+    <div class="boardbox" id="box">
+      <div class="board" id="board"><svg class="chain" id="chain"></svg></div>
+      <div class="loader" id="loader"><div class="spin"></div><p>Метель путает буквы…</p></div>
+    </div>
+    <div class="words" id="words"></div>
+    <div class="controls">
+      <button class="act" id="fresh">✨ Новое поле</button>
+      <button class="ghost" id="again">↻ Заново</button>
+      <button class="ghost" id="clear">✕ Сбросить выделение</button>
+      <button class="ghost" id="hint">💡 Подсказка · 3</button>
+    </div>
+    <div id="msg"></div>
+    <p class="note">Тяни по буквам или тапай по одной: соседняя клетка продолжит слово, повторный тап по предпоследней — шаг назад. Esc сбрасывает выделение.</p>`;
+
+  let L=1, n=6, words=[], letters=[], owner=[], paths=[];
+  let found=[], cells=[], chain=[], mode="idle", hints=3, secs=0, started=false, won=false, busy=false;
+
+  const board=$("board"), box=$("box"), chainSvg=$("chain");
+  const setMsg=(t,cls)=>{ const m=$("msg"); if(m){ m.textContent=t; m.className=cls||""; } };
+  const bestKey=()=>`advent_filword_best_${n}`;
+
+  LEVELS.forEach((lv,i)=>{
+    const b=document.createElement("button");
+    b.textContent=lv.label; b.dataset.i=i;
+    if(i===L) b.classList.add("on");
+    b.onclick=()=>{
+      if(busy||L===i) return;
+      L=i;
+      $("seg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",+x.dataset.i===i));
+      newPuzzle();
+      tone(620,70,0,.07,"triangle");
+    };
+    $("seg").appendChild(b);
+  });
+
+  function layout(){
+    const px=Math.min(box.clientWidth-24,430);
+    const cell=(px-(n-1)*4)/n;
+    board.style.width=px+"px"; board.style.height=px+"px";
+    board.style.gridTemplateColumns=`repeat(${n}, ${cell}px)`;
+    board.style.gridTemplateRows=`repeat(${n}, ${cell}px)`;
+    board.style.setProperty("--fs",Math.max(13,Math.round(cell*.44))+"px");
+    chainSvg.setAttribute("viewBox",`0 0 ${px} ${px}`);
+    chainSvg.setAttribute("width",px); chainSvg.setAttribute("height",px);
+    drawChain();
+  }
+  function cellCenter(i){
+    const br=board.getBoundingClientRect(), r=cells[i].getBoundingClientRect();
+    return { x:r.left-br.left+r.width/2, y:r.top-br.top+r.height/2,
+             vx:r.left+r.width/2, vy:r.top+r.height/2 };
+  }
+  function drawChain(){
+    if(chain.length<2){ chainSvg.innerHTML=""; return; }
+    const pts=chain.map(i=>{ const c=cellCenter(i); return `${c.x},${c.y}`; }).join(" ");
+    chainSvg.innerHTML=
+      `<polyline points="${pts}" fill="none" stroke="#e8c37a" stroke-opacity=".28" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>`+
+      `<polyline points="${pts}" fill="none" stroke="#ffd76a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }
+  function paintCell(i){
+    const el=cells[i];
+    el.classList.toggle("found",found[owner[i]]);
+    if(found[owner[i]]) el.style.setProperty("--wc",WCOL[owner[i]%WCOL.length]);
+    const pos=chain.indexOf(i);
+    el.classList.toggle("sel",pos>=0);
+    el.classList.toggle("head",pos===chain.length-1&&pos>=0);
+  }
+  function paintAll(){ for(let i=0;i<n*n;i++) paintCell(i); drawChain(); }
+  function hud(){
+    const f=found.filter(Boolean).length;
+    $("fc").textContent=f+"/"+words.length;
+    $("hc").textContent=hints;
+    $("hint").textContent="💡 Подсказка · "+hints;
+    $("hint").disabled=hints<=0||won||busy;
+    $("clear").disabled=!chain.length||won||busy;
+    const b=localStorage.getItem(bestKey());
+    $("best").textContent=b?fmt(+b):"—";
+  }
+  function renderWords(){
+    const host=$("words"); host.innerHTML="";
+    words.forEach((w,i)=>{
+      const d=document.createElement("div");
+      d.className="wchip"+(found[i]?" got":"");
+      d.style.setProperty("--wc",WCOL[i%WCOL.length]);
+      d.id="w"+i;
+      d.innerHTML=`<s></s><span>${w}</span><em>${w.length}</em>`;
+      host.appendChild(d);
+    });
+  }
+  function startClock(){
+    if(started||won) return;
+    started=true;
+    clock=setInterval(()=>{ secs++; $("tm").textContent=fmt(secs); },1000);
+  }
+  function currentString(){ return chain.map(i=>letters[i]).join(""); }
+  function clearChain(){ chain=[]; mode="idle"; paintAll(); hud(); }
+
+  function matchWord(s){
+    for(let i=0;i<words.length;i++) if(!found[i]&&(words[i]===s||words[i]===[...s].reverse().join(""))) return i;
+    return -1;
+  }
+  function hasLongerPrefix(s){
+    return words.some((w,i)=>!found[i]&&w.length>s.length&&(w.startsWith(s)||[...w].reverse().join("").startsWith(s)));
+  }
+  function accept(wi){
+    found[wi]=true;
+    const col=WCOL[wi%WCOL.length];
+    paths[wi].forEach((cell,k)=>{
+      setTimeout(()=>{
+        if(!cells[cell]) return;
+        cells[cell].classList.add("pop");
+        const c=cellCenter(cell); sparks(c.vx,c.vy,6,col);
+        setTimeout(()=>cells[cell]&&cells[cell].classList.remove("pop"),400);
+      },k*55);
+    });
+    chain=[]; mode="idle";
+    paintAll(); renderWords(); hud();
+    const chip=$("w"+wi);
+    if(chip){ chip.classList.add("flash"); setTimeout(()=>chip&&chip.classList.remove("flash"),650); }
+    box.classList.add("glow"); setTimeout(()=>box.classList.remove("glow"),720);
+    tone(660,110,0,.13,"triangle"); tone(880,110,.09,.12,"triangle"); tone(1174,150,.18,.11,"sine");
+    setMsg(`Слово «${words[wi]}» найдено ✨`,"ok");
+    if(found.every(Boolean)) win();
+  }
+  function reject(){
+    if(chain.length>1){
+      box.classList.add("shake"); setTimeout(()=>box.classList.remove("shake"),400);
+      sweep(300,110,200,.11,"sawtooth");
+      setMsg("Такого слова в списке нет — попробуй другую дорожку.","err");
+    }
+    clearChain();
+  }
+  function tryExtend(i){
+    if(won||busy||found[owner[i]]) return;
+    startClock();
+    const last=chain[chain.length-1];
+    if(last===i) return;
+    if(chain.length>1&&chain[chain.length-2]===i){
+      chain.pop(); paintAll(); hud();
+      tone(360,45,0,.05,"triangle");
+      return;
+    }
+    if(chain.includes(i)) return;
+    if(last!==undefined&&!neighbors(last,n).includes(i)) return;
+    chain.push(i);
+    paintAll(); hud();
+    tone(420+chain.length*70,55,0,.07,"triangle");
+    const s=currentString(), wi=matchWord(s);
+    if(wi>=0&&!hasLongerPrefix(s)) accept(wi);
+  }
+  function indexAt(cx,cy){
+    const el=document.elementFromPoint(cx,cy);
+    if(!el||!el.classList||!el.classList.contains("cell")) return -1;
+    const i=+el.dataset.i;
+    return Number.isFinite(i)?i:-1;
+  }
+
+  function newPuzzle(){
+    clearTimers(); killSound();
+    const lv=LEVELS[L]; n=lv.n; words=lv.words.slice();
+    busy=true; won=false; started=false; secs=0; hints=3; chain=[]; mode="idle";
+    found=words.map(()=>false);
+    $("tm").textContent="00:00";
+    $("loader").classList.add("on");
+    $("seg").querySelectorAll("button").forEach(b=>b.disabled=true);
+    setMsg("Метель путает буквы…");
+    genTimer=setTimeout(()=>{
+      genTimer=null;
+      const p=buildPuzzle(lv);
+      letters=p.letters; owner=p.owner; paths=p.paths;
+      board.querySelectorAll(".cell").forEach(e=>e.remove());
+      cells=[];
+      for(let i=0;i<n*n;i++){
+        const el=document.createElement("button");
+        el.type="button"; el.className="cell"; el.dataset.i=i; el.textContent=letters[i];
+        el.tabIndex=i===0?0:-1;
+        el.setAttribute("aria-label",`буква ${letters[i]}, строка ${((i/n)|0)+1}, столбец ${i%n+1}`);
+        el.addEventListener("pointerdown",e=>{
+          if(busy||won) return;
+          e.preventDefault(); ac();
+          if(mode==="tap"){ tryExtend(i); return; }
+          if(found[owner[i]]) return;
+          chain=[i]; mode="drag";
+          paintAll(); hud(); startClock();
+          tone(420,55,0,.07,"triangle");
+        });
+        el.addEventListener("focus",()=>{ if(!busy&&!won) el.tabIndex=0; });
+        board.appendChild(el); cells.push(el);
+      }
+      layout(); renderWords(); paintAll(); hud();
+      busy=false;
+      $("loader").classList.remove("on");
+      $("seg").querySelectorAll("button").forEach(b=>b.disabled=false);
+      setMsg(`Спрятано ${words.length} слов. Веди по буквам ❄`);
+      tone(520,90,0,.08,"triangle"); tone(780,110,.09,.07,"triangle");
+    },60);
+  }
+
+  window.addEventListener("pointermove",e=>{
+    if(mode!=="drag"||won||busy) return;
+    const i=indexAt(e.clientX,e.clientY);
+    if(i>=0) tryExtend(i);
+  });
+  window.addEventListener("pointerup",e=>{
+    if(mode!=="drag"||won||busy) return;
+    if(chain.length>1){
+      const s=currentString(), wi=matchWord(s);
+      if(wi>=0) accept(wi); else reject();
+    } else if(chain.length===1){
+      mode="tap";
+      setMsg("Тапай соседние буквы, чтобы продолжить слово.");
+    }
+  });
+  window.addEventListener("pointercancel",()=>{ if(mode==="drag") clearChain(); });
+
+  function win(){
+    won=true; clearChain();
+    if(clock){ clearInterval(clock); clock=null; }
+    killSound();
+    localStorage.setItem("advent_solved_"+DAY,new Date().toISOString());
+    const prev=localStorage.getItem(bestKey());
+    const record=!prev||secs<+prev;
+    if(record) localStorage.setItem(bestKey(),String(secs));
+    hud(); confetti();
+    tone(660,140,0,.16); tone(880,140,.15,.16); tone(1174,180,.3,.16); tone(1568,330,.47,.15);
+    setMsg(record?"✨ Все слова найдены! Новый рекорд.":"✨ Все слова найдены!","ok");
+    winTimer=setTimeout(()=>showRiddle(true,`Филворд ${n}×${n} разгадан за ${fmt(secs)}${record?" — рекорд!":""}`),1600);
+  }
+
+  $("fresh").onclick=()=>{ if(!busy) newPuzzle(); };
+  $("again").onclick=()=>{
+    if(busy) return;
+    clearTimers(); killSound();
+    found=words.map(()=>false);
+    secs=0; hints=3; started=false; won=false; chain=[]; mode="idle";
+    $("tm").textContent="00:00";
+    renderWords(); paintAll(); hud();
+    sweep(420,640,170,.09,"triangle");
+    setMsg("Поле сброшено — слова снова спрятаны.");
+  };
+  $("clear").onclick=()=>{ clearChain(); setMsg("Выделение сброшено."); tone(320,60,0,.06,"triangle"); };
+  $("hint").onclick=()=>{
+    if(hints<=0||won||busy) return;
+    const left=words.map((w,i)=>i).filter(i=>!found[i]);
+    if(!left.length) return;
+    const wi=left[(Math.random()*left.length)|0];
+    hints--; hud();
+    const cell=paths[wi][0];
+    cells[cell].classList.add("hintz");
+    const c=cellCenter(cell); sparks(c.vx,c.vy,12,"#4dd0e1");
+    tone(1320,110,0,.1,"triangle"); tone(1760,130,.1,.08,"sine");
+    setMsg(`Слово «${words[wi]}» начинается с мигающей буквы 💡`);
+    if(hintTimer) clearTimeout(hintTimer);
+    hintTimer=setTimeout(()=>{ if(cells[cell]) cells[cell].classList.remove("hintz"); hintTimer=null; },2100);
+  };
+
+  document.addEventListener("keydown",e=>{
+    if(busy||won) return;
+    if(e.key==="Escape"){ clearChain(); setMsg("Выделение сброшено."); return; }
+    if(e.key==="Enter"&&chain.length>1){
+      const wi=matchWord(currentString());
+      if(wi>=0) accept(wi); else reject();
+    }
+  });
+  addEventListener("resize",()=>{ if(cells.length) layout(); });
+  newPuzzle();
+}
+</script>
+</body>
+</html>

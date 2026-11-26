@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>День 10 — вордл</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1410;--card:#13241b;--gold:#e8c37a;--green:#3ddc84;--dim:#6f8f7d}
+*{box-sizing:border-box}
+body{margin:0;padding:0 14px 46px;background:var(--bg);color:#eaf5ee;font:16px/1.5 Manrope,sans-serif;overflow-x:hidden}
+.wrap{max-width:560px;margin:0 auto;position:relative;z-index:1}
+.garland{display:flex;justify-content:center;gap:14px;border-top:2px solid #3a5a46;overflow:hidden}
+.bulb{width:9px;height:13px;border-radius:50% 50% 45% 45%;position:relative;margin-top:7px;flex:none;background:currentColor;transform-origin:top center;animation:sway 3s ease-in-out infinite alternate,glowblink 2s infinite}
+.bulb::before{content:"";position:absolute;top:-7px;left:3.5px;width:2px;height:7px;background:#3a5a46}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+@keyframes glowblink{0%,100%{filter:brightness(1);box-shadow:0 0 8px currentColor}50%{filter:brightness(.5);box-shadow:0 0 2px currentColor}}
+.flake{position:fixed;top:-12px;color:#cfe8da;opacity:.6;pointer-events:none;z-index:0;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(105vh) rotate(360deg)}}
+.back{color:var(--dim);font-size:13px;text-decoration:none}
+h1{font-family:Unbounded,sans-serif;font-size:22px;margin:12px 0 12px}
+h1 .gold{color:var(--gold)}
+.card{background:var(--card);border:1px solid #24402f;border-radius:16px;padding:16px;margin-bottom:12px}
+.rules{border-color:#3a5a46;background:#10241a}
+.rules b{color:var(--gold)}
+.rules ul{margin:6px 0 0;padding-left:18px;color:#bcd8c6;font-size:13.5px}
+.rules li{margin-bottom:3px}
+.task{color:#bcd8c6;font-size:14px;margin:0 0 12px}
+.note{color:var(--dim);font-size:13px;text-align:center}
+.wgrid{display:grid;grid-template-columns:repeat(5,46px);gap:6px;justify-content:center;margin-bottom:14px}
+.wcell{width:46px;height:50px;border:1px solid #24402f;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px}
+.wcell.cur{border-color:var(--gold)}
+.wcell.g{background:#1d5c38;border-color:var(--green)}
+.wcell.y{background:#3a321a;border-color:var(--gold)}
+.wcell.x{background:#15281d;color:var(--dim)}
+.kbd{display:grid;gap:5px;justify-content:center}
+.krow{display:flex;gap:5px;justify-content:center}
+.key{min-width:28px;padding:9px 5px;border-radius:8px;border:1px solid #24402f;background:#16281e;color:#eaf5ee;font-weight:700;font-size:13px;cursor:pointer}
+.key.g{background:#1d5c38;border-color:var(--green)}
+.key.y{background:#3a321a;border-color:var(--gold)}
+.key.x{background:#15281d;color:var(--dim)}
+.key.wide{min-width:52px}
+#msg{min-height:20px;margin-top:10px;font-size:14px;text-align:center}
+#msg.err{color:#ff8a8a} #msg.ok{color:var(--green)}
+button.act{margin:8px 5px 0;padding:9px 16px;border-radius:999px;border:none;cursor:pointer;background:linear-gradient(90deg,#e8c37a,#f6dfae);color:#20180a;font-weight:800}
+#riddle{font-size:16px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="garland" id="garland"></div>
+<div class="wrap">
+<a class="back" href="../">← календарь</a>
+<h1>День <span class="gold">10</span> · вордл</h1>
+<div class="card rules">
+  📜 <b>Как играть:</b> цель — разгадать головоломку и добыть загадку, а ответ принести боту: он выдаст подарок и фото тайника.
+  <ul>
+    <li>Угадай новогоднее слово из 5 букв за 6 попыток.</li>
+    <li>🟩 зелёная — буква верна и на своём месте.</li>
+    <li>🟨 жёлтая — буква в слове, но не на своём месте.</li>
+    <li>⬜ серая — такой буквы в слове нет. Отгадаешь — день откроет загадку 🎁</li>
+  </ul>
+</div>
+<div id="game" class="card"></div>
+<div id="riddleCard" class="card" hidden>
+  <h3 id="rTitle" style="margin:0 0 8px;font-size:16px;color:var(--gold)"></h3>
+  <p id="riddle"></p>
+  <p class="note">Отправь ответ боту в Telegram 🤖 Застрянешь — кнопка 💡 Подсказка у бота (раз в 2 минуты).</p>
+</div>
+</div>
+<script>
+const DAY = 10;
+const WORD = "ХОЛОД";
+const RIDDLE = "Побеждает трение без единого слова.";
+const GC = ["#e74c3c","#f1c40f","#3498db","#e67e22","#9b59b6","#2ecc71","#ff7eb0"];
+for (let i = 0; i < 17; i++){ const b = document.createElement("span"); b.className = "bulb"; b.style.color = GC[i % GC.length]; b.style.animationDelay = (i*.17)+"s, "+(i*.23)+"s"; document.getElementById("garland").appendChild(b); }
+for (let i = 0; i < 12; i++){ const f = document.createElement("div"); f.className = "flake"; f.textContent = "❄"; f.style.left = Math.random()*100+"vw"; f.style.fontSize = 8+Math.random()*9+"px"; f.style.animationDuration = 7+Math.random()*8+"s"; f.style.animationDelay = -Math.random()*10+"s"; document.body.appendChild(f); }
+const $ = id => document.getElementById(id);
+const q = new URLSearchParams(location.search);
+const now = new Date();
+const PREP = now < new Date(2026, 11, 1, 19, 0, 0); // режим подготовки: замки сняты
+const inDec = now.getFullYear() === 2026 && now.getMonth() === 11;
+const today = inDec ? now.getDate() : 0;
+const open = q.has("all") || PREP || (inDec && (DAY < today || (DAY === today && now.getHours() >= 19)));
+const past = !q.has("all") && (inDec && DAY < today);
+const solved = () => !!localStorage.getItem("advent_solved_" + DAY);
+function showRiddle(fresh, extra){
+  $("game").innerHTML = ""; $("riddleCard").hidden = false;
+  $("rTitle").textContent = (fresh ? "🎉 " + (extra || "Готово!") + " Вот загадка дня:" : "Загадка дня:");
+  $("riddle").textContent = RIDDLE;
+}
+if (!open){ $("game").innerHTML = `<p class="task">День откроется 10 декабря в 19:00 🔒</p>`; }
+else if (!q.has("all") && (solved() || past)){ showRiddle(false); }
+else {
+  const L = 5, ROWS = 6;
+  const KB = ["ЁЙЦУКЕНГШЩЗХЪ", "ФЫВАПРОЛДЖЭ", "ЯЧСМИТЬБЮ"];
+  let grid = Array.from({length: ROWS}, () => Array(L).fill(""));
+  let row = 0, done = false;
+  const keys = {};
+
+  $("game").innerHTML = `<p class="task">Метель загадала новогоднее слово. Шесть попыток — хватит?</p>
+    <div class="wgrid" id="wg"></div>
+    <div class="kbd" id="kb"></div>
+    <div id="msg"></div>
+    <div style="text-align:center"><button class="act" id="again" hidden>Сыграть ещё раз</button></div>`;
+
+  const wg = $("wg");
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < L; c++){
+    const d = document.createElement("div");
+    d.className = "wcell"; d.id = `c${r}_${c}`;
+    wg.appendChild(d);
+  }
+  const paintRow = () => {
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < L; c++)
+      $(`c${r}_${c}`).classList.toggle("cur", r === row && !done);
+  };
+  KB.forEach(line => {
+    const kr = document.createElement("div"); kr.className = "krow";
+    [...line].forEach(ch => {
+      const b = document.createElement("button");
+      b.className = "key"; b.textContent = ch; keys[ch] = b;
+      b.onclick = () => put(ch);
+      kr.appendChild(b);
+    });
+    $("kb").appendChild(kr);
+  });
+  const sr = document.createElement("div"); sr.className = "krow";
+  const enter = document.createElement("button"); enter.className = "key wide"; enter.textContent = "↵";
+  enter.onclick = submit;
+  const back = document.createElement("button"); back.className = "key wide"; back.textContent = "⌫";
+  back.onclick = () => { if (done) return; const i = grid[row].lastIndexOf("") ; if (i > -1){ const len = grid[row].join("").length; if (len){ grid[row][len-1] = ""; $(`c${row}_${len-1}`).textContent = ""; } } };
+  sr.appendChild(back); sr.appendChild(enter); $("kb").appendChild(sr);
+
+  const msg = (t, cls) => { const m = $("msg"); m.textContent = t; m.className = cls || ""; };
+  function put(ch){
+    if (done) return;
+    const i = grid[row].indexOf("");
+    if (i === -1) return;
+    grid[row][i] = ch;
+    $(`c${row}_${i}`).textContent = ch;
+  }
+  function submit(){
+    if (done) return;
+    const guess = grid[row].join("");
+    if (guess.length < L){ msg("Введи 5 букв.", "err"); return; }
+    const marks = Array(L).fill("x");
+    const pool = {};
+    for (let i = 0; i < L; i++){
+      if (guess[i] === WORD[i]) marks[i] = "g";
+      else pool[WORD[i]] = (pool[WORD[i]] || 0) + 1;
+    }
+    for (let i = 0; i < L; i++){
+      if (marks[i] === "g") continue;
+      if (pool[guess[i]]){ marks[i] = "y"; pool[guess[i]]--; }
+    }
+    for (let i = 0; i < L; i++){
+      $(`c${row}_${i}`).classList.add(marks[i]);
+      const k = keys[guess[i]];
+      if (k && !k.classList.contains("g")){
+        if (marks[i] === "g" || (marks[i] === "y" && !k.classList.contains("y"))) k.classList.add(marks[i]);
+        if (marks[i] === "x" && !k.classList.contains("y")) k.classList.add("x");
+      }
+    }
+    if (guess === WORD){
+      done = true; msg("❄ Слово угадано!", "ok");
+      localStorage.setItem("advent_solved_" + DAY, new Date().toISOString());
+      setTimeout(() => showRiddle(true, `Угадано за ${row + 1} попыток!`), 700);
+      return;
+    }
+    row++;
+    if (row === ROWS){
+      done = true;
+      msg(`Не вышло. Слово было: ${WORD}.`, "err");
+      $("again").hidden = false;
+    } else { paintRow(); msg(""); }
+  }
+  $("again").onclick = () => {
+    grid = Array.from({length: ROWS}, () => Array(L).fill(""));
+    row = 0; done = false;
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < L; c++){
+      const el = $(`c${r}_${c}`); el.textContent = ""; el.className = "wcell";
+    }
+    Object.values(keys).forEach(k => k.className = "key");
+    $("again").hidden = true; msg(""); paintRow();
+  };
+  document.addEventListener("keydown", e => {
+    if (done) return;
+    const ch = e.key.toUpperCase();
+    if (/^[А-ЯЁ]$/.test(ch)) put(ch);
+    else if (e.key === "Enter") submit();
+    else if (e.key === "Backspace") back.onclick();
+  });
+  paintRow();
+}
+</script>
+</body>
+</html>

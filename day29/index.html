@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>День 29 — музыкальная шкатулка</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#150f0a; --card:#241a10; --card2:#1b130b; --line:#4a3722; --line2:#6d5330;
+  --brass:#d9a63c; --brass2:#f4d78a; --gold:#ffd76a; --amber:#ffb347;
+  --green:#3ddc84; --red:#ff5f5f; --ice:#7fe3ff; --magenta:#ff7eb0; --violet:#b39ddb;
+  --ink:#f7efe2; --dim:#a8906c; --felt:#5c1f1a; --felt2:#3a130f;
+}
+*{box-sizing:border-box}
+html{scrollbar-color:var(--line2) #150f0a;scrollbar-width:thin}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#150f0a;border-radius:9px}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:9px;border:2px solid #150f0a}
+::-webkit-scrollbar-thumb:hover{background:#8a6a3a}
+body{margin:0;padding:0 14px 54px;color:var(--ink);overflow-x:hidden;
+  background:radial-gradient(1200px 620px at 50% -16%,#5a3d1a44,transparent 70%),var(--bg);
+  font:16px/1.5 Manrope,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:640px;margin:0 auto;position:relative;z-index:1}
+
+.garland{display:flex;justify-content:center;gap:14px;border-top:2px solid var(--line2);overflow:hidden}
+.gbulb{width:9px;height:13px;border-radius:50% 50% 45% 45%;position:relative;margin-top:7px;flex:none;
+ background:currentColor;transform-origin:top center;animation:sway 3s ease-in-out infinite alternate,glowblink 2s infinite}
+.gbulb::before{content:"";position:absolute;top:-7px;left:3.5px;width:2px;height:7px;background:var(--line2)}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+@keyframes glowblink{0%,100%{filter:brightness(1);box-shadow:0 0 8px currentColor}50%{filter:brightness(.5);box-shadow:0 0 2px currentColor}}
+.flake{position:fixed;top:-14px;color:#f2e6cb;opacity:.4;pointer-events:none;z-index:0;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(106vh) rotate(360deg)}}
+
+.back{color:var(--dim);font-size:13px;text-decoration:none}
+.back:hover{color:var(--gold)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0}
+h1{font-family:Unbounded,sans-serif;font-size:clamp(17px,4.4vw,22px);margin:0;line-height:1.25}
+h1 .gold{color:var(--gold)}
+.sndbtn{flex:none;padding:9px 13px;border-radius:999px;border:1px solid var(--line2);background:var(--card);
+ color:var(--ink);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+.sndbtn:hover{border-color:var(--gold);color:var(--gold)}
+.sndbtn.off{color:var(--dim);border-color:var(--line)}
+
+.card{background:linear-gradient(165deg,var(--card),var(--card2));border:1px solid var(--line);
+ border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 10px 30px #0007}
+.rules{border-color:var(--line2);background:linear-gradient(165deg,#2a1d10,#1b130b)}
+.rules b{color:var(--gold)}
+.rules ul{margin:6px 0 0;padding-left:18px;color:#d9c8a8;font-size:13.5px}
+.rules li{margin-bottom:3px}
+.task{color:#d9c8a8;font-size:14px;margin:0 0 12px}
+.note{color:var(--dim);font-size:12.5px;margin:10px 0 0}
+
+.hud{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.stat{display:flex;flex-direction:column;gap:1px;padding:7px 12px;border-radius:12px;
+ border:1px solid var(--line);background:#1b130b;min-width:70px}
+.stat i{font:700 10px/1 Manrope,sans-serif;letter-spacing:.12em;color:var(--dim);font-style:normal}
+.stat b{font:800 16px/1.2 Manrope,sans-serif;color:var(--gold)}
+.stat.g b{color:var(--green)} .stat.d b{color:var(--red)} .stat.m b{color:var(--magenta)}
+
+.box{position:relative;border-radius:20px;padding:16px 14px 14px;border:1px solid var(--line2);
+ background:
+  radial-gradient(120% 90% at 50% -10%,#3a2812,#1b130b 70%),
+  linear-gradient(160deg,#2a1d10,#150f0a);
+ box-shadow:0 18px 40px #000b,inset 0 1px 0 #ffffff14,inset 0 -20px 40px #00000066}
+.box.good{animation:good .8s ease-out}
+@keyframes good{0%{box-shadow:0 18px 40px #000b}45%{box-shadow:0 18px 46px #000b,inset 0 0 70px #3ddc8444,0 0 40px #3ddc8433}100%{box-shadow:0 18px 40px #000b}}
+.box.shake{animation:shk .4s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shk{10%,90%{transform:translateX(-3px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
+
+.machine{display:flex;align-items:center;gap:14px;justify-content:center;flex-wrap:wrap}
+.horn{width:96px;height:96px;flex:none;position:relative}
+.horn svg{width:100%;height:100%;overflow:visible}
+.disc{width:110px;height:110px;flex:none;border-radius:50%;position:relative;
+ background:repeating-radial-gradient(circle at 50% 50%,#1a1208 0 3px,#241a10 3px 6px);
+ box-shadow:0 6px 18px #000a,inset 0 0 0 3px #6d5330,inset 0 0 26px #000;
+ display:flex;align-items:center;justify-content:center}
+.disc::after{content:"";position:absolute;width:34px;height:34px;border-radius:50%;
+ background:radial-gradient(circle at 35% 32%,var(--brass2),var(--brass) 60%,#8a6a2a);
+ box-shadow:0 0 14px #d9a63c66}
+.disc.spin{animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.needle{position:absolute;right:-6px;top:8px;width:52px;height:6px;border-radius:4px;
+ background:linear-gradient(90deg,#8a6a3a,#d9a63c);transform-origin:right center;transform:rotate(24deg);
+ box-shadow:0 2px 6px #0008;transition:transform .3s}
+.needle.on{transform:rotate(8deg)}
+
+.playrow{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:14px}
+button.act{padding:12px 22px;border-radius:999px;border:none;cursor:pointer;font:800 15px Manrope,sans-serif;
+ background:linear-gradient(90deg,var(--brass),var(--brass2));color:#2a1c06;box-shadow:0 4px 18px #d9a63c33;transition:.15s}
+button.act:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 24px #d9a63c55}
+button.act:active{transform:translateY(0)}
+button.act.pulse{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 4px 18px #d9a63c33}50%{box-shadow:0 0 0 8px #d9a63c22,0 4px 26px #d9a63c66}}
+button.act:disabled{opacity:.45;cursor:not-allowed;transform:none}
+button.ghost{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:none;
+ color:var(--dim);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+button.ghost:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+button.ghost:disabled{opacity:.4;cursor:not-allowed}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{padding:9px 12px;border:none;background:none;color:var(--dim);font:700 12px Manrope,sans-serif;cursor:pointer;transition:.15s}
+.seg button:hover{color:var(--ink)}
+.seg button.on{background:#3a2812;color:var(--brass2)}
+
+.piano{position:relative;height:86px;margin:16px auto 4px;max-width:520px;border-radius:0 0 10px 10px;overflow:hidden;
+ border:1px solid var(--line2);border-top:none;box-shadow:0 10px 24px #0009,inset 0 -8px 16px #00000066;background:#0d0906}
+.wk{position:absolute;top:0;bottom:0;background:linear-gradient(180deg,#f7f2e6,#d9d2c0 78%,#b8b0a0);
+ border-right:1px solid #00000055;transition:background .08s}
+.wk.on{background:linear-gradient(180deg,var(--gold),var(--amber));box-shadow:inset 0 -10px 18px #ff9d3c88}
+.bk{position:absolute;top:0;height:56%;background:linear-gradient(180deg,#2a2118,#0d0906);
+ border-radius:0 0 4px 4px;box-shadow:0 3px 6px #000a,inset 0 -3px 5px #ffffff22;transition:background .08s;z-index:2}
+.bk.on{background:linear-gradient(180deg,var(--brass),#8a6a2a);box-shadow:0 0 14px #d9a63c99}
+
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.opt{padding:13px 12px;border-radius:13px;border:1px solid var(--line);background:#1b130b;color:var(--ink);
+ cursor:pointer;font:700 13px/1.3 Manrope,sans-serif;text-align:left;transition:.15s;position:relative}
+.opt:hover:not(:disabled){border-color:var(--gold);transform:translateY(-2px);background:#241a10}
+.opt:disabled{cursor:not-allowed}
+.opt.gone{opacity:.3;text-decoration:line-through}
+.opt.cut{opacity:.25;pointer-events:none}
+.opt.right{border-color:var(--green);background:#12301f;color:var(--green);box-shadow:0 0 18px #3ddc8444}
+.opt.wrong{border-color:var(--red);background:#331412;color:#ffb3b3;animation:shk .35s}
+.opt .tag{position:absolute;top:6px;right:8px;font:800 10px Manrope,sans-serif;color:var(--dim)}
+
+#msg{min-height:22px;margin-top:12px;font-size:13.5px;text-align:center;color:var(--dim)}
+#msg.ok{color:var(--green)} #msg.err{color:var(--red)} #msg.warn{color:var(--amber)}
+
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.overlay{position:absolute;inset:0;z-index:8;display:none;flex-direction:column;align-items:center;justify-content:center;
+ gap:10px;padding:22px;text-align:center;background:#120c06ee;backdrop-filter:blur(6px);border-radius:20px}
+.overlay.on{display:flex;animation:fadein .35s ease-out}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.overlay h3{font-family:Unbounded,sans-serif;font-size:19px;margin:0;color:var(--gold)}
+.overlay p{margin:0;font-size:13.5px;color:#d9c8a8;max-width:350px}
+.badge{padding:5px 12px;border-radius:999px;border:1px solid var(--green);color:var(--green);
+ background:#12301f;font:700 12px Manrope,sans-serif}
+#riddle{font-size:16px;white-space:pre-wrap}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:40}
+@media (max-width:430px){
+  .stat{min-width:60px;padding:6px 9px}
+  .stat b{font-size:15px}
+  .opts{grid-template-columns:1fr}
+  .horn{width:76px;height:76px}
+  .disc{width:88px;height:88px}
+  .piano{height:70px}
+}
+</style>
+</head>
+<body>
+<div class="garland" id="garland"></div>
+<div class="wrap">
+  <a class="back" href="../">← календарь</a>
+  <div class="top">
+    <h1>День <span class="gold">29</span> · музыкальная шкатулка</h1>
+    <button class="sndbtn" id="snd">🔊 Звук</button>
+  </div>
+
+  <div class="card rules">
+    📜 <b>Как играть:</b> цель — разгадать головоломку и добыть загадку, а ответ принести боту: он выдаст подарок и фото тайника.
+    <ul>
+      <li>Шкатулка проигрывает мотив. Узнай его и нажми правильное название из четырёх.</li>
+      <li>Клавиши пианино внизу загораются вместе с нотами — следи за мелодией глазами.</li>
+      <li>Ошибка стоит жизни, повтор прослушивания — очков. Подсказка убирает два неверных варианта.</li>
+      <li>Пройди все восемь мотивов — шкатулка откроет загадку 🎁</li>
+    </ul>
+  </div>
+
+  <div id="game" class="card"></div>
+
+  <div id="riddleCard" class="card" hidden>
+    <h3 id="rTitle" style="margin:0 0 8px;font-size:16px;color:var(--gold)"></h3>
+    <p id="riddle"></p>
+    <p class="note">Отправь ответ боту в Telegram 🤖 Застрянешь — кнопка 💡 Подсказка у бота (раз в 2 минуты).</p>
+  </div>
+</div>
+<canvas id="fx"></canvas>
+
+<script>
+/* ===== настройки дня ===== */
+const DAY = 29;
+const RIDDLE = "Тройной удар: блеск на запястье, сладость на каждый день и пена до потолка. Назови все три.";
+const MEL = [
+  { id:"jingle", title:"Бубенцы (Jingle Bells)", bpm:132, notes:[[64,1],[64,1],[64,2],[64,1],[64,1],[64,2],[64,1],[67,1],[60,1],[62,1],[64,4]] },
+  { id:"twinkle", title:"Звёздная ночь (Twinkle)", bpm:104, notes:[[60,1],[60,1],[67,1],[67,1],[69,1],[69,1],[67,2],[65,1],[65,1],[64,1],[64,1],[62,1],[62,1],[60,2]] },
+  { id:"silent", title:"Тихая ночь", bpm:96, notes:[[67,1],[69,1],[67,1],[64,2],[67,1],[69,1],[67,1],[64,2],[71,2],[71,1],[69,2],[72,2],[72,1],[71,1],[67,2]] },
+  { id:"wewish", title:"Мы поздравляем (Merry Christmas)", bpm:120, notes:[[62,1],[67,1],[67,1],[69,1],[67,1],[66,1],[64,1],[62,3]] },
+  { id:"mary", title:"У Мэри был ягнёнок", bpm:112, notes:[[64,1],[62,1],[60,1],[62,1],[64,1],[64,1],[64,2],[62,1],[62,1],[62,2]] },
+  { id:"ode", title:"Ода радости", bpm:116, notes:[[64,1],[64,1],[65,1],[67,1],[67,1],[65,1],[64,1],[62,1],[60,1],[60,1],[62,1],[64,1],[64,1.5],[62,.5],[62,2]] },
+  { id:"shchedryk", title:"Щедрик (Carol of the Bells)", bpm:150, notes:[[69,.5],[69,.5],[69,.5],[69,.5],[72,.5],[69,.5],[69,.5],[69,.5],[69,.5],[69,.5],[72,.5],[69,.5],[76,1],[72,1],[69,1]] },
+  { id:"elise", title:"К Элизе", bpm:120, notes:[[76,1],[75,1],[76,1],[75,1],[76,1],[71,1],[74,1],[72,1],[69,3]] }
+];
+const ORDER = [0,1,2,3,4,5,6,7];
+
+/* ===== антураж ===== */
+const GC=["#e0453c","#ffd76a","#3ddc84","#7fe3ff","#ff7eb0","#b39ddb","#ffb347"];
+for(let i=0;i<17;i++){
+  const b=document.createElement("span");
+  b.className="gbulb"; b.style.color=GC[i%GC.length];
+  b.style.animationDelay=(i*.17)+"s, "+(i*.23)+"s";
+  document.getElementById("garland").appendChild(b);
+}
+for(let i=0;i<12;i++){
+  const f=document.createElement("div");
+  f.className="flake"; f.textContent="❄";
+  f.style.left=Math.random()*100+"vw";
+  f.style.fontSize=8+Math.random()*9+"px";
+  f.style.animationDuration=7+Math.random()*8+"s";
+  f.style.animationDelay=-Math.random()*10+"s";
+  document.body.appendChild(f);
+}
+
+/* ===== служебное ===== */
+const $=id=>document.getElementById(id);
+const q=new URLSearchParams(location.search);
+const now=new Date();
+const PREP = now < new Date(2026, 11, 1, 19, 0, 0); // режим подготовки: замки сняты
+const inDec=now.getFullYear()===2026&&now.getMonth()===11;
+const today=inDec?now.getDate():0;
+const open = q.has("all") || PREP || (inDec && (DAY < today || (DAY === today && now.getHours() >= 19)));
+const past = !q.has("all") && (inDec && DAY < today);
+const daySolved=()=>!!localStorage.getItem("advent_solved_"+DAY);
+const mtof=m=>440*Math.pow(2,(m-69)/12);
+const NOTE_NAMES=["до","до#","ре","ре#","ми","фа","фа#","соль","соль#","ля","ля#","си"];
+
+/* ===== звук ===== */
+let snd=localStorage.getItem("advent_snd")!=="0";
+let AC=null, master=null, live=[];
+function ac(){
+  if(!AC){
+    const C=window.AudioContext||window.webkitAudioContext;
+    if(C){
+      AC=new C();
+      master=AC.createGain(); master.gain.value=.9;
+      const delay=AC.createDelay(1); delay.delayTime.value=.22;
+      const fb=AC.createGain(); fb.gain.value=.26;
+      const wet=AC.createGain(); wet.gain.value=.2;
+      master.connect(AC.destination);
+      master.connect(delay); delay.connect(fb); fb.connect(delay);
+      delay.connect(wet); wet.connect(AC.destination);
+    }
+  }
+  if(AC&&AC.state==="suspended") AC.resume();
+  return AC;
+}
+function voice(midi,when,dur,vol){
+  if(!snd) return; const c=ac(); if(!c) return;
+  const f=mtof(midi);
+  const mk=(type,mult,g0)=>{
+    const o=c.createOscillator(), g=c.createGain();
+    o.type=type; o.frequency.setValueAtTime(f*mult,when);
+    g.gain.setValueAtTime(.0001,when);
+    g.gain.linearRampToValueAtTime(g0,when+.012);
+    g.gain.exponentialRampToValueAtTime(.0001,when+dur);
+    o.connect(g); g.connect(master);
+    o.start(when); o.stop(when+dur+.05);
+    live.push(o); o.onended=()=>{ live=live.filter(x=>x!==o); };
+  };
+  mk("triangle",1,vol);
+  mk("sine",2,vol*.35);
+  mk("sine",.5,vol*.22);
+}
+function tone(freq,ms,delay=0,vol=.12,type="sine"){
+  if(!snd) return; const c=ac(); if(!c) return;
+  const t=c.currentTime+delay/1000, d=ms/1000;
+  const o=c.createOscillator(), g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,t);
+  g.gain.setValueAtTime(.0001,t);
+  g.gain.linearRampToValueAtTime(vol,t+.01);
+  g.gain.setValueAtTime(vol,t+Math.max(.012,d-.03));
+  g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g); g.connect(c.destination);
+  o.start(t); o.stop(t+d+.03);
+  live.push(o); o.onended=()=>{ live=live.filter(x=>x!==o); };
+}
+function sweep(f1,f2,ms,vol=.12,type="triangle"){
+  if(!snd) return; const c=ac(); if(!c) return;
+  const t=c.currentTime,d=ms/1000;
+  const o=c.createOscillator(),g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(f1,t);
+  o.frequency.exponentialRampToValueAtTime(Math.max(30,f2),t+d);
+  g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+d+.02);
+  live.push(o); o.onended=()=>{ live=live.filter(x=>x!==o); };
+}
+function killSound(){ live.forEach(o=>{try{o.stop();}catch(e){}}); live=[]; }
+function paintSnd(){
+  const b=$("snd");
+  b.textContent=snd?"🔊 Звук":"🔇 Тихо";
+  b.classList.toggle("off",!snd);
+}
+$("snd").onclick=()=>{
+  snd=!snd; localStorage.setItem("advent_snd",snd?"1":"0");
+  paintSnd();
+  if(snd){ ac(); tone(880,90,0,.12); } else killSound();
+};
+paintSnd();
+
+/* ===== частицы ===== */
+const fx=$("fx"), fctx=fx.getContext("2d");
+let parts=[], fxRun=false;
+function sizeFx(){
+  const r=Math.min(devicePixelRatio||1,2);
+  fx.width=innerWidth*r; fx.height=innerHeight*r;
+  fx.style.width=innerWidth+"px"; fx.style.height=innerHeight+"px";
+  fctx.setTransform(r,0,0,r,0,0);
+}
+sizeFx(); addEventListener("resize",sizeFx);
+function spawn(p){ parts.push(p); if(!fxRun){ fxRun=true; requestAnimationFrame(stepFx); } }
+function noteFly(x,y,col){
+  for(let i=0;i<6;i++){
+    spawn({x:x+(Math.random()-.5)*14,y,vx:(Math.random()-.5)*1.4,vy:-1.4-Math.random()*2,
+      g:-.01,s:1.6+Math.random()*2.4,c:col,life:1,dec:.02,round:true});
+  }
+}
+function confetti(){
+  const cols=["#ffd76a","#3ddc84","#ffb347","#7fe3ff","#ff7eb0","#b39ddb","#f7efe2"];
+  for(let i=0;i<190;i++){
+    spawn({x:innerWidth/2+(Math.random()-.5)*230,y:innerHeight*.34,
+      vx:(Math.random()-.5)*8.5,vy:-Math.random()*9.5-2,g:.22,
+      w:4+Math.random()*6,h:3+Math.random()*5,a:Math.random()*Math.PI,va:(Math.random()-.5)*.3,
+      c:cols[(Math.random()*cols.length)|0],life:1,dec:.007});
+  }
+}
+function stepFx(){
+  fctx.clearRect(0,0,innerWidth,innerHeight);
+  parts.forEach(p=>{
+    p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.life-=p.dec;
+    fctx.globalAlpha=Math.max(0,p.life); fctx.fillStyle=p.c;
+    if(p.round){ fctx.beginPath(); fctx.arc(p.x,p.y,p.s,0,6.28); fctx.fill(); }
+    else { p.a+=p.va; fctx.save(); fctx.translate(p.x,p.y); fctx.rotate(p.a);
+      fctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); fctx.restore(); }
+  });
+  fctx.globalAlpha=1;
+  parts=parts.filter(p=>p.life>0&&p.y<innerHeight+50&&p.y>-40);
+  if(parts.length) requestAnimationFrame(stepFx);
+  else { fxRun=false; fctx.clearRect(0,0,innerWidth,innerHeight); }
+}
+
+/* ===== пианино ===== */
+const PLO=55, PHI=79;
+const keyEls={};
+function buildPiano(host){
+  host.innerHTML="";
+  const whites=[];
+  for(let m=PLO;m<=PHI;m++) if([0,2,4,5,7,9,11].includes(m%12)) whites.push(m);
+  const ww=100/whites.length;
+  let wi=0;
+  const pos={};
+  for(let m=PLO;m<=PHI;m++){
+    if([0,2,4,5,7,9,11].includes(m%12)){ pos[m]=wi*ww; wi++; }
+  }
+  for(let m=PLO;m<=PHI;m++){
+    const isW=[0,2,4,5,7,9,11].includes(m%12);
+    const el=document.createElement("div");
+    el.className=isW?"wk":"bk";
+    if(isW){ el.style.left=pos[m]+"%"; el.style.width=ww+"%"; }
+    else { el.style.left=(pos[m+1]-ww*.32)+"%"; el.style.width=(ww*.64)+"%"; }
+    el.dataset.m=m;
+    host.appendChild(el);
+    keyEls[m]=el;
+  }
+}
+function lightKey(m,on){
+  const el=keyEls[m]; if(!el) return;
+  el.classList.toggle("on",on);
+}
+
+/* ===== игра ===== */
+let timers=[], playToken=0;
+function later(fn,ms){ const id=setTimeout(fn,ms); timers.push(id); return id; }
+function clearTimers(){ timers.forEach(clearTimeout); timers=[]; playToken++; }
+function showRiddle(fresh,extra){
+  clearTimers(); killSound();
+  $("game").innerHTML="";
+  $("riddleCard").hidden=false;
+  $("rTitle").textContent=fresh?"🎉 "+(extra||"Готово!")+" Вот загадка дня:":"Загадка дня:";
+  $("riddle").textContent=RIDDLE;
+}
+
+if(!open){
+  $("game").innerHTML=`<p class="task">День откроется 29 декабря в 19:00 🔒</p>`;
+}
+else if(daySolved()||past){
+  showRiddle(false);
+}
+else {
+  $("game").innerHTML=`
+    <p class="task">Дед Мороз завёл старую шкатулку: игла коснулась пластинки, и полился мотив. Угадай, что звучит, — и шкатулка отдаст последний подарок декабря.</p>
+    <div class="hud">
+      <div class="stat"><i>МОТИВ</i><b id="rd">1/8</b></div>
+      <div class="stat g"><i>СЧЁТ</i><b id="sc">0</b></div>
+      <div class="stat m"><i>СЕРИЯ</i><b id="st">0</b></div>
+      <div class="stat d"><i>ЖИЗНИ</i><b id="lv">❄❄❄</b></div>
+      <div class="stat"><i>ПОДСКАЗКИ</i><b id="hc">3</b></div>
+    </div>
+    <div class="box" id="box">
+      <div class="machine">
+        <div class="horn"><svg viewBox="0 0 100 100">
+          <path d="M18 78 C10 60 14 40 34 30 C50 22 66 26 74 38 C82 50 78 66 64 72 L40 82 Z"
+            fill="url(#hg)" stroke="#8a6a2a" stroke-width="2"/>
+          <defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f4d78a"/><stop offset=".5" stop-color="#d9a63c"/><stop offset="1" stop-color="#8a6a2a"/>
+          </linearGradient></defs>
+          <circle cx="40" cy="82" r="7" fill="#6d5330"/>
+          <path d="M40 82 L52 60" stroke="#6d5330" stroke-width="5" stroke-linecap="round"/>
+        </svg></div>
+        <div class="disc" id="disc"><div class="needle" id="needle"></div></div>
+      </div>
+      <div class="playrow">
+        <button class="act pulse" id="play">▶ Слушать мотив</button>
+        <div class="seg" id="spd">
+          <button data-s="0.7">медленно</button><button data-s="1" class="on">обычно</button><button data-s="1.3">быстро</button>
+        </div>
+      </div>
+      <div class="piano" id="piano"></div>
+      <div class="opts" id="opts"></div>
+      <div id="msg">Нажми «Слушать мотив» — шкатулка заведётся.</div>
+      <div class="controls">
+        <button class="ghost" id="fifty">✂️ Убрать два · 3</button>
+        <button class="ghost" id="again">↻ Заново</button>
+      </div>
+      <div class="overlay" id="ov">
+        <h3 id="ovt">Шкатулка заведена</h3>
+        <p id="ovp"></p>
+        <div id="ovb"></div>
+        <button class="act pulse" id="ovbtn">▶ Начать</button>
+      </div>
+    </div>`;
+
+  let round=0, score=0, streak=0, bestStreak=0, lives=3, hints=3;
+  let speed=1, played=false, locked=false, over=false, replays=0;
+  let options=[], correctIdx=0, cutSet=new Set();
+
+  const box=$("box"), piano=$("piano"), opts=$("opts");
+  const setMsg=(t,cls)=>{ const m=$("msg"); if(m){ m.textContent=t; m.className=cls||""; } };
+
+  buildPiano(piano);
+
+  function cur(){ return MEL[ORDER[round]]; }
+  function makeOptions(){
+    const c=ORDER[round];
+    const others=MEL.map((m,i)=>i).filter(i=>i!==c);
+    for(let i=others.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [others[i],others[j]]=[others[j],others[i]]; }
+    const pick=others.slice(0,3);
+    options=[c,...pick].map(i=>MEL[i]);
+    for(let i=options.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [options[i],options[j]]=[options[j],options[i]]; }
+    correctIdx=options.findIndex(m=>m.id===MEL[c].id);
+  }
+  function renderOpts(){
+    opts.innerHTML=""; cutSet.clear();
+    options.forEach((m,i)=>{
+      const b=document.createElement("button");
+      b.className="opt"; b.disabled=!played||locked;
+      b.innerHTML=`<span class="tag">${i+1}</span>${m.title}`;
+      b.onclick=()=>pick(i,b);
+      opts.appendChild(b);
+    });
+  }
+  function hud(){
+    $("rd").textContent=(round+1)+"/"+ORDER.length;
+    $("sc").textContent=score;
+    $("st").textContent="×"+(1+Math.min(4,Math.floor(streak/2)));
+    $("lv").textContent="❄".repeat(Math.max(0,lives))+"·".repeat(Math.max(0,3-lives));
+    $("hc").textContent=hints;
+    $("fifty").textContent="✂️ Убрать два · "+hints;
+    $("fifty").disabled=hints<=0||locked||over||played&&cutSet.size>0;
+  }
+  function playMelody(){
+    ac();
+    clearTimers();
+    const token=++playToken;
+    played=true; locked=false;
+    const m=cur();
+    const beat=60/m.bpm/speed;
+    const t0=ac().currentTime+.12;
+    $("disc").classList.add("spin");
+    $("needle").classList.add("on");
+    $("play").disabled=true;
+    $("play").textContent="♫ Звучит…";
+    renderOpts(); hud();
+    setMsg("Слушай и смотри на клавиши…","warn");
+    let t=0;
+    m.notes.forEach(([midi,beats])=>{
+      const dur=beats*beat;
+      voice(midi,t0+t,dur*.92,.16);
+      later(()=>{
+        if(token!==playToken) return;
+        lightKey(midi,true);
+        const el=keyEls[midi];
+        if(el){ const r=el.getBoundingClientRect(); noteFly(r.left+r.width/2,r.top+8,"#ffd76a"); }
+      },(t)*1000+120);
+      later(()=>{ if(token===playToken) lightKey(midi,false); },(t+dur*.9)*1000+120);
+      t+=dur;
+    });
+    later(()=>{
+      if(token!==playToken) return;
+      $("disc").classList.remove("spin");
+      $("needle").classList.remove("on");
+      $("play").disabled=false;
+      $("play").textContent="↻ Слушать ещё";
+      setMsg("Что это за мотив? Выбирай ниже.");
+      renderOpts(); hud();
+    },t*1000+260);
+  }
+  function pick(i,btn){
+    if(locked||over||!played) return;
+    ac();
+    if(i===correctIdx){
+      locked=true;
+      btn.classList.add("right");
+      opts.querySelectorAll(".opt").forEach((b,k)=>{ b.disabled=true; if(k!==i) b.classList.add("gone"); });
+      streak++; bestStreak=Math.max(bestStreak,streak);
+      const mult=1+Math.min(4,Math.floor(streak/2));
+      const gain=(100-replays*15-(cutSet.size?30:0))*mult;
+      score+=Math.max(20,gain);
+      box.classList.add("good"); later(()=>box.classList.remove("good"),820);
+      tone(660,130,0,.14); tone(880,130,.12,.14); tone(1174,180,.24,.13);
+      const r=btn.getBoundingClientRect();
+      noteFly(r.left+r.width/2,r.top+r.height/2,"#3ddc84");
+      setMsg(`Верно! «${options[i].title}» · +${Math.max(20,gain)} очков`,"ok");
+      hud();
+      later(nextRound,1100);
+    } else {
+      btn.classList.add("wrong"); btn.disabled=true;
+      streak=0; lives--;
+      box.classList.add("shake"); later(()=>box.classList.remove("shake"),420);
+      sweep(300,90,260,.14,"sawtooth");
+      hud();
+      if(lives<=0){ lose(); return; }
+      setMsg(`Не тот мотив. Осталось жизней: ${lives}. Слушай ещё и пробуй снова.`,"err");
+    }
+  }
+  function nextRound(){
+    if(round+1>=ORDER.length){ win(); return; }
+    round++;
+    played=false; locked=false; replays=0;
+    makeOptions(); renderOpts(); hud();
+    Object.keys(keyEls).forEach(m=>lightKey(+m,false));
+    $("play").disabled=false;
+    $("play").textContent="▶ Слушать мотив";
+    setMsg(`Мотив ${round+1} из ${ORDER.length}. Заводи шкатулку.`);
+    tone(520,90,0,.08,"triangle"); tone(760,110,.09,.07,"triangle");
+  }
+  function win(){
+    over=true; clearTimers(); killSound();
+    localStorage.setItem("advent_solved_"+DAY,new Date().toISOString());
+    confetti();
+    tone(660,150,0,.16); tone(880,150,.16,.16); tone(1174,190,.32,.16); tone(1568,340,.5,.15);
+    const ov=$("ov");
+    $("ovt").textContent="🎄 Шкатулка допела!";
+    $("ovp").textContent=`Все восемь мотивов угаданы: счёт ${score}, лучшая серия ${bestStreak}. Три подарка уже ждут — браслет, адвент и пена.`;
+    $("ovb").innerHTML=(lives===3?`<span class="badge">Без потерь</span>`:"")+(score>=800?`<span class="badge">Меломан</span>`:"");
+    $("ovbtn").textContent="🎁 Открыть загадку";
+    $("ovbtn").onclick=()=>showRiddle(true,`восемь мотивов, счёт ${score}`);
+    ov.classList.add("on");
+    setMsg("✨ Финальный аккорд декабря!","ok");
+    hud();
+  }
+  function lose(){
+    over=true; clearTimers(); killSound();
+    sweep(420,80,620,.15,"triangle");
+    const ov=$("ov");
+    $("ovt").textContent="Пружина села";
+    $("ovp").textContent=`Жизни кончились на мотиве ${round+1}. Счёт ${score}. Заведи шкатулку заново — мелодии те же, уши уже теплее.`;
+    $("ovb").innerHTML="";
+    $("ovbtn").textContent="↻ Ещё раз";
+    $("ovbtn").onclick=()=>restart();
+    ov.classList.add("on");
+    setMsg("Жизни закончились.","err");
+    hud();
+  }
+  function restart(){
+    clearTimers(); killSound();
+    round=0; score=0; streak=0; bestStreak=0; lives=3; hints=3; replays=0;
+    played=false; locked=false; over=false;
+    Object.keys(keyEls).forEach(m=>lightKey(+m,false));
+    $("ov").classList.remove("on");
+    $("disc").classList.remove("spin");
+    $("needle").classList.remove("on");
+    makeOptions(); renderOpts(); hud();
+    $("play").disabled=false;
+    $("play").textContent="▶ Слушать мотив";
+    setMsg("Шкатулка заведена заново. Нажми «Слушать мотив».");
+  }
+
+  $("play").onclick=()=>{
+    if(over) return;
+    if(played) replays++;
+    playMelody();
+  };
+  $("spd").querySelectorAll("button").forEach(b=>{
+    b.onclick=()=>{
+      speed=+b.dataset.s;
+      $("spd").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));
+      tone(600*speed,60,0,.06,"triangle");
+    };
+  });
+  $("fifty").onclick=()=>{
+    if(hints<=0||locked||over||cutSet.size) return;
+    hints--;
+    const wrong=options.map((m,i)=>i).filter(i=>i!==correctIdx);
+    for(let i=wrong.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [wrong[i],wrong[j]]=[wrong[j],wrong[i]]; }
+    wrong.slice(0,2).forEach(i=>{
+      cutSet.add(i);
+      const b=opts.children[i];
+      if(b){ b.classList.add("cut"); b.disabled=true; }
+    });
+    tone(1320,110,0,.1,"triangle"); tone(1760,130,.1,.08,"sine");
+    hud();
+    setMsg("Два неверных варианта убраны ✂️");
+  };
+  $("again").onclick=restart;
+  document.addEventListener("keydown",e=>{
+    if(over){ if(e.key==="Enter"){ e.preventDefault(); $("ovbtn").click(); } return; }
+    if(e.key>="1"&&e.key<="4"){
+      const i=+e.key-1;
+      const b=opts.children[i];
+      if(b&&!b.disabled) b.click();
+    }
+    if(e.key===" "){ e.preventDefault(); if(!$("play").disabled) $("play").click(); }
+  });
+
+  makeOptions(); renderOpts(); hud();
+  const ov=$("ov");
+  $("ovt").textContent="Музыкальная шкатулка";
+  $("ovp").textContent="Восемь мотивов, три жизни, три подсказки-ножницы. Клавиши пианино подскажут контур мелодии. Цифры 1–4 выбирают вариант.";
+  $("ovb").innerHTML="";
+  $("ovbtn").textContent="▶ Начать";
+  $("ovbtn").onclick=()=>{ ov.classList.remove("on"); ac(); setMsg("Нажми «Слушать мотив»."); };
+  ov.classList.add("on");
+}
+</script>
+</body>
+</html>

@@ -3,86 +3,200 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>День 5 — Терминал</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<title>День 5 — сейф Деда Мороза</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-  body{margin:0;background:#0a0f0a;color:#33ff66;font:15px/1.5 "Courier New",monospace;padding:14px}
-  #out{white-space:pre-wrap;word-break:break-word}
-  #line{display:flex;gap:8px;margin-top:8px}
-  #cmd{flex:1;background:transparent;border:none;outline:none;color:#33ff66;font:inherit}
-  .dim{color:#1f9944}
-  a.back{color:#1f9944;font-size:13px}
+:root{--bg:#0b1410;--card:#13241b;--gold:#e8c37a;--green:#3ddc84;--dim:#6f8f7d}
+*{box-sizing:border-box}
+body{margin:0;padding:0 14px 46px;background:var(--bg);color:#eaf5ee;
+     font:16px/1.5 Manrope,sans-serif;overflow-x:hidden}
+.wrap{max-width:560px;margin:0 auto;position:relative;z-index:1}
+.garland{display:flex;justify-content:center;gap:14px;border-top:2px solid #3a5a46;overflow:hidden}
+.bulb{width:9px;height:13px;border-radius:50% 50% 45% 45%;position:relative;margin-top:7px;flex:none;
+ background:currentColor;transform-origin:top center;
+ animation:sway 3s ease-in-out infinite alternate, glowblink 2s infinite}
+.bulb::before{content:"";position:absolute;top:-7px;left:3.5px;width:2px;height:7px;background:#3a5a46}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+@keyframes glowblink{0%,100%{filter:brightness(1);box-shadow:0 0 8px currentColor}50%{filter:brightness(.5);box-shadow:0 0 2px currentColor}}
+.flake{position:fixed;top:-12px;color:#cfe8da;opacity:.6;pointer-events:none;z-index:0;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(105vh) rotate(360deg)}}
+.back{color:var(--dim);font-size:13px;text-decoration:none}
+h1{font-family:Unbounded,sans-serif;font-size:22px;margin:12px 0 12px}
+h1 .gold{color:var(--gold)}
+.card{background:var(--card);border:1px solid #24402f;border-radius:16px;padding:16px;margin-bottom:12px}
+.rules{border-color:#3a5a46;background:#10241a}
+.rules b{color:var(--gold)}
+.rules ul{margin:6px 0 0;padding-left:18px;color:#bcd8c6;font-size:13.5px}
+.rules li{margin-bottom:3px}
+.task{color:#bcd8c6;font-size:14px;margin:0 0 12px}
+.note{color:var(--dim);font-size:13px}
+.code{display:flex;gap:10px;justify-content:center;margin:6px 0 12px}
+.code input{width:52px;height:60px;text-align:center;font-size:26px;font-weight:800;border-radius:12px;
+ border:1px solid #24402f;background:#0d1a13;color:var(--gold);outline:none}
+.code input:focus{border-color:var(--gold)}
+.btns{text-align:center}
+button.act{margin:4px 5px;padding:10px 20px;border-radius:999px;border:none;cursor:pointer;
+ background:linear-gradient(90deg,#e8c37a,#f6dfae);color:#20180a;font-weight:800}
+button.ghost{background:none;border:1px solid #24402f;color:var(--dim);font-weight:600}
+.hist{margin-top:12px;display:grid;gap:6px}
+.hrow{display:flex;justify-content:space-between;background:#0d1a13;border:1px solid #24402f;
+ border-radius:10px;padding:7px 12px;font-size:14px}
+.hrow b{color:var(--gold);letter-spacing:3px}
+#msg{min-height:20px;margin-top:8px;font-size:14px;text-align:center}
+#msg.err{color:#ff8a8a} #msg.ok{color:var(--green)}
+.shake{animation:sh .4s}
+@keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+#riddle{font-size:16px;white-space:pre-wrap}
 </style>
 </head>
 <body>
-<a class="back" href="../">← в календарь</a>
-<div id="out"></div>
-<div id="line"><span>&gt;</span><input id="cmd" autocomplete="off" autofocus></div>
+<div class="garland" id="garland"></div>
+<div class="wrap">
+<a class="back" href="../">← календарь</a>
+<h1>День <span class="gold">5</span> · сейф Деда Мороза</h1>
+
+<div class="card rules">
+  📜 <b>Как играть:</b> цель — разгадать головоломку и добыть загадку, а ответ принести боту: он выдаст подарок и фото тайника.
+  <ul>
+    <li>Введи 4 цифры кода и жми «Проверить».</li>
+    <li>⭐ — цифра верна и стоит на своём месте.</li>
+    <li>❄ — цифра в коде есть, но стоит не на своём месте.</li>
+    <li>Цифры в коде не повторяются. Взломай сейф — откроется загадка дня 🎁</li>
+  </ul>
+</div>
+
+<div id="game" class="card"></div>
+<div id="riddleCard" class="card" hidden>
+  <h3 id="rTitle" style="margin:0 0 8px;font-size:16px;color:var(--gold)"></h3>
+  <p id="riddle"></p>
+  <p class="note">Отправь ответ боту в Telegram 🤖 Застрянешь — кнопка 💡 Подсказка у бота (раз в 2 минуты).</p>
+</div>
+</div>
+
 <script>
+/* ====== НАСТРОЙКИ ДНЯ ====== */
 const DAY = 5;
-const ANSWER = "камин"; // видно в исходнике — для подарка ок, позже заменим на хэш
-const API_URL = "https://api.ТВОЙ-ДОМЕН.ru/api/solve"; // для Mini App; для пути A не нужен
+const RIDDLE = "Деревянные братья с графитовым сердцем: рисуют, чертят, ошибаются — и становятся короче с каждым днём.";
 
-const tg = window.Telegram && window.Telegram.WebApp;
-if (tg) { tg.ready(); tg.expand(); }
-
-const out = document.getElementById("out");
-const cmd = document.getElementById("cmd");
-const norm = s => s.toLowerCase().replace(/ё/g,"е").replace(/[^a-zа-я0-9]/g,"");
-const print = (t, cls) => {
-  const d = document.createElement("div");
-  if (cls) d.className = cls;
-  d.textContent = t;
-  out.appendChild(d);
-  window.scrollTo(0, document.body.scrollHeight);
-};
-
-const FILES = {
-  "readme.txt": "Система взломана. Команды: help, ls, cat <файл>, answer <слово>.",
-  "hint.txt": "В доме есть место, где живёт огонь, но это не плита.\nТам танцуют языки пламени и греются руки.\nЧто это? Ответь: answer <слово>",
-  ".secret": "Доступ запрещён. Но подсказка рядом: cat hint.txt"
-};
-
-async function win(answer){
-  localStorage.setItem("advent_solved_" + DAY, "1");   // галочка в календаре
-  print("✔ Кодовое слово принято: " + answer.toUpperCase());
-  if (tg && tg.initData) {
-    try {
-      const r = await fetch(API_URL, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({day: DAY, answer, initData: tg.initData})
-      });
-      if ((await r.json()).ok) {
-        tg.showAlert("🎉 Разгадано! Подарок уже ждёт в боте");
-        tg.close();
-        return;
-      }
-    } catch(e) { /* API не настроен — запасной путь ниже */ }
-  }
-  print("Отправь это слово боту в чат — он выдаст подарок 🎁", "dim");
+/* ====== антураж ====== */
+const GC = ["#e74c3c","#f1c40f","#3498db","#e67e22","#9b59b6","#2ecc71","#ff7eb0"];
+for (let i = 0; i < 17; i++){
+  const b = document.createElement("span");
+  b.className = "bulb"; b.style.color = GC[i % GC.length];
+  b.style.animationDelay = (i*.17)+"s, "+(i*.23)+"s";
+  document.getElementById("garland").appendChild(b);
+}
+for (let i = 0; i < 12; i++){
+  const f = document.createElement("div");
+  f.className = "flake"; f.textContent = "❄";
+  f.style.left = Math.random()*100+"vw";
+  f.style.fontSize = 8+Math.random()*9+"px";
+  f.style.animationDuration = 7+Math.random()*8+"s";
+  f.style.animationDelay = -Math.random()*10+"s";
+  document.body.appendChild(f);
 }
 
-function handle(line){
-  print("> " + line);
-  const [c, ...rest] = line.trim().split(/\s+/);
-  const arg = rest.join(" ");
-  if (c === "help") print("Команды: help | ls | cat <файл> | answer <слово>", "dim");
-  else if (c === "ls") print(Object.keys(FILES).join("   "));
-  else if (c === "cat") print(FILES[arg] || "Файл не найден: " + arg);
-  else if (c === "answer") {
-    if (norm(arg) === norm(ANSWER)) win(arg.trim());
-    else print("✘ Неверно. Попробуй ещё.", "dim");
-  }
-  else if (c) print("Неизвестная команда: " + c + ". Набери help", "dim");
+/* ====== служебное ====== */
+const $ = id => document.getElementById(id);
+const q = new URLSearchParams(location.search);
+const now = new Date();
+const PREP = now < new Date(2026, 11, 1, 19, 0, 0); // режим подготовки: замки сняты
+const inDec = now.getFullYear() === 2026 && now.getMonth() === 11;
+const today = inDec ? now.getDate() : 0;
+const open = q.has("all") || PREP || (inDec && (DAY < today || (DAY === today && now.getHours() >= 19)));
+const past = !q.has("all") && (inDec && DAY < today);
+const solved = () => !!localStorage.getItem("advent_solved_" + DAY);
+
+function showRiddle(fresh, extra){
+  $("game").innerHTML = "";
+  $("riddleCard").hidden = false;
+  $("rTitle").textContent = (fresh ? "🎉 " + (extra || "Готово!") + " Вот загадка дня:" : "Загадка дня:");
+  $("riddle").textContent = RIDDLE;
 }
 
-cmd.addEventListener("keydown", e => {
-  if (e.key === "Enter") { handle(cmd.value); cmd.value = ""; }
-});
+if (!open){
+  $("game").innerHTML = `<p class="task">День откроется 5 декабря в 19:00 🔒</p>`;
+}
+else if (!q.has("all") && (solved() || past)){
+  showRiddle(false);
+}
+else {
+  /* код сейфа живёт в localStorage: перезагрузка страницы не сбрасывает игру */
+  const KEY = "advent_bc_" + DAY;
+  let st = JSON.parse(localStorage.getItem(KEY) || "null");
+  const gen = () => {
+    const d = [0,1,2,3,4,5,6,7,8,9].sort(() => Math.random() - .5);
+    return d.slice(0, 4).join("");
+  };
+  if (!st || st.done) st = { code: gen(), tries: [], done: false };
+  localStorage.setItem(KEY, JSON.stringify(st));
 
-print("ADVENT TERMINAL v1.0 — день " + DAY, "dim");
-print("Набери help, чтобы начать.");
+  $("game").innerHTML = `<p class="task">Дед Мороз спрятал подарок в сейф и зашифровал код.
+    Звёзды и снежинки после каждой попытки подскажут, где ты греешь руки у истины.</p>
+    <div class="code">
+      <input id="g0" inputmode="numeric" maxlength="1">
+      <input id="g1" inputmode="numeric" maxlength="1">
+      <input id="g2" inputmode="numeric" maxlength="1">
+      <input id="g3" inputmode="numeric" maxlength="1">
+    </div>
+    <div class="btns">
+      <button class="act" id="go">Проверить</button>
+      <button class="act ghost" id="reset">Начать заново</button>
+    </div>
+    <div id="msg"></div>
+    <div class="hist" id="hist"></div>`;
+
+  const inputs = [0,1,2,3].map(i => $("g" + i));
+  inputs.forEach((inp, i) => {
+    inp.addEventListener("input", () => {
+      inp.value = inp.value.replace(/\D/g, "").slice(-1);
+      if (inp.value && i < 3) inputs[i+1].focus();
+    });
+    inp.addEventListener("keydown", e => {
+      if (e.key === "Enter") check();
+      if (e.key === "Backspace" && !inp.value && i > 0) inputs[i-1].focus();
+    });
+  });
+
+  const msg = (t, cls) => { const m = $("msg"); m.textContent = t; m.className = cls || ""; };
+  const drawHist = () => {
+    $("hist").innerHTML = st.tries.map((t, i) =>
+      `<div class="hrow"><span>Попытка ${i+1}: <b>${t.g}</b></span><span>${"⭐".repeat(t.b)}${"❄".repeat(t.c)}${t.b+t.c ? "" : "· пусто"}</span></div>`
+    ).join("");
+  };
+
+  function check(){
+    const g = inputs.map(i => i.value).join("");
+    if (g.length < 4){ msg("Введи все 4 цифры кода.", "err"); return; }
+    if (new Set(g).size < 4){ msg("Цифры не должны повторяться.", "err"); return; }
+    let b = 0, c = 0;
+    for (let i = 0; i < 4; i++){
+      if (g[i] === st.code[i]) b++;
+      else if (st.code.includes(g[i])) c++;
+    }
+    st.tries.push({ g, b, c });
+    localStorage.setItem(KEY, JSON.stringify(st));
+    drawHist();
+    inputs.forEach(i => i.value = "");
+    inputs[0].focus();
+    if (b === 4){
+      st.done = true;
+      localStorage.setItem(KEY, JSON.stringify(st));
+      localStorage.setItem("advent_solved_" + DAY, new Date().toISOString());
+      msg("🔓 Сейф открыт!", "ok");
+      setTimeout(() => showRiddle(true, `Код взломан за ${st.tries.length} попыток!`), 700);
+    } else {
+      msg(`⭐${b} ❄${c} — думай дальше!`);
+    }
+  }
+  $("go").onclick = check;
+  $("reset").onclick = () => {
+    st = { code: gen(), tries: [], done: false };
+    localStorage.setItem(KEY, JSON.stringify(st));
+    drawHist(); msg("Новый код загружен в сейф 🔄");
+  };
+  drawHist();
+}
 </script>
 </body>
 </html>

@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>День 13 — пазл зимней ночи</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1410; --card:#13241b; --card2:#0f1f17; --line:#24402f; --line2:#3a5a46;
+  --gold:#e8c37a; --amber:#ffb347; --green:#3ddc84; --red:#ff6b6b; --blue:#7fb4ff;
+  --magenta:#ff7eb0; --ink:#eaf5ee; --dim:#7fa08c;
+}
+*{box-sizing:border-box}
+html{scrollbar-color:var(--line2) #0d1a13;scrollbar-width:thin}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#0d1a13}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:9px;border:2px solid #0d1a13}
+::-webkit-scrollbar-thumb:hover{background:#4d7a5f}
+body{margin:0;padding:0 14px 54px;color:var(--ink);overflow-x:hidden;
+  background:radial-gradient(1200px 560px at 50% -14%,#16302240,transparent 70%),var(--bg);
+  font:16px/1.5 Manrope,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:600px;margin:0 auto;position:relative;z-index:1}
+
+.garland{display:flex;justify-content:center;gap:14px;border-top:2px solid var(--line2);overflow:hidden}
+.bulb{width:9px;height:13px;border-radius:50% 50% 45% 45%;position:relative;margin-top:7px;flex:none;
+ background:currentColor;transform-origin:top center;animation:sway 3s ease-in-out infinite alternate,glowblink 2s infinite}
+.bulb::before{content:"";position:absolute;top:-7px;left:3.5px;width:2px;height:7px;background:var(--line2)}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+@keyframes glowblink{0%,100%{filter:brightness(1);box-shadow:0 0 8px currentColor}50%{filter:brightness(.5);box-shadow:0 0 2px currentColor}}
+.flake{position:fixed;top:-14px;color:#cfe8da;opacity:.5;pointer-events:none;z-index:0;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(106vh) rotate(360deg)}}
+
+.back{color:var(--dim);font-size:13px;text-decoration:none}
+.back:hover{color:var(--gold)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0}
+h1{font-family:Unbounded,sans-serif;font-size:clamp(18px,4.6vw,23px);margin:0;line-height:1.25}
+h1 .gold{color:var(--gold)}
+.sndbtn{flex:none;padding:9px 13px;border-radius:999px;border:1px solid var(--line2);background:var(--card);
+ color:var(--ink);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+.sndbtn:hover{border-color:var(--gold);color:var(--gold)}
+.sndbtn.off{color:var(--dim);border-color:var(--line)}
+
+.card{background:linear-gradient(165deg,var(--card),var(--card2));border:1px solid var(--line);
+ border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 10px 30px #0006}
+.rules{border-color:var(--line2);background:linear-gradient(165deg,#10241a,#0d1c14)}
+.rules b{color:var(--gold)}
+.rules ul{margin:6px 0 0;padding-left:18px;color:#bcd8c6;font-size:13.5px}
+.rules li{margin-bottom:3px}
+.task{color:#bcd8c6;font-size:14px;margin:0 0 12px}
+.note{color:var(--dim);font-size:12.5px;margin:10px 0 0}
+
+.hud{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.stat{display:flex;flex-direction:column;gap:1px;padding:7px 12px;border-radius:12px;
+ border:1px solid var(--line);background:#0f1f17;min-width:74px}
+.stat i{font:700 10px/1 Manrope,sans-serif;letter-spacing:.12em;color:var(--dim);font-style:normal}
+.stat b{font:800 16px/1.2 Manrope,sans-serif;color:var(--gold)}
+.stat.g b{color:var(--green)}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-left:auto}
+.seg button{padding:9px 12px;border:none;background:none;color:var(--dim);font:700 12px Manrope,sans-serif;cursor:pointer;transition:.15s}
+.seg button:hover{color:var(--ink)}
+.seg button.on{background:#1d5c38;color:#eaf5ee}
+
+.boardhost{position:relative;margin:0 auto;border-radius:16px;overflow:hidden;
+ border:1px solid var(--line2);background:#08130d;box-shadow:0 14px 34px #0008,inset 0 0 0 1px #ffffff08;
+ touch-action:none;user-select:none}
+.board{position:relative;width:100%;height:100%}
+.tile{position:absolute;border-radius:7px;background-repeat:no-repeat;cursor:grab;
+ box-shadow:0 2px 8px #0007, inset 0 0 0 1px #ffffff1f;
+ transition:left .22s cubic-bezier(.2,.8,.25,1),top .22s cubic-bezier(.2,.8,.25,1),box-shadow .18s,filter .18s;
+ will-change:left,top,transform}
+.tile:hover{filter:brightness(1.08)}
+.tile.ok{box-shadow:0 2px 8px #0007, inset 0 0 0 2px #3ddc84aa, 0 0 12px #3ddc8433}
+.tile.sel{box-shadow:0 0 0 3px var(--gold),0 8px 22px #000a;filter:brightness(1.12);z-index:6}
+.tile.drag{cursor:grabbing;z-index:9;box-shadow:0 16px 34px #000c,0 0 0 2px var(--gold);filter:brightness(1.14)}
+.tile.snap{animation:snap .32s ease-out}
+@keyframes snap{0%{filter:brightness(1.5)}100%{filter:brightness(1)}}
+.peek{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;
+ transition:opacity .18s;pointer-events:none;z-index:12}
+.peek.on{opacity:.96}
+.boardwin{position:absolute;inset:0;pointer-events:none;z-index:11;opacity:0;transition:opacity .5s;
+ box-shadow:inset 0 0 60px #3ddc8455, inset 0 0 0 2px #3ddc84aa;border-radius:16px}
+.boardwin.on{opacity:1}
+
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+button.act{padding:11px 18px;border-radius:999px;border:none;cursor:pointer;font:800 14px Manrope,sans-serif;
+ background:linear-gradient(90deg,var(--gold),#f6dfae);color:#20180a;box-shadow:0 4px 16px #e8c37a2e;transition:.15s}
+button.act:hover{transform:translateY(-1px);box-shadow:0 7px 20px #e8c37a44}
+button.act:active{transform:translateY(0)}
+button.ghost{padding:10px 15px;border-radius:999px;border:1px solid var(--line);background:none;
+ color:var(--dim);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+button.ghost:hover{border-color:var(--gold);color:var(--gold)}
+button.ghost.on{border-color:var(--green);color:var(--green);background:#12301f}
+#msg{min-height:22px;margin-top:10px;font-size:13.5px;text-align:center;color:var(--dim)}
+#msg.ok{color:var(--green)} #msg.err{color:var(--red)}
+#riddle{font-size:16px;white-space:pre-wrap}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:40}
+@media (max-width:430px){
+  .stat{min-width:64px;padding:6px 10px}
+  .seg{margin-left:0;width:100%;justify-content:center}
+}
+</style>
+</head>
+<body>
+<div class="garland" id="garland"></div>
+<div class="wrap">
+  <a class="back" href="../">← календарь</a>
+  <div class="top">
+    <h1>День <span class="gold">13</span> · пазл зимней ночи</h1>
+    <button class="sndbtn" id="snd">🔊 Звук</button>
+  </div>
+
+  <div class="card rules">
+    📜 <b>Как играть:</b> цель — разгадать головоломку и добыть загадку, а ответ принести боту: он выдаст подарок и фото тайника.
+    <ul>
+      <li>Метель разрезала зимнюю картинку на кусочки и перепутала их.</li>
+      <li>Тяни кусочек на другой — они поменяются местами. Или тапни два кусочка подряд.</li>
+      <li>Удерживай «Подсмотреть», чтобы увидеть целую картину. Зелёная кромка — кусочек уже на своём месте.</li>
+      <li>Соберёшь картинку целиком — день откроет загадку 🎁</li>
+    </ul>
+  </div>
+
+  <div id="game" class="card"></div>
+
+  <div id="riddleCard" class="card" hidden>
+    <h3 id="rTitle" style="margin:0 0 8px;font-size:16px;color:var(--gold)"></h3>
+    <p id="riddle"></p>
+    <p class="note">Отправь ответ боту в Telegram 🤖 Застрянешь — кнопка 💡 Подсказка у бота (раз в 2 минуты).</p>
+  </div>
+</div>
+<canvas id="fx"></canvas>
+
+<script>
+/* ===== настройки дня ===== */
+const DAY = 13;
+const PHOTO = "";                       // впиши "photo.jpg" — своя картинка вместо нарисованной
+const RIDDLE = "ошейник без поводочка";
+
+/* ===== антураж ===== */
+const GC = ["#e74c3c","#f1c40f","#3498db","#e67e22","#9b59b6","#2ecc71","#ff7eb0"];
+for (let i = 0; i < 17; i++){
+  const b = document.createElement("span");
+  b.className = "bulb"; b.style.color = GC[i % GC.length];
+  b.style.animationDelay = (i*.17)+"s, "+(i*.23)+"s";
+  document.getElementById("garland").appendChild(b);
+}
+for (let i = 0; i < 12; i++){
+  const f = document.createElement("div");
+  f.className = "flake"; f.textContent = "❄";
+  f.style.left = Math.random()*100+"vw";
+  f.style.fontSize = 8+Math.random()*9+"px";
+  f.style.animationDuration = 7+Math.random()*8+"s";
+  f.style.animationDelay = -Math.random()*10+"s";
+  document.body.appendChild(f);
+}
+
+/* ===== служебное ===== */
+const $ = id => document.getElementById(id);
+const q = new URLSearchParams(location.search);
+const now = new Date();
+const PREP = now < new Date(2026, 11, 1, 19, 0, 0); // режим подготовки: замки сняты
+const inDec = now.getFullYear() === 2026 && now.getMonth() === 11;
+const today = inDec ? now.getDate() : 0;
+const open = q.has("all") || PREP || (inDec && (DAY < today || (DAY === today && now.getHours() >= 19)));
+const past = !q.has("all") && (inDec && DAY < today);
+const solved = () => !!localStorage.getItem("advent_solved_" + DAY);
+
+/* ===== звук ===== */
+let snd = localStorage.getItem("advent_snd") !== "0";
+let AC = null, live = [];
+function ac(){
+  if (!AC){ const C = window.AudioContext || window.webkitAudioContext; if (C) AC = new C(); }
+  if (AC && AC.state === "suspended") AC.resume();
+  return AC;
+}
+function tone(freq, ms, delay = 0, vol = .14, type = "sine"){
+  if (!snd) return; const c = ac(); if (!c) return;
+  const t = c.currentTime + delay/1000, d = ms/1000;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type; o.frequency.value = freq;
+  g.gain.setValueAtTime(.0001, t);
+  g.gain.linearRampToValueAtTime(vol, t + .008);
+  g.gain.setValueAtTime(vol, t + Math.max(.012, d - .02));
+  g.gain.linearRampToValueAtTime(.0001, t + d);
+  o.connect(g); g.connect(c.destination);
+  o.start(t); o.stop(t + d + .03);
+  live.push(o); o.onended = () => { live = live.filter(x => x !== o); };
+}
+function killSound(){ live.forEach(o => { try{ o.stop(); }catch(e){} }); live = []; }
+function paintSnd(){
+  const b = $("snd");
+  b.textContent = snd ? "🔊 Звук" : "🔇 Тихо";
+  b.classList.toggle("off", !snd);
+}
+$("snd").onclick = () => {
+  snd = !snd; localStorage.setItem("advent_snd", snd ? "1" : "0");
+  paintSnd();
+  if (snd){ ac(); tone(880, 90, 0, .12); } else killSound();
+};
+paintSnd();
+
+/* ===== конфетти ===== */
+const fx = $("fx"), fctx = fx.getContext("2d");
+let parts = [], fxRun = false;
+function sizeFx(){
+  const r = Math.min(devicePixelRatio || 1, 2);
+  fx.width = innerWidth*r; fx.height = innerHeight*r;
+  fx.style.width = innerWidth+"px"; fx.style.height = innerHeight+"px";
+  fctx.setTransform(r,0,0,r,0,0);
+}
+sizeFx(); addEventListener("resize", sizeFx);
+function burst(){
+  const cols = ["#e8c37a","#3ddc84","#ffb347","#7fb4ff","#ff7eb0","#f2e6cb"];
+  for (let i = 0; i < 140; i++){
+    parts.push({ x: innerWidth/2 + (Math.random()-.5)*160, y: innerHeight*.34,
+      vx:(Math.random()-.5)*7.5, vy:-Math.random()*8.5-2, w:4+Math.random()*6, h:3+Math.random()*5,
+      a:Math.random()*Math.PI, va:(Math.random()-.5)*.3, c:cols[(Math.random()*cols.length)|0], life:1 });
+  }
+  if (!fxRun){ fxRun = true; requestAnimationFrame(stepFx); }
+}
+function stepFx(){
+  fctx.clearRect(0,0,innerWidth,innerHeight);
+  parts.forEach(p => {
+    p.vy += .22; p.x += p.vx; p.y += p.vy; p.a += p.va; p.life -= .008;
+    fctx.save(); fctx.translate(p.x,p.y); fctx.rotate(p.a);
+    fctx.globalAlpha = Math.max(0,p.life); fctx.fillStyle = p.c;
+    fctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); fctx.restore();
+  });
+  parts = parts.filter(p => p.life > 0 && p.y < innerHeight+40);
+  if (parts.length) requestAnimationFrame(stepFx);
+  else { fxRun = false; fctx.clearRect(0,0,innerWidth,innerHeight); }
+}
+
+/* ===== процедурная зимняя картина ===== */
+function buildScene(S){
+  const c = document.createElement("canvas"); c.width = c.height = S;
+  const g = c.getContext("2d");
+  const R = (a,b) => a + Math.random()*(b-a);
+
+  const sky = g.createLinearGradient(0,0,0,S);
+  sky.addColorStop(0,"#050f1a"); sky.addColorStop(.34,"#0a2436");
+  sky.addColorStop(.62,"#123f45"); sky.addColorStop(1,"#1b5f4e");
+  g.fillStyle = sky; g.fillRect(0,0,S,S);
+
+  g.save(); g.globalCompositeOperation = "lighter";
+  [["61,220,132",.20],["127,180,255",.16],["255,126,176",.13]].forEach((a,i) => {
+    for (let k = 0; k < 3; k++){
+      const y0 = S*(.11+i*.075)+k*S*.022;
+      g.beginPath(); g.moveTo(-S*.1,y0);
+      g.bezierCurveTo(S*.26,y0-S*.13,S*.62,y0+S*.11,S*1.1,y0-S*.05);
+      g.lineWidth = S*(.03+k*.014);
+      g.strokeStyle = `rgba(${a[0]},${a[1]/(k+1)})`;
+      g.shadowColor = `rgba(${a[0]},.5)`; g.shadowBlur = S*.055;
+      g.stroke();
+    }
+  });
+  g.restore();
+
+  for (let i = 0; i < 230; i++){
+    g.globalAlpha = R(.22,.95);
+    g.fillStyle = i % 9 === 0 ? "#ffe9a8" : "#dff2ff";
+    g.beginPath(); g.arc(R(0,S), R(0,S*.63), R(.6,2.1), 0, 7); g.fill();
+  }
+  g.globalAlpha = 1;
+
+  const mx = S*.79, my = S*.16, mr = S*.072;
+  let halo = g.createRadialGradient(mx,my,mr*.4,mx,my,mr*4.2);
+  halo.addColorStop(0,"rgba(255,236,180,.42)"); halo.addColorStop(1,"rgba(255,236,180,0)");
+  g.fillStyle = halo; g.beginPath(); g.arc(mx,my,mr*4.2,0,7); g.fill();
+  const mg = g.createRadialGradient(mx-mr*.3,my-mr*.3,mr*.1,mx,my,mr);
+  mg.addColorStop(0,"#fffaf0"); mg.addColorStop(.7,"#f3e2b0"); mg.addColorStop(1,"#d9c184");
+  g.fillStyle = mg; g.beginPath(); g.arc(mx,my,mr,0,7); g.fill();
+  g.fillStyle = "rgba(178,158,110,.28)";
+  [[.26,-.2,.16],[-.3,.16,.12],[.06,.36,.1]].forEach(o => {
+    g.beginPath(); g.arc(mx+mr*o[0], my+mr*o[1], mr*o[2], 0, 7); g.fill();
+  });
+
+  function ridge(baseY,h,color,cap){
+    const pts = [];
+    g.beginPath(); g.moveTo(0,S); g.lineTo(0,baseY);
+    for (let i = 0; i <= 6; i++){
+      const px = S*i/6, py = baseY - (i%2 ? h*R(.75,1) : h*R(.2,.45));
+      g.lineTo(px,py); pts.push([px,py]);
+    }
+    g.lineTo(S,S); g.closePath(); g.fillStyle = color; g.fill();
+    if (cap){
+      g.fillStyle = cap;
+      pts.forEach((p,i) => {
+        if (i%2) {
+          g.beginPath(); g.moveTo(p[0],p[1]);
+          g.lineTo(p[0]-S*.035,p[1]+S*.035); g.lineTo(p[0]-S*.012,p[1]+S*.028);
+          g.lineTo(p[0]+S*.008,p[1]+S*.04); g.lineTo(p[0]+S*.035,p[1]+S*.035);
+          g.closePath(); g.fill();
+        }
+      });
+    }
+  }
+  ridge(S*.60,S*.16,"#12303a","rgba(220,240,250,.55)");
+  ridge(S*.66,S*.11,"#0e2a2c","rgba(220,240,250,.4)");
+
+  function fir(x,base,h,col,snow){
+    const w = h*.52;
+    g.fillStyle = "#3a2a1c";
+    g.fillRect(x-w*.06, base-h*.12, w*.12, h*.14);
+    for (let i = 0; i < 3; i++){
+      const ty = base - h*(.16+i*.28), tw = w*(1-i*.24), th = h*.42;
+      g.beginPath(); g.moveTo(x,ty-th); g.lineTo(x+tw/2,ty); g.lineTo(x-tw/2,ty);
+      g.closePath(); g.fillStyle = col; g.fill();
+      if (snow){
+        g.beginPath(); g.moveTo(x,ty-th);
+        g.lineTo(x+tw*.22,ty-th*.5); g.lineTo(x+tw*.06,ty-th*.55);
+        g.lineTo(x-tw*.05,ty-th*.42); g.lineTo(x-tw*.22,ty-th*.5);
+        g.closePath(); g.fillStyle = snow; g.fill();
+      }
+    }
+  }
+  for (let i = 0; i < 16; i++) fir(S*(i/15)+R(-8,8), S*.70, S*R(.09,.14), "#0d3327", "rgba(226,244,250,.35)");
+
+  const gr = g.createLinearGradient(0,S*.66,0,S);
+  gr.addColorStop(0,"#e9f4f7"); gr.addColorStop(.5,"#d3e6ec"); gr.addColorStop(1,"#b9d3dd");
+  g.beginPath(); g.moveTo(0,S);
+  g.lineTo(0,S*.74);
+  g.bezierCurveTo(S*.25,S*.68,S*.45,S*.80,S*.62,S*.75);
+  g.bezierCurveTo(S*.8,S*.70,S*.9,S*.79,S,S*.74);
+  g.lineTo(S,S); g.closePath(); g.fillStyle = gr; g.fill();
+  g.fillStyle = "rgba(120,160,190,.18)";
+  [[.18,.86,.13],[.52,.93,.16],[.82,.88,.11]].forEach(o => {
+    g.beginPath(); g.ellipse(S*o[0],S*o[1],S*o[2],S*.022,0,0,7); g.fill();
+  });
+
+  /* домик */
+  const cx = S*.24, cy = S*.83, cw = S*.24, ch = S*.15;
+  g.fillStyle = "rgba(90,130,160,.22)";
+  g.beginPath(); g.ellipse(cx+cw*.5, cy+S*.012, cw*.66, S*.02, 0, 0, 7); g.fill();
+  const wood = g.createLinearGradient(cx,cy-ch,cx,cy);
+  wood.addColorStop(0,"#6b4a2f"); wood.addColorStop(1,"#4a3220");
+  g.fillStyle = wood; g.fillRect(cx,cy-ch,cw,ch);
+  g.strokeStyle = "rgba(0,0,0,.18)"; g.lineWidth = 1.5;
+  for (let i = 1; i < 5; i++){
+    g.beginPath(); g.moveTo(cx,cy-ch+ch*i/5); g.lineTo(cx+cw,cy-ch+ch*i/5); g.stroke();
+  }
+  g.beginPath(); g.moveTo(cx-cw*.1,cy-ch); g.lineTo(cx+cw*.5,cy-ch-S*.10);
+  g.lineTo(cx+cw*1.1,cy-ch); g.closePath();
+  g.fillStyle = "#3c2a1b"; g.fill();
+  g.beginPath(); g.moveTo(cx-cw*.1,cy-ch); g.lineTo(cx+cw*.5,cy-ch-S*.10);
+  g.lineTo(cx+cw*1.1,cy-ch); g.lineTo(cx+cw*1.02,cy-ch+S*.012);
+  g.lineTo(cx+cw*.5,cy-ch-S*.075); g.lineTo(cx-cw*.02,cy-ch+S*.012); g.closePath();
+  g.fillStyle = "#eef7fa"; g.fill();
+  g.fillStyle = "#4a3220"; g.fillRect(cx+cw*.72, cy-ch-S*.085, cw*.12, S*.06);
+  g.fillStyle = "#eef7fa"; g.fillRect(cx+cw*.70, cy-ch-S*.092, cw*.16, S*.012);
+  g.save(); g.globalAlpha = .3; g.fillStyle = "#dfeaf0";
+  for (let i = 0; i < 4; i++){
+    g.beginPath();
+    g.arc(cx+cw*.78 + Math.sin(i*1.2)*S*.02, cy-ch-S*.11-i*S*.032, S*(.012+i*.006), 0, 7);
+    g.fill();
+  }
+  g.restore();
+  [[.16,.30],[.58,.30]].forEach(o => {
+    const wx = cx+cw*o[0], wy = cy-ch+ch*o[1], ww = cw*.26, wh = ch*.36;
+    const glow = g.createRadialGradient(wx+ww/2,wy+wh/2,1,wx+ww/2,wy+wh/2,ww*2.4);
+    glow.addColorStop(0,"rgba(255,190,90,.55)"); glow.addColorStop(1,"rgba(255,190,90,0)");
+    g.fillStyle = glow; g.beginPath(); g.arc(wx+ww/2,wy+wh/2,ww*2.4,0,7); g.fill();
+    const win = g.createLinearGradient(wx,wy,wx,wy+wh);
+    win.addColorStop(0,"#ffe6a8"); win.addColorStop(1,"#ffab3d");
+    g.fillStyle = win; g.fillRect(wx,wy,ww,wh);
+    g.strokeStyle = "#3c2a1b"; g.lineWidth = 2.4; g.strokeRect(wx,wy,ww,wh);
+    g.beginPath(); g.moveTo(wx+ww/2,wy); g.lineTo(wx+ww/2,wy+wh);
+    g.moveTo(wx,wy+wh/2); g.lineTo(wx+ww,wy+wh/2); g.stroke();
+  });
+  g.fillStyle = "#2f2013"; g.fillRect(cx+cw*.42, cy-ch*.52, cw*.16, ch*.52);
+  g.fillStyle = "#e8c37a"; g.beginPath(); g.arc(cx+cw*.55, cy-ch*.26, S*.006, 0, 7); g.fill();
+  g.fillStyle = "#eef7fa";
+  g.beginPath(); g.ellipse(cx+cw*.5, cy, cw*.62, S*.016, 0, 0, 7); g.fill();
+
+  for (let i = 0; i < 6; i++) fir(S*(.04+i*.045), S*.90, S*R(.10,.16), "#0b2b20", "rgba(232,246,250,.5)");
+  fir(S*.93, S*.94, S*.22, "#0a2419", "rgba(232,246,250,.55)");
+  fir(S*.80, S*.88, S*.14, "#0b2b20", "rgba(232,246,250,.45)");
+
+  /* снеговик */
+  const sx = S*.63, sy = S*.90;
+  g.fillStyle = "rgba(90,130,160,.22)";
+  g.beginPath(); g.ellipse(sx,sy+S*.006,S*.055,S*.014,0,0,7); g.fill();
+  const snowGrad = (y,r) => {
+    const gg = g.createRadialGradient(sx-r*.35,y-r*.4,r*.15,sx,y,r);
+    gg.addColorStop(0,"#ffffff"); gg.addColorStop(1,"#c9dee8");
+    return gg;
+  };
+  g.fillStyle = snowGrad(sy-S*.032,S*.045); g.beginPath(); g.arc(sx,sy-S*.032,S*.045,0,7); g.fill();
+  g.fillStyle = snowGrad(sy-S*.088,S*.033); g.beginPath(); g.arc(sx,sy-S*.088,S*.033,0,7); g.fill();
+  g.fillStyle = snowGrad(sy-S*.132,S*.024); g.beginPath(); g.arc(sx,sy-S*.132,S*.024,0,7); g.fill();
+  g.strokeStyle = "#5a3a22"; g.lineWidth = S*.006; g.lineCap = "round";
+  g.beginPath(); g.moveTo(sx-S*.03,sy-S*.09); g.lineTo(sx-S*.075,sy-S*.125);
+  g.moveTo(sx-S*.062,sy-S*.112); g.lineTo(sx-S*.078,sy-S*.098);
+  g.moveTo(sx+S*.03,sy-S*.09); g.lineTo(sx+S*.078,sy-S*.12);
+  g.moveTo(sx+S*.062,sy-S*.108); g.lineTo(sx+S*.08,sy-S*.094); g.stroke();
+  g.fillStyle = "#c0392b";
+  g.fillRect(sx-S*.026, sy-S*.112, S*.052, S*.012);
+  g.beginPath(); g.moveTo(sx+S*.014,sy-S*.104); g.lineTo(sx+S*.03,sy-S*.072);
+  g.lineTo(sx+S*.016,sy-S*.07); g.closePath(); g.fill();
+  g.fillStyle = "#22303a";
+  g.beginPath(); g.arc(sx-S*.009,sy-S*.138,S*.004,0,7); g.fill();
+  g.beginPath(); g.arc(sx+S*.009,sy-S*.138,S*.004,0,7); g.fill();
+  [[-.014,-.078],[0,-.062],[.014,-.078]].forEach(o => {
+    g.beginPath(); g.arc(sx+S*o[0],sy+S*o[1],S*.004,0,7); g.fill();
+  });
+  g.fillStyle = "#e67e22";
+  g.beginPath(); g.moveTo(sx,sy-S*.13); g.lineTo(sx+S*.03,sy-S*.124);
+  g.lineTo(sx,sy-S*.12); g.closePath(); g.fill();
+  g.fillStyle = "#1f2a33";
+  g.fillRect(sx-S*.028, sy-S*.166, S*.056, S*.008);
+  g.fillRect(sx-S*.018, sy-S*.192, S*.036, S*.028);
+  g.fillStyle = "#c0392b"; g.fillRect(sx-S*.018, sy-S*.172, S*.036, S*.006);
+
+  /* подарки */
+  function gift(x,y,w,h,col,rib){
+    g.fillStyle = "rgba(90,130,160,.2)";
+    g.beginPath(); g.ellipse(x+w/2,y+h+S*.004,w*.62,S*.008,0,0,7); g.fill();
+    g.fillStyle = col; g.fillRect(x,y,w,h);
+    g.fillStyle = rib; g.fillRect(x+w*.42,y,w*.16,h); g.fillRect(x,y+h*.42,w,h*.16);
+    g.beginPath(); g.ellipse(x+w*.36,y-h*.1,w*.16,h*.14,-.4,0,7); g.fill();
+    g.beginPath(); g.ellipse(x+w*.64,y-h*.1,w*.16,h*.14,.4,0,7); g.fill();
+  }
+  gift(S*.40,S*.885,S*.055,S*.045,"#c0392b","#f1c40f");
+  gift(S*.455,S*.90,S*.042,S*.034,"#2e86c1","#eaf5ee");
+  gift(S*.355,S*.905,S*.036,S*.03,"#27ae60","#ff7eb0");
+
+  for (let i = 0; i < 90; i++){
+    g.globalAlpha = R(.25,.8); g.fillStyle = "#ffffff";
+    g.beginPath(); g.arc(R(0,S), R(S*.2,S), R(.8,2.6), 0, 7); g.fill();
+  }
+  g.globalAlpha = 1;
+
+  const vig = g.createRadialGradient(S/2,S/2,S*.28,S/2,S/2,S*.78);
+  vig.addColorStop(0,"rgba(0,0,0,0)"); vig.addColorStop(1,"rgba(2,8,6,.5)");
+  g.fillStyle = vig; g.fillRect(0,0,S,S);
+
+  return c.toDataURL("image/jpeg", .92);
+}
+
+function prepareArt(cb){
+  const fallback = () => cb(buildScene(900));
+  if (!PHOTO){ fallback(); return; }
+  const img = new Image();
+  img.onload = () => {
+    const S = 900, c = document.createElement("canvas");
+    c.width = c.height = S;
+    const g = c.getContext("2d");
+    const k = Math.max(S/img.width, S/img.height);
+    const w = img.width*k, h = img.height*k;
+    g.drawImage(img, (S-w)/2, (S-h)/2, w, h);
+    try { cb(c.toDataURL("image/jpeg", .92)); } catch(e){ fallback(); }
+  };
+  img.onerror = fallback;
+  img.src = PHOTO;
+}
+
+/* ===== игра ===== */
+function showRiddle(fresh, extra){
+  stopTimer();
+  $("game").innerHTML = "";
+  $("riddleCard").hidden = false;
+  $("rTitle").textContent = fresh ? "🎉 " + (extra || "Готово!") + " Вот загадка дня:" : "Загадка дня:";
+  $("riddle").textContent = RIDDLE;
+}
+
+let timer = null;
+function stopTimer(){ if (timer){ clearInterval(timer); timer = null; } }
+
+if (!open){
+  $("game").innerHTML = `<p class="task">День откроется 13 декабря в 19:00 🔒</p>`;
+}
+else if (!q.has("all") && (solved() || past)){
+  showRiddle(false);
+}
+else {
+  $("game").innerHTML = `
+    <p class="task">Метель разрезала зимнюю ночь на кусочки. Собери картину — и станция отдаст загадку дня.</p>
+    <div class="hud">
+      <div class="stat"><i>ХОДЫ</i><b id="mv">0</b></div>
+      <div class="stat"><i>ВРЕМЯ</i><b id="tm">00:00</b></div>
+      <div class="stat g"><i>НА МЕСТЕ</i><b id="pr">0/9</b></div>
+      <div class="seg" id="seg">
+        <button data-n="3" class="on">3×3</button><button data-n="4">4×4</button><button data-n="5">5×5</button>
+      </div>
+    </div>
+    <div class="boardhost" id="host">
+      <div class="board" id="board"></div>
+      <div class="peek" id="peek"></div>
+      <div class="boardwin" id="bwin"></div>
+    </div>
+    <div class="controls">
+      <button class="act" id="peekbtn">👁 Подсмотреть</button>
+      <button class="ghost" id="shuffle">↻ Перемешать</button>
+      <button class="ghost on" id="hl">Подсветка верных</button>
+    </div>
+    <div id="msg"></div>
+    <p class="note">Тяни кусочек на другой — поменяются местами. Или тапни два подряд. Удерживай «Подсмотреть», чтобы увидеть оригинал.</p>`;
+
+  let ART = "", N = 3, order = [], tiles = [], moves = 0, secs = 0, started = false;
+  let sel = -1, drag = null, done = false, highlight = true, px = 0, cell = 0, gap = 4;
+
+  const host = $("host"), board = $("board"), peek = $("peek");
+  const setMsg = (t, cls) => { const m = $("msg"); if (m){ m.textContent = t; m.className = cls || ""; } };
+
+  function layout(){
+    px = Math.min(host.clientWidth || 420, 460);
+    host.style.height = px + "px";
+    cell = px / N;
+  }
+  function place(el, pos){
+    const col = pos % N, row = (pos / N) | 0, s = cell - gap;
+    el.style.width = s + "px"; el.style.height = s + "px";
+    el.style.left = (col*cell + gap/2) + "px";
+    el.style.top = (row*cell + gap/2) + "px";
+  }
+  function paint(){
+    let ok = 0;
+    for (let pos = 0; pos < order.length; pos++){
+      const piece = order[pos], el = tiles[piece];
+      if (!el) continue;
+      place(el, pos);
+      const c = piece % N, r = (piece / N) | 0, s = cell - gap;
+      el.style.backgroundImage = `url(${ART})`;
+      el.style.backgroundSize = `${N*s}px ${N*s}px`;
+      el.style.backgroundPosition = `-${c*s}px -${r*s}px`;
+      const good = piece === pos;
+      if (good) ok++;
+      el.classList.toggle("ok", highlight && good && !done);
+      el.classList.toggle("sel", sel === pos);
+    }
+    const pr = $("pr"); if (pr) pr.textContent = ok + "/" + order.length;
+    return ok;
+  }
+  function shuffle(){
+    order = Array.from({length: N*N}, (_, i) => i);
+    do {
+      for (let i = order.length-1; i > 0; i--){
+        const j = (Math.random()*(i+1))|0;
+        [order[i], order[j]] = [order[j], order[i]];
+      }
+    } while (order.every((p,i) => p === i));
+  }
+  function build(){
+    layout();
+    board.innerHTML = ""; tiles = [];
+    for (let piece = 0; piece < N*N; piece++){
+      const el = document.createElement("div");
+      el.className = "tile"; el.dataset.piece = piece;
+      el.addEventListener("pointerdown", onDown);
+      board.appendChild(el); tiles.push(el);
+    }
+    shuffle();
+    sel = -1; moves = 0; secs = 0; started = false; done = false;
+    stopTimer();
+    $("mv").textContent = "0"; $("tm").textContent = "00:00";
+    $("bwin").classList.remove("on");
+    peek.style.backgroundImage = `url(${ART})`;
+    paint();
+    setMsg("Кусочки перемешаны. Собери зимнюю ночь ❄");
+  }
+  function startTimer(){
+    if (started) return;
+    started = true;
+    timer = setInterval(() => {
+      secs++;
+      const m = String((secs/60)|0).padStart(2,"0"), s = String(secs%60).padStart(2,"0");
+      const t = $("tm"); if (t) t.textContent = m + ":" + s;
+    }, 1000);
+  }
+  function posFromPoint(cx, cy){
+    const r = host.getBoundingClientRect();
+    const col = Math.floor((cx - r.left)/cell), row = Math.floor((cy - r.top)/cell);
+    if (col < 0 || row < 0 || col >= N || row >= N) return -1;
+    return row*N + col;
+  }
+  function swap(a, b){
+    if (a === b || a < 0 || b < 0) return;
+    startTimer();
+    [order[a], order[b]] = [order[b], order[a]];
+    moves++; $("mv").textContent = moves;
+    sel = -1;
+    const okNow = paint();
+    const moved = [order[a], order[b]];
+    moved.forEach((piece, k) => {
+      const pos = k === 0 ? a : b;
+      if (piece === pos){
+        const el = tiles[piece];
+        el.classList.add("snap");
+        setTimeout(() => el.classList.remove("snap"), 340);
+      }
+    });
+    if (moved.some((piece,k) => piece === (k === 0 ? a : b))) tone(1046, 90, 0, .1, "triangle");
+    else tone(420, 55, 0, .07, "triangle");
+    if (okNow === order.length) win();
+    else setMsg(`Собрано ${okNow} из ${order.length} кусочков.`);
+  }
+  function win(){
+    done = true; stopTimer(); killSound();
+    $("bwin").classList.add("on");
+    tiles.forEach(t => t.classList.remove("ok","sel"));
+    setMsg("✨ Картина собрана!", "ok");
+    localStorage.setItem("advent_solved_" + DAY, new Date().toISOString());
+    tone(660,140,0,.16); tone(880,140,150,.16); tone(1174,180,300,.16); tone(1568,320,470,.15);
+    burst();
+    const mm = String((secs/60)|0).padStart(2,"0"), ss = String(secs%60).padStart(2,"0");
+    setTimeout(() => showRiddle(true, `Картина собрана за ${moves} ходов и ${mm}:${ss}!`), 1400);
+  }
+
+  function onDown(e){
+    if (done) return;
+    const el = e.currentTarget;
+    const piece = +el.dataset.piece;
+    const pos = order.indexOf(piece);
+    ac();
+    el.setPointerCapture(e.pointerId);
+    drag = { el, piece, pos, x0: e.clientX, y0: e.clientY, moved: false, id: e.pointerId };
+    el.style.transition = "none";
+    el.classList.add("drag");
+  }
+  function onMove(e){
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+    if (!drag.moved && Math.hypot(dx,dy) > 6) drag.moved = true;
+    if (drag.moved) drag.el.style.transform = `translate(${dx}px,${dy}px) scale(1.06)`;
+  }
+  function onUp(e){
+    if (!drag || e.pointerId !== drag.id) return;
+    const d = drag; drag = null;
+    d.el.classList.remove("drag");
+    d.el.style.transition = "";
+    d.el.style.transform = "";
+    if (d.moved){
+      const target = posFromPoint(e.clientX, e.clientY);
+      if (target >= 0 && target !== d.pos) swap(d.pos, target);
+      else { paint(); tone(240, 70, 0, .06, "square"); }
+    } else {
+      if (sel === -1){ sel = d.pos; tone(760, 45, 0, .06, "triangle"); paint(); setMsg("Выбран кусочек — тапни второй, чтобы поменять."); }
+      else if (sel === d.pos){ sel = -1; paint(); setMsg(""); }
+      else swap(sel, d.pos);
+    }
+  }
+  window.addEventListener("pointermove", onMove);
+  window.addEventListener("pointerup", onUp);
+  window.addEventListener("pointercancel", e => {
+    if (drag && e.pointerId === drag.id){
+      drag.el.classList.remove("drag");
+      drag.el.style.transition = ""; drag.el.style.transform = "";
+      drag = null; paint();
+    }
+  });
+
+  /* подсмотреть */
+  const pb = $("peekbtn");
+  const peekOn = () => { if (done) return; peek.classList.add("on"); tone(520, 120, 0, .05); };
+  const peekOff = () => peek.classList.remove("on");
+  pb.addEventListener("pointerdown", e => { e.preventDefault(); peekOn(); });
+  pb.addEventListener("pointerup", peekOff);
+  pb.addEventListener("pointerleave", peekOff);
+  pb.addEventListener("pointercancel", peekOff);
+  pb.addEventListener("keydown", e => { if (e.key === " " || e.key === "Enter"){ e.preventDefault(); peekOn(); } });
+  pb.addEventListener("keyup", peekOff);
+
+  $("shuffle").onclick = () => { if (!done){ build(); tone(320, 90, 0, .08, "triangle"); } };
+  $("hl").onclick = () => {
+    highlight = !highlight;
+    $("hl").classList.toggle("on", highlight);
+    paint();
+  };
+  $("seg").querySelectorAll("button").forEach(b => {
+    b.onclick = () => {
+      if (done) return;
+      N = +b.dataset.n;
+      $("seg").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b));
+      build();
+      tone(600, 70, 0, .07, "triangle");
+    };
+  });
+  addEventListener("resize", () => { if (!done && tiles.length){ layout(); paint(); } });
+
+  prepareArt(src => { ART = src; build(); });
+}
+</script>
+</body>
+</html>

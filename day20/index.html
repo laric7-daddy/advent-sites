@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>День 20 — ледяная кладовая</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1410; --card:#13241b; --card2:#0f1f17; --line:#24402f; --line2:#3a5a46;
+  --gold:#e8c37a; --amber:#ffb347; --green:#3ddc84; --red:#ff6b6b; --blue:#7fb4ff;
+  --magenta:#ff7eb0; --cyan:#4dd0e1; --violet:#b39ddb; --ink:#eaf5ee; --dim:#7fa08c;
+  --slate1:#16302a; --slate2:#0d1f1a;
+}
+*{box-sizing:border-box}
+html{scrollbar-color:var(--line2) #0d1a13;scrollbar-width:thin}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#0d1a13}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:9px;border:2px solid #0d1a13}
+::-webkit-scrollbar-thumb:hover{background:#4d7a5f}
+body{margin:0;padding:0 14px 54px;color:var(--ink);overflow-x:hidden;
+  background:radial-gradient(1200px 560px at 50% -14%,#16302240,transparent 70%),var(--bg);
+  font:16px/1.5 Manrope,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:620px;margin:0 auto;position:relative;z-index:1}
+
+.garland{display:flex;justify-content:center;gap:14px;border-top:2px solid var(--line2);overflow:hidden}
+.gbulb{width:9px;height:13px;border-radius:50% 50% 45% 45%;position:relative;margin-top:7px;flex:none;
+ background:currentColor;transform-origin:top center;animation:sway 3s ease-in-out infinite alternate,glowblink 2s infinite}
+.gbulb::before{content:"";position:absolute;top:-7px;left:3.5px;width:2px;height:7px;background:var(--line2)}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+@keyframes glowblink{0%,100%{filter:brightness(1);box-shadow:0 0 8px currentColor}50%{filter:brightness(.5);box-shadow:0 0 2px currentColor}}
+.flake{position:fixed;top:-14px;color:#cfe8da;opacity:.5;pointer-events:none;z-index:0;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(106vh) rotate(360deg)}}
+
+.back{color:var(--dim);font-size:13px;text-decoration:none}
+.back:hover{color:var(--gold)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0}
+h1{font-family:Unbounded,sans-serif;font-size:clamp(18px,4.6vw,23px);margin:0;line-height:1.25}
+h1 .gold{color:var(--gold)}
+.sndbtn{flex:none;padding:9px 13px;border-radius:999px;border:1px solid var(--line2);background:var(--card);
+ color:var(--ink);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+.sndbtn:hover{border-color:var(--gold);color:var(--gold)}
+.sndbtn.off{color:var(--dim);border-color:var(--line)}
+
+.card{background:linear-gradient(165deg,var(--card),var(--card2));border:1px solid var(--line);
+ border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 10px 30px #0006}
+.rules{border-color:var(--line2);background:linear-gradient(165deg,#10241a,#0d1c14)}
+.rules b{color:var(--gold)}
+.rules ul{margin:6px 0 0;padding-left:18px;color:#bcd8c6;font-size:13.5px}
+.rules li{margin-bottom:3px}
+.task{color:#bcd8c6;font-size:14px;margin:0 0 12px}
+.note{color:var(--dim);font-size:12.5px;margin:10px 0 0}
+
+.hud{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.stat{position:relative;display:flex;flex-direction:column;gap:1px;padding:7px 12px;border-radius:12px;
+ border:1px solid var(--line);background:#0f1f17;min-width:74px}
+.stat i{font:700 10px/1 Manrope,sans-serif;letter-spacing:.12em;color:var(--dim);font-style:normal}
+.stat b{font:800 16px/1.2 Manrope,sans-serif;color:var(--gold)}
+.stat.g b{color:var(--green)} .stat.b b{color:var(--blue)} .stat.m b{color:var(--magenta)}
+.gain{position:absolute;left:50%;top:-4px;transform:translateX(-50%);font:800 14px Manrope,sans-serif;
+ color:var(--green);pointer-events:none;animation:gain .8s ease-out forwards;text-shadow:0 0 10px #3ddc8488}
+@keyframes gain{0%{opacity:0;transform:translate(-50%,6px)}25%{opacity:1}100%{opacity:0;transform:translate(-50%,-22px)}}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-left:auto}
+.seg button{padding:9px 11px;border:none;background:none;color:var(--dim);font:700 12px Manrope,sans-serif;cursor:pointer;transition:.15s}
+.seg button:hover{color:var(--ink)}
+.seg button.on{background:#1d5c38;color:#eaf5ee}
+
+.goal{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.goal .bar{flex:1;height:8px;border-radius:99px;background:#0d1a13;border:1px solid var(--line);overflow:hidden}
+.goal .bar i{display:block;height:100%;width:0;border-radius:99px;transition:width .45s ease;
+ background:linear-gradient(90deg,var(--cyan),var(--green),var(--gold),var(--magenta));box-shadow:0 0 12px #e8c37a55}
+.goal span{font:700 11.5px Manrope,sans-serif;color:var(--dim);white-space:nowrap}
+
+.host{position:relative;border-radius:18px;padding:12px;border:1px solid var(--line2);
+ background:linear-gradient(160deg,#1a3226,#08130d 72%);box-shadow:0 16px 36px #0009,inset 0 1px 0 #ffffff0d}
+.host.shake{animation:shk .4s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shk{10%,90%{transform:translateX(-3px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
+.host.win{animation:hwin .8s ease-out}
+@keyframes hwin{0%{box-shadow:0 16px 36px #0009}45%{box-shadow:0 16px 44px #0009,inset 0 0 70px #e8c37a66,0 0 46px #e8c37a55}100%{box-shadow:0 16px 36px #0009}}
+.board{position:relative;margin:0 auto;border-radius:14px;touch-action:none;user-select:none;
+ background:linear-gradient(160deg,var(--slate1),var(--slate2));box-shadow:inset 0 0 0 1px #ffffff10,inset 0 6px 20px #0007}
+.bgcell{position:absolute;border-radius:11px;background:#ffffff08;box-shadow:inset 0 0 0 1px #ffffff0a}
+.tile{position:absolute;border-radius:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+ gap:1px;background:linear-gradient(158deg,var(--t1),var(--t2));color:var(--tf);
+ box-shadow:0 4px 12px #0007,inset 0 1px 0 #ffffff55,0 0 var(--gl,0px) var(--gc,transparent);
+ transition:transform .13s cubic-bezier(.25,.7,.3,1);will-change:transform;overflow:hidden}
+.tile em{font-style:normal;line-height:1;font-size:var(--es)}
+.tile b{font:800 var(--ns)/1 Manrope,sans-serif;letter-spacing:.02em;opacity:.92}
+.tile.new{animation:tnew .18s ease-out}
+@keyframes tnew{from{transform:var(--tf-pos) scale(.1);opacity:0}to{opacity:1}}
+.tile.merged{animation:tmerge .22s ease-out .1s backwards}
+@keyframes tmerge{0%{opacity:0;filter:brightness(2.4)}45%{opacity:1;filter:brightness(1.7)}100%{filter:brightness(1)}}
+.tile.hot::after{content:"";position:absolute;inset:0;border-radius:11px;pointer-events:none;
+ background:radial-gradient(circle at 50% 40%,#ffffff33,transparent 62%);animation:hot 2.4s ease-in-out infinite}
+@keyframes hot{0%,100%{opacity:.35}50%{opacity:.85}}
+
+.overlay{position:absolute;inset:0;z-index:8;display:none;flex-direction:column;align-items:center;justify-content:center;
+ gap:10px;padding:22px;text-align:center;background:#06121ae8;backdrop-filter:blur(5px);border-radius:18px}
+.overlay.on{display:flex;animation:fadein .35s ease-out}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.overlay h3{font-family:Unbounded,sans-serif;font-size:19px;margin:0;color:var(--gold)}
+.overlay p{margin:0;font-size:13.5px;color:#bcd8c6;max-width:340px}
+.ovbtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.badge{padding:5px 12px;border-radius:999px;border:1px solid var(--green);color:var(--green);
+ background:#12301f;font:700 12px Manrope,sans-serif}
+
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+button.act{padding:11px 18px;border-radius:999px;border:none;cursor:pointer;font:800 14px Manrope,sans-serif;
+ background:linear-gradient(90deg,var(--gold),#f6dfae);color:#20180a;box-shadow:0 4px 16px #e8c37a2e;transition:.15s}
+button.act:hover{transform:translateY(-1px);box-shadow:0 7px 20px #e8c37a44}
+button.act:active{transform:translateY(0)}
+button.act.pulse{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 4px 16px #e8c37a2e}50%{box-shadow:0 0 0 7px #e8c37a22,0 4px 22px #e8c37a66}}
+button.ghost{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:none;
+ color:var(--dim);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+button.ghost:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+button.ghost:disabled{opacity:.4;cursor:not-allowed}
+#msg{min-height:22px;margin-top:10px;font-size:13.5px;text-align:center;color:var(--dim)}
+#msg.ok{color:var(--green)} #msg.err{color:var(--red)}
+#riddle{font-size:16px;white-space:pre-wrap}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:40}
+@media (max-width:430px){
+  .stat{min-width:64px;padding:6px 10px}
+  .stat b{font-size:15px}
+  .seg{margin-left:0;width:100%;justify-content:center}
+}
+</style>
+</head>
+<body>
+<div class="garland" id="garland"></div>
+<div class="wrap">
+  <a class="back" href="../">← календарь</a>
+  <div class="top">
+    <h1>День <span class="gold">20</span> · ледяная кладовая</h1>
+    <button class="sndbtn" id="snd">🔊 Звук</button>
+  </div>
+
+  <div class="card rules">
+    📜 <b>Как играть:</b> цель — разгадать головоломку и добыть загадку, а ответ принести боту: он выдаст подарок и фото тайника.
+    <ul>
+      <li>Двигай плитки свайпом, стрелками или WASD — все плитки едут в одну сторону.</li>
+      <li>Две одинаковые сливаются в одну вдвое крупнее: ❄ → ✨ → 🍬 → 🍊 → 🕯 → 🔔 → 🎄 → ⛄ → 🎁 → 🎅 → 👑.</li>
+      <li>Дойди до целевой плитки режима — кладовая откроет загадку. Три отмены спасают от неудачного хода.</li>
+      <li>Ходов не осталось — кладовая замёрзла, но всегда можно начать заново 🎁</li>
+    </ul>
+  </div>
+
+  <div id="game" class="card"></div>
+
+  <div id="riddleCard" class="card" hidden>
+    <h3 id="rTitle" style="margin:0 0 8px;font-size:16px;color:var(--gold)"></h3>
+    <p id="riddle"></p>
+    <p class="note">Отправь ответ боту в Telegram 🤖 Застрянешь — кнопка 💡 Подсказка у бота (раз в 2 минуты).</p>
+  </div>
+</div>
+<canvas id="fx"></canvas>
+
+<script>
+/* ===== настройки дня ===== */
+const DAY = 20;
+const RIDDLE = "Маленький символ на груди: хранит смысл, который понятен только нам двоим.";
+const MODES = [
+  { key:"calm",     label:"Спокойно", n:5, target:256,  four:.05, undos:5 },
+  { key:"classic",  label:"Классика", n:4, target:512,  four:.12, undos:3 },
+  { key:"blizzard", label:"Метель",   n:4, target:1024, four:.32, undos:2 }
+];
+const SKIN = {
+  2:    { e:"❄",  t1:"#e8f6fb", t2:"#bcd9e6", f:"#123039", gl:0,  gc:"transparent" },
+  4:    { e:"✨", t1:"#cfeaf7", t2:"#96c4dc", f:"#102b34", gl:0,  gc:"transparent" },
+  8:    { e:"🍬", t1:"#8fc0ff", t2:"#3d7fd6", f:"#f4fbff", gl:10, gc:"#7fb4ff66" },
+  16:   { e:"🍊", t1:"#5fdcea", t2:"#1f9bb0", f:"#04222a", gl:12, gc:"#4dd0e177" },
+  32:   { e:"🕯", t1:"#5ce89a", t2:"#1f9d5c", f:"#04240f", gl:14, gc:"#3ddc8488" },
+  64:   { e:"🔔", t1:"#ffc76b", t2:"#e07a12", f:"#2a1704", gl:16, gc:"#ffb34799" },
+  128:  { e:"🎄", t1:"#f2d79a", t2:"#c99a3a", f:"#2a1f06", gl:18, gc:"#e8c37aaa" },
+  256:  { e:"⛄", t1:"#ff9cc4", t2:"#d94f86", f:"#2d0716", gl:20, gc:"#ff7eb0aa" },
+  512:  { e:"🎁", t1:"#ff8a8a", t2:"#c93b3b", f:"#fff2f2", gl:22, gc:"#ff6b6bbb" },
+  1024: { e:"🎅", t1:"#c7aef0", t2:"#7e57c2", f:"#fdf7ff", gl:24, gc:"#b39ddbcc" },
+  2048: { e:"👑", t1:"#fff6d8", t2:"#ffd76a", f:"#2a1f06", gl:30, gc:"#ffd76aee" },
+  4096: { e:"🌟", t1:"#fffdf3", t2:"#ffe9a8", f:"#2a1f06", gl:34, gc:"#fff3cfff" }
+};
+const skinOf = v => SKIN[v] || SKIN[4096];
+
+/* ===== антураж ===== */
+const GC=["#e74c3c","#f1c40f","#3498db","#e67e22","#9b59b6","#2ecc71","#ff7eb0"];
+for(let i=0;i<17;i++){
+  const b=document.createElement("span");
+  b.className="gbulb"; b.style.color=GC[i%GC.length];
+  b.style.animationDelay=(i*.17)+"s, "+(i*.23)+"s";
+  document.getElementById("garland").appendChild(b);
+}
+for(let i=0;i<12;i++){
+  const f=document.createElement("div");
+  f.className="flake"; f.textContent="❄";
+  f.style.left=Math.random()*100+"vw";
+  f.style.fontSize=8+Math.random()*9+"px";
+  f.style.animationDuration=7+Math.random()*8+"s";
+  f.style.animationDelay=-Math.random()*10+"s";
+  document.body.appendChild(f);
+}
+
+/* ===== служебное ===== */
+const $=id=>document.getElementById(id);
+const q=new URLSearchParams(location.search);
+const now=new Date();
+const PREP = now < new Date(2026, 11, 1, 19, 0, 0); // режим подготовки: замки сняты
+const inDec=now.getFullYear()===2026&&now.getMonth()===11;
+const today=inDec?now.getDate():0;
+const open = q.has("all") || PREP || (inDec && (DAY < today || (DAY === today && now.getHours() >= 19)));
+const past = !q.has("all") && (inDec && DAY < today);
+const daySolved=()=>!!localStorage.getItem("advent_solved_"+DAY);
+
+/* ===== звук ===== */
+let snd=localStorage.getItem("advent_snd")!=="0";
+let AC=null, live=[];
+function ac(){
+  if(!AC){ const C=window.AudioContext||window.webkitAudioContext; if(C) AC=new C(); }
+  if(AC&&AC.state==="suspended") AC.resume();
+  return AC;
+}
+function tone(freq,ms,delay=0,vol=.13,type="sine"){
+  if(!snd) return; const c=ac(); if(!c) return;
+  const t=c.currentTime+delay/1000, d=ms/1000;
+  const o=c.createOscillator(), g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,t);
+  g.gain.setValueAtTime(.0001,t);
+  g.gain.linearRampToValueAtTime(vol,t+.01);
+  g.gain.setValueAtTime(vol,t+Math.max(.015,d-.04));
+  g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g); g.connect(c.destination);
+  o.start(t); o.stop(t+d+.03);
+  live.push(o); o.onended=()=>{ live=live.filter(x=>x!==o); };
+}
+function noise(ms,vol=.12,cut=1400){
+  if(!snd) return; const c=ac(); if(!c) return;
+  const n=Math.floor(c.sampleRate*ms/1000);
+  const buf=c.createBuffer(1,n,c.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*(1-i/n);
+  const src=c.createBufferSource(); src.buffer=buf;
+  const f=c.createBiquadFilter(); f.type="lowpass"; f.frequency.value=cut;
+  const g=c.createGain(); g.gain.value=vol;
+  src.connect(f); f.connect(g); g.connect(c.destination); src.start();
+  live.push(src); src.onended=()=>{ live=live.filter(x=>x!==src); };
+}
+function sweep(f1,f2,ms,vol=.13,type="triangle"){
+  if(!snd) return; const c=ac(); if(!c) return;
+  const t=c.currentTime,d=ms/1000;
+  const o=c.createOscillator(),g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(f1,t);
+  o.frequency.exponentialRampToValueAtTime(Math.max(30,f2),t+d);
+  g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+d+.02);
+  live.push(o); o.onended=()=>{ live=live.filter(x=>x!==o); };
+}
+function killSound(){ live.forEach(o=>{try{o.stop();}catch(e){}}); live=[]; }
+function paintSnd(){
+  const b=$("snd");
+  b.textContent=snd?"🔊 Звук":"🔇 Тихо";
+  b.classList.toggle("off",!snd);
+}
+$("snd").onclick=()=>{
+  snd=!snd; localStorage.setItem("advent_snd",snd?"1":"0");
+  paintSnd();
+  if(snd){ ac(); tone(880,90,0,.12); } else killSound();
+};
+paintSnd();
+
+/* ===== частицы ===== */
+const fx=$("fx"), fctx=fx.getContext("2d");
+let parts=[], fxRun=false;
+function sizeFx(){
+  const r=Math.min(devicePixelRatio||1,2);
+  fx.width=innerWidth*r; fx.height=innerHeight*r;
+  fx.style.width=innerWidth+"px"; fx.style.height=innerHeight+"px";
+  fctx.setTransform(r,0,0,r,0,0);
+}
+sizeFx(); addEventListener("resize",sizeFx);
+function spawn(p){ parts.push(p); if(!fxRun){ fxRun=true; requestAnimationFrame(stepFx); } }
+function sparks(x,y,n,col){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2, sp=.8+Math.random()*3.8;
+    spawn({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,g:.1,s:1.4+Math.random()*3,
+      c:col||"#dff3ff",life:1,dec:.026,round:true});
+  }
+}
+function confetti(){
+  const cols=["#e8c37a","#3ddc84","#ffb347","#7fb4ff","#ff7eb0","#4dd0e1","#b39ddb"];
+  for(let i=0;i<180;i++){
+    spawn({x:innerWidth/2+(Math.random()-.5)*220,y:innerHeight*.34,
+      vx:(Math.random()-.5)*8.5,vy:-Math.random()*9.5-2,g:.22,
+      w:4+Math.random()*6,h:3+Math.random()*5,a:Math.random()*Math.PI,va:(Math.random()-.5)*.3,
+      c:cols[(Math.random()*cols.length)|0],life:1,dec:.007});
+  }
+}
+function stepFx(){
+  fctx.clearRect(0,0,innerWidth,innerHeight);
+  parts.forEach(p=>{
+    p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.life-=p.dec;
+    fctx.globalAlpha=Math.max(0,p.life); fctx.fillStyle=p.c;
+    if(p.round){ fctx.beginPath(); fctx.arc(p.x,p.y,p.s,0,7); fctx.fill(); }
+    else { p.a+=p.va; fctx.save(); fctx.translate(p.x,p.y); fctx.rotate(p.a);
+      fctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); fctx.restore(); }
+  });
+  fctx.globalAlpha=1;
+  parts=parts.filter(p=>p.life>0&&p.y<innerHeight+50);
+  if(parts.length) requestAnimationFrame(stepFx);
+  else { fxRun=false; fctx.clearRect(0,0,innerWidth,innerHeight); }
+}
+
+/* ===== игра ===== */
+let timers=[];
+function later(fn,ms){ const id=setTimeout(fn,ms); timers.push(id); return id; }
+function clearTimers(){ timers.forEach(clearTimeout); timers=[]; }
+function showRiddle(fresh,extra){
+  clearTimers(); killSound();
+  $("game").innerHTML="";
+  $("riddleCard").hidden=false;
+  $("rTitle").textContent=fresh?"🎉 "+(extra||"Готово!")+" Вот загадка дня:":"Загадка дня:";
+  $("riddle").textContent=RIDDLE;
+}
+
+if(!open){
+  $("game").innerHTML=`<p class="task">День откроется 20 декабря в 19:00 🔒</p>`;
+}
+else if(daySolved()||past){
+  showRiddle(false);
+}
+else {
+  $("game").innerHTML=`
+    <p class="task">В кладовой Деда Мороза лёд слипается: две одинаковые льдинки становятся одной вдвое ценнее. Доведи её до главной плитки — и кладовая отдаст загадку.</p>
+    <div class="hud">
+      <div class="stat g" id="scbox"><i>СЧЁТ</i><b id="sc">0</b></div>
+      <div class="stat b"><i>РЕКОРД</i><b id="best">0</b></div>
+      <div class="stat"><i>ЦЕЛЬ</i><b id="tg">512</b></div>
+      <div class="stat m"><i>ОТМЕНЫ</i><b id="un">3</b></div>
+      <div class="seg" id="seg"></div>
+    </div>
+    <div class="goal"><span id="glabel">❄ 2</span><div class="bar"><i id="gbar"></i></div><span id="ggoal">🎁 512</span></div>
+    <div class="host" id="host">
+      <div class="board" id="board"></div>
+      <div class="overlay" id="ov">
+        <h3 id="ovt">Ледяная кладовая</h3>
+        <p id="ovp">Свайп, стрелки или WASD двигают все плитки. Одинаковые сливаются.</p>
+        <div id="ovb"></div>
+        <div class="ovbtns"><button class="act pulse" id="ovbtn">▶ Начать</button><button class="ghost" id="ovbtn2" style="display:none">Продолжить игру</button></div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="act" id="again">↻ Заново</button>
+      <button class="ghost" id="undo">↶ Отменить · 3</button>
+    </div>
+    <div id="msg"></div>
+    <p class="note">Свайп по полю на телефоне, стрелки или WASD на клавиатуре, Z — отмена хода, R — заново.</p>`;
+
+  let M=1, mode=MODES[1], N=4;
+  let grid=[], tiles=new Map(), nextId=1;
+  let score=0, undos=3, history=[], busy=false, over=false, wonOnce=false, endless=false;
+  let px=0, gap=8, cell=0, step=0, maxTile=2;
+
+  const board=$("board"), host=$("host");
+  const setMsg=(t,cls)=>{ const m=$("msg"); if(m){ m.textContent=t; m.className=cls||""; } };
+  const bestKey=()=>`advent_ice_best_${mode.key}`;
+
+  MODES.forEach((m,i)=>{
+    const b=document.createElement("button");
+    b.textContent=m.label; b.dataset.i=i;
+    if(i===M) b.classList.add("on");
+    b.onclick=()=>{
+      if(M===i) return;
+      M=i; mode=MODES[i];
+      $("seg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",+x.dataset.i===i));
+      reset();
+      tone(620,70,0,.07,"triangle");
+    };
+    $("seg").appendChild(b);
+  });
+
+  function layout(){
+    px=Math.min(host.clientWidth-24,420);
+    gap=Math.max(6,Math.round(px*.022));
+    cell=(px-gap*(N+1))/N;
+    step=cell+gap;
+    board.style.width=px+"px"; board.style.height=px+"px";
+    board.querySelectorAll(".bgcell").forEach((el,i)=>{
+      const r=(i/N)|0, c=i%N;
+      el.style.width=cell+"px"; el.style.height=cell+"px";
+      el.style.transform=`translate(${gap+c*step}px,${gap+r*step}px)`;
+    });
+    tiles.forEach(t=>{
+      t.el.style.width=cell+"px"; t.el.style.height=cell+"px";
+      t.el.style.setProperty("--es",Math.round(cell*.4)+"px");
+      t.el.style.setProperty("--ns",Math.max(10,Math.round(cell*.19))+"px");
+      place(t);
+    });
+  }
+  function place(t){
+    const x=gap+t.c*step, y=gap+t.r*step;
+    t.pos=`translate(${x}px,${y}px)`;
+    t.el.style.transform=t.pos;
+    t.el.style.setProperty("--tf-pos",t.pos);
+  }
+  function makeTile(v,r,c,anim){
+    const sk=skinOf(v);
+    const el=document.createElement("div");
+    el.className="tile"+(anim?" "+anim:"")+(v>=256?" hot":"");
+    el.style.setProperty("--t1",sk.t1); el.style.setProperty("--t2",sk.t2);
+    el.style.setProperty("--tf",sk.f); el.style.setProperty("--gl",sk.gl+"px");
+    el.style.setProperty("--gc",sk.gc);
+    el.style.width=cell+"px"; el.style.height=cell+"px";
+    el.style.setProperty("--es",Math.round(cell*.4)+"px");
+    el.style.setProperty("--ns",Math.max(10,Math.round(cell*.19))+"px");
+    el.innerHTML=`<em>${sk.e}</em><b>${v}</b>`;
+    const t={id:nextId++, v, r, c, el};
+    board.appendChild(el);
+    tiles.set(t.id,t);
+    place(t);
+    if(anim) later(()=>{ if(t.el) t.el.classList.remove(anim); },320);
+    return t;
+  }
+  function dropTile(t){
+    if(!t) return;
+    tiles.delete(t.id);
+    if(t.el&&t.el.parentNode) t.el.parentNode.removeChild(t.el);
+  }
+  function buildBG(){
+    board.innerHTML=""; tiles.clear();
+    for(let i=0;i<N*N;i++){
+      const d=document.createElement("div");
+      d.className="bgcell";
+      board.appendChild(d);
+    }
+  }
+  function empties(){
+    const out=[];
+    for(let i=0;i<N*N;i++) if(!grid[i]) out.push(i);
+    return out;
+  }
+  function spawnTile(){
+    const e=empties();
+    if(!e.length) return null;
+    const i=e[(Math.random()*e.length)|0];
+    const v=Math.random()<mode.four?4:2;
+    const t=makeTile(v,(i/N)|0,i%N,"new");
+    grid[i]=t;
+    tone(v===4?620:480,60,0,.05,"triangle");
+    return t;
+  }
+  function recalcMax(){
+    maxTile=2;
+    grid.forEach(t=>{ if(t&&t.v>maxTile) maxTile=t.v; });
+  }
+  function hud(gain){
+    $("sc").textContent=score;
+    $("tg").textContent=mode.target;
+    $("un").textContent=undos;
+    $("undo").textContent="↶ Отменить · "+undos;
+    $("undo").disabled=undos<=0||!history.length||over||busy;
+    const b=+(localStorage.getItem(bestKey())||0);
+    $("best").textContent=Math.max(b,score);
+    recalcMax();
+    const sk=skinOf(maxTile), tg=skinOf(mode.target);
+    $("glabel").textContent=`${sk.e} ${maxTile}`;
+    $("ggoal").textContent=`${tg.e} ${mode.target}`;
+    const p=Math.min(1,Math.log2(Math.max(2,maxTile))/Math.log2(mode.target));
+    $("gbar").style.width=(p*100)+"%";
+    if(gain>0){
+      const g=document.createElement("span");
+      g.className="gain"; g.textContent="+"+gain;
+      $("scbox").appendChild(g);
+      later(()=>g.remove(),820);
+    }
+  }
+  function snapshot(){
+    history.push({ v:grid.map(t=>t?t.v:0), score });
+    if(history.length>40) history.shift();
+  }
+  function canMove(){
+    if(empties().length) return true;
+    for(let r=0;r<N;r++) for(let c=0;c<N;c++){
+      const t=grid[r*N+c];
+      if(c+1<N&&grid[r*N+c+1]&&grid[r*N+c+1].v===t.v) return true;
+      if(r+1<N&&grid[(r+1)*N+c]&&grid[(r+1)*N+c].v===t.v) return true;
+    }
+    return false;
+  }
+  function overlay(on,title,text,btn,extra,handler,btn2,handler2){
+    const ov=$("ov");
+    ov.classList.toggle("on",on);
+    if(on){
+      $("ovt").textContent=title;
+      $("ovp").textContent=text;
+      $("ovb").innerHTML=extra||"";
+      $("ovbtn").textContent=btn;
+      $("ovbtn").onclick=handler;
+      const b2=$("ovbtn2");
+      if(btn2){ b2.style.display=""; b2.textContent=btn2; b2.onclick=handler2; }
+      else b2.style.display="none";
+    }
+  }
+
+  function move(dir){
+    if(busy||over) return;
+    const lines=[];
+    if(dir==="left"||dir==="right"){
+      for(let r=0;r<N;r++){
+        const line=[];
+        for(let c=0;c<N;c++) line.push([r,c]);
+        if(dir==="right") line.reverse();
+        lines.push(line);
+      }
+    } else {
+      for(let c=0;c<N;c++){
+        const line=[];
+        for(let r=0;r<N;r++) line.push([r,c]);
+        if(dir==="down") line.reverse();
+        lines.push(line);
+      }
+    }
+    const before=grid.map(t=>t?t.v:0).join(",");
+    const removals=[], births=[];
+    const next=new Array(N*N).fill(null);
+    let gained=0, merged=0;
+
+    lines.forEach(line=>{
+      const list=line.map(([r,c])=>grid[r*N+c]).filter(Boolean);
+      const out=[];
+      for(let i=0;i<list.length;i++){
+        if(i+1<list.length&&list[i].v===list[i+1].v){
+          out.push({m:[list[i],list[i+1]],v:list[i].v*2}); i++;
+        } else out.push({t:list[i],v:list[i].v});
+      }
+      out.forEach((item,k)=>{
+        const [r,c]=line[k];
+        if(item.m){
+          const [a,b]=item.m;
+          a.r=r; a.c=c; place(a);
+          b.r=r; b.c=c; place(b);
+          removals.push(a,b);
+          births.push({v:item.v,r,c});
+          gained+=item.v; merged++;
+        } else {
+          const t=item.t;
+          t.r=r; t.c=c; place(t);
+          next[r*N+c]=t;
+        }
+      });
+    });
+
+    const after=next.map(t=>t?t.v:0).join(",");
+    if(before===after&&births.length===0){
+      host.classList.add("shake"); later(()=>host.classList.remove("shake"),420);
+      tone(180,80,0,.06,"square");
+      setMsg("В эту сторону хода нет.");
+      return;
+    }
+
+    snapshot();
+    busy=true;
+    ac();
+    noise(90,.09,1100);
+    grid=next;
+
+    later(()=>{
+      removals.forEach(dropTile);
+      births.forEach(b=>{
+        const t=makeTile(b.v,b.r,b.c,"merged");
+        grid[b.r*N+b.c]=t;
+        const rect=t.el.getBoundingClientRect();
+        const sk=skinOf(b.v);
+        sparks(rect.left+rect.width/2, rect.top+rect.height/2, 10+b.v/32|0, sk.t1);
+      });
+      if(merged){
+        const base=380+Math.min(600,Math.log2(Math.max(2,births[0]?births[0].v:2))*70);
+        tone(base,110,0,.11,"triangle");
+        tone(base*1.5,90,.06,.07,"sine");
+      }
+      score+=gained;
+      spawnTile();
+      recalcMax();
+      hud(gained);
+      busy=false;
+
+      if(!wonOnce&&maxTile>=mode.target){ win(); return; }
+      if(!canMove()){ lose(); return; }
+      setMsg(gained?`Слияние: +${gained} очков ✨`:"Плитки съехали.");
+    },140);
+  }
+
+  function win(){
+    wonOnce=true; over=true;
+    clearTimers(); killSound();
+    localStorage.setItem("advent_solved_"+DAY,new Date().toISOString());
+    const prev=+(localStorage.getItem(bestKey())||0);
+    const record=score>prev;
+    if(record) localStorage.setItem(bestKey(),String(score));
+    hud();
+    host.classList.add("win"); later(()=>host.classList.remove("win"),820);
+    confetti();
+    tone(660,150,0,.16); tone(880,150,.16,.16); tone(1174,190,.32,.16); tone(1568,340,.5,.15);
+    const sk=skinOf(mode.target);
+    overlay(true,`${sk.e} Плитка ${mode.target} собрана!`,
+      `Кладовая открылась: счёт ${score}, лучшая плитка ${maxTile}. Забирай загадку дня — или продолжай плавить лёд дальше.`,
+      "🎁 Открыть загадку",
+      record?`<div class="badge">Новый рекорд счёта</div>`:"",
+      ()=>showRiddle(true,`плитка ${mode.target}, счёт ${score}`),
+      "Продолжить игру",
+      ()=>{ over=false; endless=true; overlay(false); setMsg("Лёд плавится дальше — рекорды ждут ✨"); });
+    setMsg("✨ Цель режима достигнута!","ok");
+  }
+  function lose(){
+    over=true; clearTimers(); killSound();
+    const prev=+(localStorage.getItem(bestKey())||0);
+    if(score>prev) localStorage.setItem(bestKey(),String(score));
+    hud();
+    sweep(420,80,620,.15,"triangle");
+    host.classList.add("shake"); later(()=>host.classList.remove("shake"),420);
+    overlay(true,"Кладовая замёрзла",
+      `Ходов не осталось. Счёт ${score}, лучшая плитка ${maxTile}${wonOnce?" — цель уже была взята":""}. Начни заново и попробуй другую раскладку.`,
+      "↻ Ещё раз","",()=>reset());
+    setMsg("Ходов не осталось.","err");
+  }
+  function undo(){
+    if(undos<=0||!history.length||busy||over) return;
+    clearTimers();
+    const h=history.pop();
+    undos--;
+    tiles.forEach(t=>{ if(t.el&&t.el.parentNode) t.el.parentNode.removeChild(t.el); });
+    tiles.clear();
+    grid=new Array(N*N).fill(null);
+    h.v.forEach((v,i)=>{ if(v) grid[i]=makeTile(v,(i/N)|0,i%N,null); });
+    score=h.score;
+    hud();
+    sweep(520,320,160,.09,"triangle");
+    setMsg("Ход отменён ↶");
+  }
+  function reset(){
+    clearTimers(); killSound();
+    mode=MODES[M]; N=mode.n;
+    score=0; undos=mode.undos; history=[]; busy=false; over=false; wonOnce=false; endless=false;
+    grid=new Array(N*N).fill(null);
+    buildBG(); layout();
+    spawnTile(); spawnTile();
+    recalcMax(); hud();
+    overlay(false);
+    setMsg(`Режим «${mode.label}»: собери плитку ${mode.target} ${skinOf(mode.target).e}`);
+    tone(520,90,0,.08,"triangle"); tone(760,110,.09,.07,"triangle");
+  }
+
+  $("again").onclick=()=>reset();
+  $("undo").onclick=undo;
+
+  document.addEventListener("keydown",e=>{
+    const map={ArrowLeft:"left",ArrowRight:"right",ArrowUp:"up",ArrowDown:"down",
+      a:"left",d:"right",w:"up",s:"down",A:"left",D:"right",W:"up",S:"down",
+      ф:"left",в:"right",ц:"up",ы:"down"};
+    if(map[e.key]){ e.preventDefault(); move(map[e.key]); return; }
+    if(e.key==="z"||e.key==="Z"||e.key==="я"||e.key==="Я"){ e.preventDefault(); undo(); return; }
+    if(e.key==="r"||e.key==="R"||e.key==="к"||e.key==="К"){ e.preventDefault(); reset(); return; }
+    if(e.key==="Enter"&&$("ov").classList.contains("on")){ e.preventDefault(); $("ovbtn").click(); }
+  });
+
+  let sx=0, sy=0, tracking=false;
+  board.addEventListener("pointerdown",e=>{ tracking=true; sx=e.clientX; sy=e.clientY; });
+  board.addEventListener("pointerup",e=>{
+    if(!tracking) return;
+    tracking=false;
+    const dx=e.clientX-sx, dy=e.clientY-sy;
+    if(Math.max(Math.abs(dx),Math.abs(dy))<24) return;
+    move(Math.abs(dx)>Math.abs(dy) ? (dx>0?"right":"left") : (dy>0?"down":"up"));
+  });
+  board.addEventListener("pointercancel",()=>{ tracking=false; });
+  board.addEventListener("touchmove",e=>{ e.preventDefault(); },{passive:false});
+
+  addEventListener("resize",()=>{ if(grid.length) layout(); });
+
+  reset();
+  overlay(true,"Ледяная кладовая",
+    `Режим «${mode.label}»: поле ${N}×${N}, цель — плитка ${mode.target} ${skinOf(mode.target).e}, отмен: ${mode.undos}. Свайп, стрелки или WASD.`,
+    "▶ Начать","",()=>{ overlay(false); ac(); setMsg(`Собери плитку ${mode.target} ${skinOf(mode.target).e}`); });
+}
+</script>
+</body>
+</html>

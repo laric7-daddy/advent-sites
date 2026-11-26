@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>День 31 — финал декабря</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&family=Manrope:wght@400;600;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0f14; --card:#141d24; --card2:#0e161c; --line:#263844; --line2:#3d5a6b;
+  --gold:#ffd76a; --amber:#ffb347; --green:#3ddc84; --red:#ff5f5f; --ice:#7fe3ff;
+  --magenta:#ff7eb0; --violet:#b39ddb; --ink:#eef7fb; --dim:#87a3b2;
+  --paper:#f6ecd8; --paper2:#e8dab8; --inkp:#3a2c18;
+}
+*{box-sizing:border-box}
+html{scrollbar-color:var(--line2) #0a0f14;scrollbar-width:thin}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#0a0f14;border-radius:9px}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:9px;border:2px solid #0a0f14}
+::-webkit-scrollbar-thumb:hover{background:#4d7a90}
+body{margin:0;padding:0 14px 54px;color:var(--ink);overflow-x:hidden;
+  background:radial-gradient(1200px 640px at 50% -16%,#1c4a5c55,transparent 70%),var(--bg);
+  font:16px/1.5 Manrope,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:640px;margin:0 auto;position:relative;z-index:1}
+
+.garland{display:flex;justify-content:center;gap:14px;border-top:2px solid var(--line2);overflow:hidden}
+.gbulb{width:9px;height:13px;border-radius:50% 50% 45% 45%;position:relative;margin-top:7px;flex:none;
+ background:currentColor;transform-origin:top center;animation:sway 3s ease-in-out infinite alternate,glowblink 2s infinite}
+.gbulb::before{content:"";position:absolute;top:-7px;left:3.5px;width:2px;height:7px;background:var(--line2)}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+@keyframes glowblink{0%,100%{filter:brightness(1);box-shadow:0 0 8px currentColor}50%{filter:brightness(.5);box-shadow:0 0 2px currentColor}}
+.flake{position:fixed;top:-14px;color:#dff3ff;opacity:.5;pointer-events:none;z-index:0;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(106vh) rotate(360deg)}}
+
+.back{color:var(--dim);font-size:13px;text-decoration:none}
+.back:hover{color:var(--gold)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0}
+h1{font-family:Unbounded,sans-serif;font-size:clamp(18px,4.6vw,24px);margin:0;line-height:1.25}
+h1 .gold{color:var(--gold)}
+.sndbtn{flex:none;padding:9px 13px;border-radius:999px;border:1px solid var(--line2);background:var(--card);
+ color:var(--ink);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+.sndbtn:hover{border-color:var(--gold);color:var(--gold)}
+.sndbtn.off{color:var(--dim);border-color:var(--line)}
+
+.card{background:linear-gradient(165deg,var(--card),var(--card2));border:1px solid var(--line);
+ border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 10px 30px #0007}
+.rules{border-color:var(--line2);background:linear-gradient(165deg,#12283255,#0c1a22)}
+.rules b{color:var(--gold)}
+.rules ul{margin:6px 0 0;padding-left:18px;color:#bcd6e2;font-size:13.5px}
+.rules li{margin-bottom:3px}
+.task{color:#bcd6e2;font-size:14px;margin:0 0 12px}
+.note{color:var(--dim);font-size:12.5px;margin:10px 0 0}
+
+.recap{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.rc{display:flex;flex-direction:column;gap:1px;padding:8px 13px;border-radius:12px;
+ border:1px solid var(--line);background:#0e161c;min-width:86px}
+.rc i{font:700 10px/1 Manrope,sans-serif;letter-spacing:.12em;color:var(--dim);font-style:normal}
+.rc b{font:800 18px/1.2 Manrope,sans-serif;color:var(--gold)}
+.rc.g b{color:var(--green)} .rc.b b{color:var(--ice)} .rc.m b{color:var(--magenta)}
+
+.month{display:grid;grid-template-columns:repeat(auto-fill,minmax(30px,1fr));gap:5px;margin:4px 0 2px}
+.md{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;
+ font:800 11px/1 Manrope,sans-serif;color:var(--dim);background:#0e161c;border:1px solid var(--line);transition:.2s}
+.md.done{color:#062018;background:linear-gradient(160deg,#7ff0b6,var(--green));border-color:var(--green);
+ box-shadow:0 0 10px #3ddc8455}
+.md.today{border-color:var(--gold);color:var(--gold);box-shadow:0 0 0 2px #ffd76a33}
+
+.stage{position:relative;border-radius:18px;padding:16px;border:1px solid var(--line2);
+ background:radial-gradient(130% 100% at 50% 0%,#17303c,#081116 74%);
+ box-shadow:0 16px 36px #000a,inset 0 1px 0 #ffffff10;min-height:280px}
+.stage.shake{animation:shk .4s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shk{10%,90%{transform:translateX(-3px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
+
+.qhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.qnum{font:700 11px/1 Manrope,sans-serif;letter-spacing:.14em;color:var(--dim)}
+.qdots{display:flex;gap:5px}
+.qdots s{width:9px;height:9px;border-radius:50%;background:#22343e;text-decoration:none;transition:.25s}
+.qdots s.now{background:var(--gold);box-shadow:0 0 10px #ffd76a88;transform:scale(1.25)}
+.qdots s.got{background:var(--green);box-shadow:0 0 8px #3ddc8477}
+.qtext{font-family:Unbounded,sans-serif;font-size:clamp(15px,4vw,19px);line-height:1.4;margin:0 0 14px;color:var(--ink)}
+.qnote{font-size:13px;color:var(--dim);margin:10px 0 0;min-height:18px}
+.qnote.ok{color:var(--green)} .qnote.err{color:var(--red)}
+
+.opts{display:grid;gap:8px}
+.opt{padding:13px 15px;border-radius:13px;border:1px solid var(--line);background:#0e161c;color:var(--ink);
+ cursor:pointer;font:700 14px/1.35 Manrope,sans-serif;text-align:left;transition:.15s;position:relative}
+.opt:hover:not(:disabled){border-color:var(--gold);transform:translateX(3px);background:#12202a}
+.opt:disabled{cursor:not-allowed}
+.opt.right{border-color:var(--green);background:#0f2e22;color:var(--green);box-shadow:0 0 18px #3ddc8444}
+.opt.wrong{border-color:var(--red);background:#2e1412;color:#ffb3b3;animation:shk .35s}
+.opt .k{position:absolute;right:12px;top:50%;transform:translateY(-50%);font:800 11px Manrope,sans-serif;color:var(--dim)}
+.tin{display:flex;gap:8px;flex-wrap:wrap}
+.tin input{flex:1;min-width:160px;padding:13px 15px;border-radius:13px;border:1px solid var(--line2);
+ background:#0b141a;color:var(--ink);font:700 15px Manrope,sans-serif;outline:none;transition:.15s}
+.tin input:focus{border-color:var(--gold);box-shadow:0 0 0 3px #ffd76a22}
+button.act{padding:12px 20px;border-radius:999px;border:none;cursor:pointer;font:800 14px Manrope,sans-serif;
+ background:linear-gradient(90deg,var(--gold),#ffeec0);color:#2a1f06;box-shadow:0 4px 16px #ffd76a2e;transition:.15s}
+button.act:hover{transform:translateY(-1px);box-shadow:0 7px 20px #ffd76a44}
+button.act:active{transform:translateY(0)}
+button.act.pulse{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 4px 16px #ffd76a2e}50%{box-shadow:0 0 0 7px #ffd76a22,0 4px 22px #ffd76a66}}
+button.ghost{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:none;
+ color:var(--dim);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+button.ghost:hover{border-color:var(--gold);color:var(--gold)}
+
+.letter{position:relative;border-radius:14px;padding:22px 20px 26px;color:var(--inkp);
+ background:linear-gradient(168deg,var(--paper),var(--paper2));
+ box-shadow:0 18px 44px #000c,inset 0 0 0 1px #ffffff66;transform:rotate(-.6deg);
+ font-family:Caveat,cursive;font-size:21px;line-height:1.5;white-space:pre-wrap}
+.letter::before{content:"";position:absolute;left:50%;top:-13px;width:56px;height:26px;transform:translateX(-50%) rotate(-2deg);
+ background:#ffffff55;border:1px solid #ffffff88;border-radius:3px;backdrop-filter:blur(1px)}
+.letter .seal{position:absolute;right:16px;bottom:14px;width:46px;height:46px;border-radius:50%;
+ background:radial-gradient(circle at 35% 32%,#ff8a8a,#c0392b 65%,#7d1f18);
+ box-shadow:0 4px 12px #0007,inset 0 2px 4px #ffffff55;
+ display:flex;align-items:center;justify-content:center;color:#ffe0dc;font:800 17px Manrope,sans-serif}
+.letter h4{font-family:Unbounded,sans-serif;font-size:15px;margin:0 0 8px;color:#7a4a12}
+
+.overlay{position:absolute;inset:0;z-index:8;display:none;flex-direction:column;align-items:center;justify-content:center;
+ gap:12px;padding:22px;text-align:center;background:#060d12ee;backdrop-filter:blur(6px);border-radius:18px}
+.overlay.on{display:flex;animation:fadein .4s ease-out}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.overlay h3{font-family:Unbounded,sans-serif;font-size:20px;margin:0;color:var(--gold)}
+.overlay p{margin:0;font-size:13.5px;color:#bcd6e2;max-width:360px}
+.badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.badge{padding:5px 12px;border-radius:999px;border:1px solid var(--green);color:var(--green);
+ background:#0f2e22;font:700 12px Manrope,sans-serif}
+#riddle{font-size:16px;white-space:pre-wrap}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:40}
+@media (max-width:430px){
+  .rc{min-width:74px;padding:6px 10px}
+  .rc b{font-size:16px}
+  .letter{font-size:19px;padding:18px 16px 24px}
+}
+</style>
+</head>
+<body>
+<div class="garland" id="garland"></div>
+<div class="wrap">
+  <a class="back" href="../">← календарь</a>
+  <div class="top">
+    <h1>День <span class="gold">31</span> · финал декабря</h1>
+    <button class="sndbtn" id="snd">🔊 Звук</button>
+  </div>
+
+  <div class="card rules">
+    📜 <b>Как играть:</b> это финал. Сначала шкатулка покажет, каким был твой декабрь, потом задаст семь вопросов о нас и о нашем приключении.
+    <ul>
+      <li>Отвечай на вопросы: неверный ответ не страшен, попробуй ещё — но «без промахов» даст особый значок.</li>
+      <li>Последний вопрос — без неправильных ответов. Честно.</li>
+      <li>В конце тебя ждёт письмо и последний подарок года 🎁</li>
+    </ul>
+  </div>
+
+  <div id="game" class="card"></div>
+
+  <div id="riddleCard" class="card" hidden>
+    <h3 id="rTitle" style="margin:0 0 8px;font-size:16px;color:var(--gold)"></h3>
+    <p id="riddle"></p>
+    <p class="note">Отправь ответ боту в Telegram 🤖 Это последняя загадка года — он пришлёт подарок, место и фото тайника.</p>
+  </div>
+</div>
+<canvas id="fx"></canvas>
+
+<script>
+/* ===== настройки дня ===== */
+const DAY = 31;
+const RIDDLE = "Два источника аромата: один — на тебе, невидимый; второй — на столе, с огоньком. Вместе — запах нашего Нового года.";
+const LETTER =
+`Моя хорошая,
+
+тридцать один день я прятал по дому маленькие «да» тебе.
+Ты ломала шифры, ловила снежинки, спорила с оттепелью —
+и ни разу не сдалась.
+
+Пусть эти духи напомнят тебе все наши вечера,
+а свечка горит так же тепло, как ты умеешь молчать рядом.
+
+С Новым годом. Ты — мой лучший подарок,
+и я не шифрую это ни в какие ребусы.`;
+
+const QUESTIONS = [
+  { type:"choice", q:"Сколько огоньков нужно было зажечь на ёлке в самый первый день?",
+    opts:["25","30","31","34"], a:2,
+    note:"Тридцать один — по огоньку на каждый день декабря." },
+  { type:"choice", q:"Какое слово спрятало колесо шифра в день 6?",
+    opts:["МЕТЕЛЬ","МАГИЯ","МИШУРА","МУЗЫКА"], a:2,
+    note:"Мишура. Потому что без неё праздник не праздник." },
+  { type:"choice", q:"Что пряталось под сугробами на снежном поле в день 14?",
+    opts:["льдинки","петарды","угольки","шишки"], a:1,
+    note:"Петарды — и ни одна не взорвалась раньше времени." },
+  { type:"choice", q:"Сколько дуэлей Мороз выиграл у Оттепели?",
+    opts:["три","четыре","пять","шесть"], a:2,
+    note:"Пять стёкол остались морозными. Оттепель запомнила." },
+  { type:"choice", q:"Какая плитка была целью «Ледяной кладовой» в классике?",
+    opts:["256","512","1024","2048"], a:1,
+    note:"512 — половинка тысячи. Как половинка меня." },
+  { type:"text", q:"Вспомни сейф из дня 5: какое кодовое слово открывало загадку про карандаши?",
+    answers:["карандаши","карандаш","цветные карандаши"],
+    note:"Малютки буратинки, геи и блядинки." },
+  { type:"any", q:"И последнее. За что я люблю тебя больше всего?",
+    opts:["за смех, который лечит","за тепло, которое не кончается","за то, что ты просто есть","за всё сразу — и ещё чуть-чуть"],
+    note:"Правильный ответ — любой. Потому что всё это — ты." }
+];
+
+const STAR_KEYS=["advent_lights16_progress","advent_ladder21_progress","advent_hanoi25_progress",
+  "advent_turn30_progress","advent_nono22_progress","advent_logic27_progress","advent_soko28_progress"];
+
+/* ===== антураж ===== */
+const GC=["#e0453c","#ffd76a","#3ddc84","#7fe3ff","#ff7eb0","#b39ddb","#ffb347"];
+for(let i=0;i<17;i++){
+  const b=document.createElement("span");
+  b.className="gbulb"; b.style.color=GC[i%GC.length];
+  b.style.animationDelay=(i*.17)+"s, "+(i*.23)+"s";
+  document.getElementById("garland").appendChild(b);
+}
+for(let i=0;i<14;i++){
+  const f=document.createElement("div");
+  f.className="flake"; f.textContent="❄";
+  f.style.left=Math.random()*100+"vw";
+  f.style.fontSize=8+Math.random()*10+"px";
+  f.style.animationDuration=7+Math.random()*8+"s";
+  f.style.animationDelay=-Math.random()*10+"s";
+  document.body.appendChild(f);
+}
+
+/* ===== служебное ===== */
+const $=id=>document.getElementById(id);
+const q=new URLSearchParams(location.search);
+const now=new Date();
+const PREP = now < new Date(2026, 11, 1, 19, 0, 0); // режим подготовки: замки сняты
+const inDec=now.getFullYear()===2026&&now.getMonth()===11;
+const today=inDec?now.getDate():0;
+const open = q.has("all") || PREP || (inDec && (DAY < today || (DAY === today && now.getHours() >= 19)));
+const past = !q.has("all") && (inDec && DAY < today);
+const daySolved=()=>!!localStorage.getItem("advent_solved_"+DAY);
+const norm=s=>(s||"").toLowerCase().replace(/ё/g,"е").replace(/[^a-zа-я0-9]/g,"");
+
+function recap(){
+  let solved=0;
+  const days=[];
+  for(let d=1;d<=31;d++){
+    const ok=!!localStorage.getItem("advent_solved_"+d);
+    if(ok) solved++;
+    days.push(ok);
+  }
+  let stars=0;
+  STAR_KEYS.forEach(k=>{
+    try{
+      const p=JSON.parse(localStorage.getItem(k)||"null");
+      if(p&&p.stars) stars+=Object.values(p.stars).reduce((a,b)=>a+b,0);
+    }catch(e){}
+  });
+  return {solved,days,stars};
+}
+
+/* ===== звук ===== */
+let snd=localStorage.getItem("advent_snd")!=="0";
+let AC=null, live=[];
+function ac(){
+  if(!AC){ const C=window.AudioContext||window.webkitAudioContext; if(C) AC=new C(); }
+  if(AC&&AC.state==="suspended") AC.resume();
+  return AC;
+}
+function tone(freq,ms,delay=0,vol=.12,type="sine"){
+  if(!snd) return; const c=ac(); if(!c) return;
+  const t=c.currentTime+delay/1000, d=ms/1000;
+  const o=c.createOscillator(), g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,t);
+  g.gain.setValueAtTime(.0001,t);
+  g.gain.linearRampToValueAtTime(vol,t+.01);
+  g.gain.setValueAtTime(vol,t+Math.max(.012,d-.03));
+  g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g); g.connect(c.destination);
+  o.start(t); o.stop(t+d+.03);
+  live.push(o); o.onended=()=>{ live=live.filter(x=>x!==o); };
+}
+function sweep(f1,f2,ms,vol=.12,type="triangle"){
+  if(!snd) return; const c=ac(); if(!c) return;
+  const t=c.currentTime,d=ms/1000;
+  const o=c.createOscillator(),g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(f1,t);
+  o.frequency.exponentialRampToValueAtTime(Math.max(30,f2),t+d);
+  g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+d+.02);
+  live.push(o); o.onended=()=>{ live=live.filter(x=>x!==o); };
+}
+function killSound(){ live.forEach(o=>{try{o.stop();}catch(e){}}); live=[]; }
+function playTune(){
+  if(!snd) return;
+  const N={G:67,A:69,B:71,C:72,D:74,E:76,F:78};
+  const seq=[["D",1],["G",1],["G",1],["A",1],["G",1],["F",1],["E",1],["D",2],
+             ["G",1],["G",1],["A",1],["G",1],["C",1],["B",1],["G",2]];
+  let t=0;
+  seq.forEach(([n,b])=>{
+    tone(Math.pow(2,(N[n]-69)/12)*440, b*260, t*260, .12, "triangle");
+    tone(Math.pow(2,(N[n]-57)/12)*440, b*260, t*260, .05, "sine");
+    t+=b;
+  });
+}
+function paintSnd(){
+  const b=$("snd");
+  b.textContent=snd?"🔊 Звук":"🔇 Тихо";
+  b.classList.toggle("off",!snd);
+}
+$("snd").onclick=()=>{
+  snd=!snd; localStorage.setItem("advent_snd",snd?"1":"0");
+  paintSnd();
+  if(snd){ ac(); tone(880,90,0,.12); } else killSound();
+};
+paintSnd();
+
+/* ===== фейерверк ===== */
+const fx=$("fx"), fctx=fx.getContext("2d");
+let parts=[], fxRun=false, fwTimer=null;
+function sizeFx(){
+  const r=Math.min(devicePixelRatio||1,2);
+  fx.width=innerWidth*r; fx.height=innerHeight*r;
+  fx.style.width=innerWidth+"px"; fx.style.height=innerHeight+"px";
+  fctx.setTransform(r,0,0,r,0,0);
+}
+sizeFx(); addEventListener("resize",sizeFx);
+function spawn(p){ parts.push(p); if(!fxRun){ fxRun=true; requestAnimationFrame(stepFx); } }
+function burstAt(x,y,col,n){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*6.28, sp=1+Math.random()*5.4;
+    spawn({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,g:.06,s:1.3+Math.random()*2.6,
+      c:col,life:1,dec:.014,round:true});
+  }
+}
+function fireworks(on){
+  if(fwTimer){ clearInterval(fwTimer); fwTimer=null; }
+  if(!on) return;
+  const cols=["#ffd76a","#ff7eb0","#7fe3ff","#3ddc84","#b39ddb","#ffb347","#ff5f5f"];
+  fwTimer=setInterval(()=>{
+    burstAt(innerWidth*(.15+Math.random()*.7), innerHeight*(.12+Math.random()*.4),
+      cols[(Math.random()*cols.length)|0], 46);
+    tone(180+Math.random()*120,120,0,.05,"triangle");
+  },700);
+}
+function stepFx(){
+  fctx.clearRect(0,0,innerWidth,innerHeight);
+  parts.forEach(p=>{
+    p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.life-=p.dec;
+    fctx.globalAlpha=Math.max(0,p.life); fctx.fillStyle=p.c;
+    fctx.beginPath(); fctx.arc(p.x,p.y,p.s,0,6.28); fctx.fill();
+  });
+  fctx.globalAlpha=1;
+  parts=parts.filter(p=>p.life>0&&p.y<innerHeight+50);
+  if(parts.length) requestAnimationFrame(stepFx);
+  else { fxRun=false; fctx.clearRect(0,0,innerWidth,innerHeight); }
+}
+
+/* ===== игра ===== */
+function showRiddle(fresh,extra){
+  fireworks(false); killSound();
+  $("game").innerHTML="";
+  $("riddleCard").hidden=false;
+  $("rTitle").textContent=fresh?"🎉 "+(extra||"Готово!")+" Вот последняя загадка года:":"Загадка дня:";
+  $("riddle").textContent=RIDDLE;
+}
+
+if(!open){
+  $("game").innerHTML=`<p class="task">Финал откроется 31 декабря в 19:00 🔒</p>`;
+}
+else if(daySolved()||past){
+  showRiddle(false);
+}
+else {
+  $("game").innerHTML=`
+    <div class="recap" id="recap"></div>
+    <div class="month" id="month"></div>
+    <p class="note" id="msub" style="margin-top:8px"></p>
+    <div class="stage" id="stage">
+      <div id="screen"></div>
+      <div class="overlay" id="ov">
+        <h3 id="ovt">Финал декабря</h3>
+        <p id="ovp"></p>
+        <div class="badges" id="ovb"></div>
+        <button class="act pulse" id="ovbtn">▶ Начать финальный квиз</button>
+      </div>
+    </div>
+    <div id="msg" style="min-height:22px;margin-top:10px;font-size:13.5px;text-align:center;color:var(--dim)"></div>`;
+
+  const stage=$("stage"), screen=$("screen");
+  const setMsg=(t,cls)=>{ const m=$("msg"); if(m){ m.textContent=t; m.className=cls||""; } };
+  const R=recap();
+
+  $("recap").innerHTML=`
+    <div class="rc g"><i>ДНЕЙ ПРОЙДЕНО</i><b>${R.solved}/31</b></div>
+    <div class="rc b"><i>ЗВЁЗД ГОЛОВОЛОМОК</i><b>${R.stars}</b></div>
+    <div class="rc m"><i>ЭТОТ ДЕКАБРЬ</i><b>наш</b></div>`;
+  $("month").innerHTML=R.days.map((ok,i)=>
+    `<div class="md${ok?" done":""}${i+1===today?" today":""}" title="день ${i+1}">${i+1}</div>`).join("");
+  $("msub").textContent=R.solved>0
+    ? `Зелёные клетки — дни, которые ты прошла. Серые тоже считались: они просто ждали своего вечера.`
+    : `Пока ни одной зелёной клетки — но сегодня всё изменится.`;
+
+  let qi=0, misses=0, answered=[];
+
+  function dots(){
+    return `<div class="qdots">${QUESTIONS.map((_,i)=>
+      `<s class="${i<qi?"got":i===qi?"now":""}"></s>`).join("")}</div>`;
+  }
+  function renderQ(){
+    const Q=QUESTIONS[qi];
+    screen.innerHTML=`
+      <div class="qhead"><span class="qnum">ВОПРОС ${qi+1} / ${QUESTIONS.length}</span>${dots()}</div>
+      <p class="qtext">${Q.q}</p>
+      ${Q.type==="text"
+        ? `<div class="tin"><input id="ans" placeholder="твой ответ…" autocomplete="off" spellcheck="false">
+           <button class="act" id="go">Ответить</button></div>`
+        : `<div class="opts" id="opts">${Q.opts.map((o,i)=>
+            `<button class="opt" data-i="${i}">${o}<span class="k">${i+1}</span></button>`).join("")}</div>`}
+      <p class="qnote" id="qn"></p>`;
+    if(Q.type==="text"){
+      const inp=$("ans");
+      $("go").onclick=()=>checkText(inp.value);
+      inp.addEventListener("keydown",e=>{ if(e.key==="Enter") checkText(inp.value); });
+      setTimeout(()=>inp.focus(),60);
+    } else {
+      screen.querySelectorAll(".opt").forEach(b=>{
+        b.onclick=()=>checkChoice(+b.dataset.i,b);
+      });
+    }
+    tone(520+qi*40,90,0,.08,"triangle"); tone(780+qi*40,110,.09,.06,"triangle");
+  }
+  function note(t,cls){
+    const n=$("qn"); if(n){ n.textContent=t; n.className="qnote "+(cls||""); }
+  }
+  function checkChoice(i,btn){
+    const Q=QUESTIONS[qi];
+    ac();
+    if(Q.type==="any"){
+      btn.classList.add("right");
+      screen.querySelectorAll(".opt").forEach(b=>b.disabled=true);
+      answered.push(true);
+      note(Q.note,"ok");
+      tone(660,120,0,.13); tone(880,120,.11,.12); tone(1174,170,.22,.11);
+      const r=btn.getBoundingClientRect();
+      burstAt(r.left+r.width/2,r.top+r.height/2,"#ff7eb0",20);
+      setTimeout(next,1400);
+      return;
+    }
+    if(i===Q.a){
+      btn.classList.add("right");
+      screen.querySelectorAll(".opt").forEach(b=>b.disabled=true);
+      answered.push(true);
+      note(Q.note,"ok");
+      tone(660,120,0,.13); tone(880,120,.11,.12); tone(1174,170,.22,.11);
+      const r=btn.getBoundingClientRect();
+      burstAt(r.left+r.width/2,r.top+r.height/2,"#3ddc84",20);
+      setTimeout(next,1300);
+    } else {
+      misses++;
+      btn.classList.add("wrong"); btn.disabled=true;
+      stage.classList.add("shake"); setTimeout(()=>stage.classList.remove("shake"),420);
+      sweep(300,90,240,.13,"sawtooth");
+      note("Не совсем. Вспомни наш декабрь…","err");
+    }
+  }
+  function checkText(v){
+    const Q=QUESTIONS[qi];
+    ac();
+    const val=norm(v);
+    if(!val){ note("Сначала напиши ответ.","err"); return; }
+    if(Q.answers.some(a=>norm(a)===val)){
+      answered.push(true);
+      $("go").disabled=true; $("ans").disabled=true;
+      note(Q.note,"ok");
+      tone(660,120,0,.13); tone(880,120,.11,.12); tone(1174,170,.22,.11);
+      burstAt(innerWidth/2,innerHeight*.4,"#7fe3ff",26);
+      setTimeout(next,1300);
+    } else {
+      misses++;
+      stage.classList.add("shake"); setTimeout(()=>stage.classList.remove("shake"),420);
+      sweep(300,90,240,.13,"sawtooth");
+      note("Не то слово. Подсказка: оно было кодовым в день 5.","err");
+    }
+  }
+  function next(){
+    qi++;
+    if(qi>=QUESTIONS.length){ finale(); return; }
+    renderQ();
+  }
+  function finale(){
+    localStorage.setItem("advent_solved_"+DAY,new Date().toISOString());
+    screen.innerHTML=`<div class="letter"><h4>письмо, которое ждало весь месяц</h4>${LETTER}<span class="seal">❤</span></div>
+      <div style="text-align:center;margin-top:14px">
+        <button class="act pulse" id="last">🎁 Открыть последнюю загадку</button>
+      </div>`;
+    $("last").onclick=()=>showRiddle(true,`квиз пройден${misses===0?" без единого промаха":""}`);
+    fireworks(true);
+    playTune();
+    confettiBurst();
+    const ov=$("ov"); ov.classList.remove("on");
+    setMsg("С Новым годом, моя хорошая. Дальше — письмо и последний подарок.","ok");
+  }
+  function confettiBurst(){
+    for(let k=0;k<3;k++){
+      setTimeout(()=>burstAt(innerWidth*(.3+Math.random()*.4),innerHeight*(.25+Math.random()*.2),
+        ["#ffd76a","#ff7eb0","#7fe3ff"][k],60),k*350);
+    }
+  }
+
+  const ov=$("ov");
+  $("ovt").textContent="Тридцать первое декабря";
+  $("ovp").textContent=`Декабрь собран почти до конца: пройдено дней — ${R.solved} из 31, звёзд головоломок — ${R.stars}. Остался один вечер, семь вопросов и одно письмо.`;
+  $("ovb").innerHTML=(R.solved>=25?`<span class="badge">Почти идеальный декабрь</span>`:"")+
+    (R.stars>=40?`<span class="badge">Коллекционер звёзд</span>`:"");
+  $("ovbtn").onclick=()=>{
+    ac(); ov.classList.remove("on");
+    qi=0; misses=0; answered=[];
+    renderQ();
+    setMsg("Семь вопросов. Дыши. Вспоминай наш декабрь.");
+  };
+  document.addEventListener("keydown",e=>{
+    if(ov.classList.contains("on")&&e.key==="Enter"){ e.preventDefault(); $("ovbtn").click(); return; }
+    const Q=QUESTIONS[qi];
+    if(!Q||Q.type!=="choice") return;
+    if(e.key>="1"&&e.key<="4"){
+      const b=screen.querySelectorAll(".opt")[+e.key-1];
+      if(b&&!b.disabled) b.click();
+    }
+  });
+  ov.classList.add("on");
+}
+</script>
+</body>
+</html>

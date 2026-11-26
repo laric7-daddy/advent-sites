@@ -1,0 +1,1000 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>День 27 — улица Деда Мороза</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08161e; --card:#0f2733; --card2:#0b1e28; --line:#1d3f4e; --line2:#2e6377;
+  --ice:#7fe3ff; --amber:#ffb347; --gold:#ffd76a; --red:#e0453c; --green:#3ddc84;
+  --magenta:#ff7eb0; --violet:#b39ddb; --ink:#e9f7ff; --dim:#7fa8b8;
+  --snow:#eef7fa; --night1:#0a1f2b; --night2:#061219;
+}
+*{box-sizing:border-box}
+html{scrollbar-color:var(--line2) #08161e;scrollbar-width:thin}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#08161e;border-radius:9px}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:9px;border:2px solid #08161e}
+::-webkit-scrollbar-thumb:hover{background:#3d8399}
+body{margin:0;padding:0 14px 54px;color:var(--ink);overflow-x:hidden;
+  background:radial-gradient(1200px 620px at 50% -16%,#12455855,transparent 70%),var(--bg);
+  font:16px/1.5 Manrope,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:680px;margin:0 auto;position:relative;z-index:1}
+
+.aurora{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.aurora i{position:absolute;width:70vw;height:70vw;border-radius:50%;filter:blur(100px);opacity:.14}
+.aurora i:nth-child(1){background:#1f9fc0;top:-26vw;left:-18vw;animation:dr1 27s ease-in-out infinite alternate}
+.aurora i:nth-child(2){background:#ffb347;bottom:-32vw;right:-22vw;opacity:.08;animation:dr2 34s ease-in-out infinite alternate}
+@keyframes dr1{to{transform:translate(14vw,10vw)}}
+@keyframes dr2{to{transform:translate(-12vw,-8vw)}}
+.garland{display:flex;justify-content:center;gap:14px;border-top:2px solid var(--line2);overflow:hidden}
+.gbulb{width:9px;height:13px;border-radius:50% 50% 45% 45%;position:relative;margin-top:7px;flex:none;
+ background:currentColor;transform-origin:top center;animation:sway 3s ease-in-out infinite alternate,glowblink 2s infinite}
+.gbulb::before{content:"";position:absolute;top:-7px;left:3.5px;width:2px;height:7px;background:var(--line2)}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+@keyframes glowblink{0%,100%{filter:brightness(1);box-shadow:0 0 8px currentColor}50%{filter:brightness(.5);box-shadow:0 0 2px currentColor}}
+.flake{position:fixed;top:-14px;color:#cfeaf7;opacity:.45;pointer-events:none;z-index:0;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(106vh) rotate(360deg)}}
+
+.back{color:var(--dim);font-size:13px;text-decoration:none}
+.back:hover{color:var(--ice)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0}
+h1{font-family:Unbounded,sans-serif;font-size:clamp(17px,4.4vw,22px);margin:0;line-height:1.25}
+h1 .gold{color:var(--gold)}
+.sndbtn{flex:none;padding:9px 13px;border-radius:999px;border:1px solid var(--line2);background:var(--card);
+ color:var(--ink);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+.sndbtn:hover{border-color:var(--ice);color:var(--ice)}
+.sndbtn.off{color:var(--dim);border-color:var(--line)}
+
+.card{background:linear-gradient(165deg,var(--card),var(--card2));border:1px solid var(--line);
+ border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 10px 30px #0006}
+.rules{border-color:var(--line2);background:linear-gradient(165deg,#0c2b38,#091d26)}
+.rules b{color:var(--gold)}
+.rules ul{margin:6px 0 0;padding-left:18px;color:#b6d9e6;font-size:13.5px}
+.rules li{margin-bottom:3px}
+.task{color:#b6d9e6;font-size:14px;margin:0 0 12px}
+.note{color:var(--dim);font-size:12.5px;margin:10px 0 0}
+
+.hud{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.stat{display:flex;flex-direction:column;gap:1px;padding:7px 12px;border-radius:12px;
+ border:1px solid var(--line);background:#0a1e28;min-width:70px}
+.stat i{font:700 10px/1 Manrope,sans-serif;letter-spacing:.12em;color:var(--dim);font-style:normal}
+.stat b{font:800 16px/1.2 Manrope,sans-serif;color:var(--gold)}
+.stat.g b{color:var(--green)} .stat.b b{color:var(--ice)} .stat.m b{color:var(--magenta)}
+
+.levels{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.lv{min-width:50px;height:48px;padding:0 9px;border-radius:12px;border:1px solid var(--line);
+ background:#0a1e28;color:var(--dim);cursor:pointer;font:800 13px/1 Manrope,sans-serif;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:.15s}
+.lv:hover:not(:disabled){border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+.lv.cur{border-color:var(--gold);background:#2a2410;color:var(--gold);box-shadow:0 0 0 2px #ffd76a22,0 0 16px #ffd76a33}
+.lv.done{border-color:var(--green);color:var(--green);background:#0f2e22}
+.lv:disabled{opacity:.35;cursor:not-allowed}
+.lv u{display:flex;gap:1.5px;text-decoration:none}
+.lv u s{width:4px;height:4px;border-radius:50%;background:#254a58;text-decoration:none}
+.lv u s.f{background:var(--gold);box-shadow:0 0 5px #ffd76a99}
+.lv em{font-style:normal;font-size:9px;opacity:.8}
+
+.stage{position:relative;border-radius:18px;padding:12px;border:1px solid var(--line2);
+ background:linear-gradient(180deg,var(--night1),var(--night2) 72%);
+ box-shadow:0 16px 36px #000a,inset 0 1px 0 #ffffff10}
+.stage.shake{animation:shk .4s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shk{10%,90%{transform:translateX(-3px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
+.stage.good{animation:good .8s ease-out}
+@keyframes good{0%{box-shadow:0 16px 36px #000a}45%{box-shadow:0 16px 44px #000a,inset 0 0 70px #3ddc8455,0 0 44px #3ddc8444}100%{box-shadow:0 16px 36px #000a}}
+
+.sky{position:absolute;left:12px;right:12px;top:12px;height:70px;pointer-events:none;overflow:hidden;border-radius:12px}
+.sky .moon{position:absolute;right:16px;top:8px;width:26px;height:26px;border-radius:50%;
+ background:radial-gradient(circle at 35% 32%,#fffaf0,#f3e2b0 62%,#d9c184);box-shadow:0 0 22px #ffe9b866}
+.sky s{position:absolute;width:2px;height:2px;border-radius:50%;background:#dff3ff;text-decoration:none;animation:tw 3.4s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.15}50%{opacity:.9}}
+
+.street{display:flex;gap:8px;overflow-x:auto;padding:56px 2px 10px;position:relative;z-index:1}
+.house{flex:1 0 104px;min-width:104px;border-radius:14px;padding:8px 7px 9px;position:relative;
+ background:linear-gradient(180deg,#123240,#0b202b);border:1px solid var(--line);
+ box-shadow:0 8px 20px #0007,inset 0 1px 0 #ffffff10;transition:.2s}
+.house.hi{border-color:var(--gold);box-shadow:0 0 0 2px #ffd76a44,0 8px 22px #0008}
+.house.solved{border-color:var(--green);box-shadow:0 0 0 1px #3ddc8455,0 8px 22px #0008}
+.roof{position:absolute;left:-4px;right:-4px;top:-16px;height:20px;border-radius:6px 6px 0 0;
+ background:linear-gradient(180deg,color-mix(in srgb,var(--hc) 88%,#fff),var(--hc));
+ clip-path:polygon(50% 0,100% 100%,0 100%);box-shadow:0 3px 8px #0006}
+.snowcap{position:absolute;left:-4px;right:-4px;top:-17px;height:7px;border-radius:99px;background:var(--snow);opacity:.9}
+.num{position:absolute;top:-9px;left:50%;transform:translateX(-50%);z-index:2;
+ width:20px;height:20px;border-radius:50%;background:#0a1e28;border:1px solid var(--hc);
+ display:flex;align-items:center;justify-content:center;font:800 11px Manrope,sans-serif;color:var(--hc)}
+.win{height:16px;margin:6px 0 8px;border-radius:4px;background:linear-gradient(180deg,#3a2a12,#241a0c);
+ box-shadow:inset 0 0 0 1px #ffffff14;position:relative;overflow:hidden}
+.win::after{content:"";position:absolute;inset:2px;border-radius:3px;background:#ffb34733;transition:.3s}
+.house.lit .win::after{background:linear-gradient(180deg,#ffe6a8,#ffb347);box-shadow:0 0 14px #ffb34799}
+.slot{width:100%;display:flex;align-items:center;gap:5px;padding:6px 6px;margin-bottom:5px;border-radius:9px;
+ border:1px dashed #24505f;background:#0a1e28;color:#b6d9e6;cursor:pointer;text-align:left;transition:.15s}
+.slot:last-child{margin-bottom:0}
+.slot:hover{border-color:var(--ice);background:#0e2a36}
+.slot .ic{font-size:15px;line-height:1;flex:none;width:18px;text-align:center}
+.slot .tx{font:700 10.5px/1.2 Manrope,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slot.filled{border-style:solid;border-color:color-mix(in srgb,var(--sc) 55%,transparent);
+ background:color-mix(in srgb,var(--sc) 12%,#0a1e28);color:var(--ink)}
+.slot.filled .tx{color:color-mix(in srgb,var(--sc) 75%,#ffffff)}
+.slot.dup{border-color:var(--red);box-shadow:0 0 0 1px #e0453c66}
+.slot.hi{animation:shi 1s ease-out 2}
+@keyframes shi{0%,100%{box-shadow:none}50%{box-shadow:0 0 0 3px #ffd76a88,0 0 18px #ffd76aaa}}
+.slot.pop{animation:spop .35s ease-out}
+@keyframes spop{0%{transform:scale(.86);filter:brightness(1.7)}100%{transform:scale(1)}}
+.catlegend{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.cl{display:flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;border:1px solid var(--line);
+ background:#0a1e28;font:700 10.5px Manrope,sans-serif;color:#b6d9e6}
+.cl s{width:8px;height:8px;border-radius:50%;background:var(--sc);text-decoration:none;box-shadow:0 0 7px var(--sc)}
+
+.clues{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.clues h2{font-family:Unbounded,sans-serif;font-size:13px;margin:0 0 8px;color:var(--gold)}
+.clist{display:grid;gap:6px;max-height:250px;overflow-y:auto;padding-right:5px}
+.clue{display:flex;align-items:flex-start;gap:7px;padding:8px 10px;border-radius:11px;
+ border:1px solid var(--line);background:#0a1e28;transition:.18s}
+.clue:hover{border-color:var(--line2)}
+.clue.ok{border-color:#2f7a52;background:#0e2620}
+.clue.bad{border-color:#8a3a34;background:#2a1512}
+.clue.used{opacity:.5}
+.clue.used .ctext{text-decoration:line-through}
+.cdot{width:9px;height:9px;border-radius:50%;flex:none;margin-top:5px;background:#2a4c5a;transition:.2s}
+.clue.ok .cdot{background:var(--green);box-shadow:0 0 8px #3ddc8488}
+.clue.bad .cdot{background:var(--red);box-shadow:0 0 8px #e0453c88}
+.ctext{flex:1;background:none;border:none;padding:0;text-align:left;cursor:pointer;
+ font:600 12.5px/1.45 Manrope,sans-serif;color:#cfe6f0}
+.ctext b{font-weight:800;color:var(--ink)}
+.ctext .ref{display:inline-flex;align-items:center;gap:3px;padding:1px 5px;border-radius:6px;
+ background:color-mix(in srgb,var(--sc) 16%,transparent);color:color-mix(in srgb,var(--sc) 80%,#fff);font-weight:800}
+.cmark{flex:none;width:24px;height:24px;border-radius:7px;border:1px solid var(--line);background:none;
+ color:var(--dim);cursor:pointer;font:800 12px Manrope,sans-serif;transition:.15s}
+.cmark:hover{border-color:var(--green);color:var(--green)}
+.clue.used .cmark{border-color:var(--green);color:var(--green);background:#0f2e22}
+
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+button.act{padding:11px 18px;border-radius:999px;border:none;cursor:pointer;font:800 14px Manrope,sans-serif;
+ background:linear-gradient(90deg,var(--gold),#ffeec0);color:#2a1f06;box-shadow:0 4px 16px #ffd76a2e;transition:.15s}
+button.act:hover{transform:translateY(-1px);box-shadow:0 7px 20px #ffd76a44}
+button.act:active{transform:translateY(0)}
+button.act.pulse{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 4px 16px #ffd76a2e}50%{box-shadow:0 0 0 7px #ffd76a22,0 4px 22px #ffd76a66}}
+button.ghost{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:none;
+ color:var(--dim);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+button.ghost:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+button.ghost.on{border-color:var(--green);color:var(--green);background:#0f2e22}
+button.ghost:disabled{opacity:.4;cursor:not-allowed}
+#msg{min-height:22px;margin-top:10px;font-size:13.5px;text-align:center;color:var(--dim)}
+#msg.ok{color:var(--green)} #msg.err{color:var(--red)} #msg.warn{color:var(--amber)}
+
+.picker{position:absolute;inset:0;z-index:7;display:none;align-items:center;justify-content:center;padding:18px;
+ background:#04101699;backdrop-filter:blur(5px);border-radius:18px}
+.picker.on{display:flex;animation:fadein .22s ease-out}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.pbox{width:100%;max-width:340px;background:linear-gradient(165deg,#123240,#0a1e28);
+ border:1px solid var(--line2);border-radius:16px;padding:14px;box-shadow:0 20px 50px #000b}
+.pbox h3{font-family:Unbounded,sans-serif;font-size:14px;margin:0 0 3px;color:var(--gold)}
+.pbox p{margin:0 0 10px;font-size:11.5px;color:var(--dim)}
+.pitems{display:grid;gap:6px}
+.pit{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:11px;border:1px solid var(--line);
+ background:#0a1e28;color:var(--ink);cursor:pointer;font:700 13px Manrope,sans-serif;transition:.14s;text-align:left}
+.pit:hover{border-color:var(--gold);transform:translateX(2px)}
+.pit .ic{font-size:18px;width:22px;text-align:center}
+.pit .at{margin-left:auto;font:700 10.5px Manrope,sans-serif;color:var(--dim)}
+.pit.taken{opacity:.62}
+.pit.clear{justify-content:center;color:var(--dim);border-style:dashed}
+
+.overlay{position:absolute;inset:0;z-index:8;display:none;flex-direction:column;align-items:center;justify-content:center;
+ gap:10px;padding:22px;text-align:center;background:#04101699;backdrop-filter:blur(6px);border-radius:18px}
+.overlay.on{display:flex;animation:fadein .3s ease-out}
+.overlay h3{font-family:Unbounded,sans-serif;font-size:19px;margin:0;color:var(--gold)}
+.overlay p{margin:0;font-size:13.5px;color:#b6d9e6;max-width:350px}
+.stars{display:flex;gap:8px;font-size:30px;line-height:1}
+.stars span{opacity:.22;transform:scale(.7);transition:.3s}
+.stars span.f{opacity:1;transform:scale(1);text-shadow:0 0 16px #ffd76a}
+.badge{padding:5px 12px;border-radius:999px;border:1px solid var(--green);color:var(--green);
+ background:#0f2e22;font:700 12px Manrope,sans-serif}
+.loader{position:absolute;inset:0;z-index:9;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+ background:#041016ee;border-radius:18px}
+.loader.on{display:flex}
+.spin{width:34px;height:34px;border-radius:50%;border:3px solid #1d3f4e;border-top-color:var(--gold);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader p{margin:0;font-size:13.5px;color:#b6d9e6}
+#riddle{font-size:16px;white-space:pre-wrap}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:40}
+@media (max-width:430px){
+  .stat{min-width:60px;padding:6px 9px}
+  .stat b{font-size:15px}
+  .lv{min-width:44px;height:42px;font-size:12px}
+  .house{flex:1 0 96px;min-width:96px}
+  .clist{max-height:210px}
+}
+</style>
+</head>
+<body>
+<div class="aurora"><i></i><i></i></div>
+<div class="garland" id="garland"></div>
+<div class="wrap">
+  <a class="back" href="../">← календарь</a>
+  <div class="top">
+    <h1>День <span class="gold">27</span> · улица Деда Мороза</h1>
+    <button class="sndbtn" id="snd">🔊 Звук</button>
+  </div>
+
+  <div class="card rules">
+    📜 <b>Как играть:</b> цель — разгадать головоломку и добыть загадку, а ответ принести боту: он выдаст подарок и фото тайника.
+    <ul>
+      <li>На улице стоят домики. У каждого — свой житель, питомец, напиток и подарок, и всё это нужно расселить без повторов.</li>
+      <li>Тапни клетку в домике и выбери, кто там живёт. Улики снизу — единственный источник истины, решение у загадки ровно одно.</li>
+      <li>Тап по улике подсветит связанные домики и клетки. Кружок справа отмечает улику как использованную.</li>
+      <li>Рассели всех верно на пяти улицах — день откроет загадку 🎁</li>
+    </ul>
+  </div>
+
+  <div id="game" class="card"></div>
+
+  <div id="riddleCard" class="card" hidden>
+    <h3 id="rTitle" style="margin:0 0 8px;font-size:16px;color:var(--gold)"></h3>
+    <p id="riddle"></p>
+    <p class="note">Отправь ответ боту в Telegram 🤖 Застрянешь — кнопка 💡 Подсказка у бота (раз в 2 минуты).</p>
+  </div>
+</div>
+<canvas id="fx"></canvas>
+
+<script>
+/* ===== настройки дня ===== */
+const DAY = 27;
+const RIDDLE = "Пушистый друг, который никогда не спорит, хоть задуши его, он даже не застонет";
+const CATS = [
+  { key:"who",  name:"Житель",  col:"#7fe3ff", items:[["⛄","Снеговик"],["🦌","Олень"],["🐧","Пингвин"],["🧙","Гном"],["🐰","Зайчик"]] },
+  { key:"pet",  name:"Питомец", col:"#ff7eb0", items:[["🐱","Кот"],["🐶","Щенок"],["🦉","Сова"],["🐭","Мышка"],["🦊","Лисёнок"]] },
+  { key:"drink",name:"Напиток", col:"#3ddc84", items:[["☕","Какао"],["🍵","Чай"],["🧃","Морс"],["🥛","Молоко"],["🍹","Компот"]] },
+  { key:"gift", name:"Подарок", col:"#ffd76a", items:[["🧸","Мишка"],["📕","Книга"],["🛷","Санки"],["🥁","Барабан"],["🎁","Шар"]] }
+];
+const HOUSE_COL = ["#e0453c","#ffb347","#3ddc84","#7fe3ff","#b39ddb"];
+const LEVELS = [
+  { n:3, c:3, name:"Переулок",  direct:.9 },
+  { n:4, c:3, name:"Улица",     direct:.6 },
+  { n:4, c:4, name:"Проспект",  direct:.35 },
+  { n:5, c:3, name:"Посёлок",   direct:.18 },
+  { n:5, c:4, name:"Городок",   direct:.06 }
+];
+const PKEY="advent_logic27_progress";
+function loadProg(){
+  try{
+    const p=JSON.parse(localStorage.getItem(PKEY)||"null");
+    if(p&&typeof p.unlocked==="number") return {unlocked:p.unlocked,stars:p.stars||{},best:p.best||{}};
+  }catch(e){}
+  return {unlocked:0,stars:{},best:{}};
+}
+let prog=loadProg();
+const saveProg=()=>localStorage.setItem(PKEY,JSON.stringify(prog));
+const totalStars=()=>Object.values(prog.stars).reduce((a,b)=>a+b,0);
+
+/* ===== генератор ===== */
+const PCACHE={};
+function perms(n){
+  if(PCACHE[n]) return PCACHE[n];
+  const out=[], cur=[], used=new Array(n).fill(false);
+  (function rec(){
+    if(cur.length===n){ out.push(cur.slice()); return; }
+    for(let i=0;i<n;i++){ if(used[i]) continue; used[i]=true; cur.push(i); rec(); cur.pop(); used[i]=false; }
+  })();
+  return PCACHE[n]=out;
+}
+function posOf(assign,cat,item){
+  const a=assign[cat];
+  if(!a) return -1;
+  return a.indexOf(item);
+}
+function evalClue(cl,assign,N){
+  for(const r of cl.refs) if(posOf(assign,r.c,r.i)<0) return null;
+  const p=r=>posOf(assign,r.c,r.i);
+  switch(cl.type){
+    case "at": return p(cl.refs[0])===cl.h;
+    case "notAt": return p(cl.refs[0])!==cl.h;
+    case "edge": return p(cl.refs[0])===(cl.side==="left"?0:N-1);
+    case "middle": return p(cl.refs[0])===((N-1)/2);
+    case "same": return p(cl.refs[0])===p(cl.refs[1]);
+    case "diff": return p(cl.refs[0])!==p(cl.refs[1]);
+    case "next": return Math.abs(p(cl.refs[0])-p(cl.refs[1]))===1;
+    case "imleft": return p(cl.refs[1])-p(cl.refs[0])===1;
+    case "left": return p(cl.refs[0])<p(cl.refs[1]);
+  }
+  return null;
+}
+function clueCats(cl){ const s=new Set(cl.refs.map(r=>r.c)); return [...s]; }
+function countSolutions(N,C,clues,limit){
+  const ps=perms(N);
+  const assign=new Array(C).fill(null);
+  const byCat=clues.map(cl=>({cl,cats:clueCats(cl)}));
+  let count=0, nodes=0;
+  function ok(upto){
+    for(const {cl,cats} of byCat){
+      if(cats.some(c=>c>upto)) continue;
+      if(evalClue(cl,assign,N)===false) return false;
+    }
+    return true;
+  }
+  (function rec(ci){
+    if(count>=2||nodes>limit) return;
+    if(ci===C){ count++; return; }
+    for(const p of ps){
+      nodes++;
+      if(nodes>limit){ count=2; return; }
+      assign[ci]=p;
+      if(ok(ci)) rec(ci+1);
+      assign[ci]=null;
+      if(count>=2) return;
+    }
+  })(0);
+  return count;
+}
+function buildCandidates(N,C,sol,direct){
+  const out=[];
+  const R=(c,i)=>({c,i});
+  for(let c=0;c<C;c++){
+    for(let i=0;i<N;i++){
+      const h=sol[c].indexOf(i);
+      if(Math.random()<direct) out.push({type:"at",refs:[R(c,i)],h});
+      out.push({type:"notAt",refs:[R(c,i)],h:(h+1+Math.floor(Math.random()*(N-1)))%N});
+      if(h===0) out.push({type:"edge",refs:[R(c,i)],side:"left"});
+      if(h===N-1) out.push({type:"edge",refs:[R(c,i)],side:"right"});
+      if(N%2===1&&h===(N-1)/2) out.push({type:"middle",refs:[R(c,i)]});
+    }
+  }
+  for(let c1=0;c1<C;c1++) for(let c2=c1+1;c2<C;c2++){
+    for(let i=0;i<N;i++) for(let j=0;j<N;j++){
+      const a=sol[c1].indexOf(i), b=sol[c2].indexOf(j);
+      if(a===b) out.push({type:"same",refs:[R(c1,i),R(c2,j)]});
+      else{
+        if(Math.random()<.35) out.push({type:"diff",refs:[R(c1,i),R(c2,j)]});
+        if(Math.abs(a-b)===1) out.push({type:"next",refs:[R(c1,i),R(c2,j)]});
+        if(b-a===1) out.push({type:"imleft",refs:[R(c1,i),R(c2,j)]});
+        if(a<b&&Math.random()<.3) out.push({type:"left",refs:[R(c1,i),R(c2,j)]});
+      }
+    }
+  }
+  for(let i=out.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [out[i],out[j]]=[out[j],out[i]]; }
+  return out.slice(0,54);
+}
+function generate(N,C,direct){
+  const sol=[];
+  const ps=perms(N);
+  for(let c=0;c<C;c++) sol.push(ps[(Math.random()*ps.length)|0].slice());
+  const limit=N>=5&&C>=4?260000:150000;
+  let clues=buildCandidates(N,C,sol,direct);
+  if(countSolutions(N,C,clues,limit)!==1){
+    for(let c=0;c<C;c++) for(let i=0;i<N;i++) clues.push({type:"at",refs:[{c,i}],h:sol[c].indexOf(i)});
+  }
+  for(let k=clues.length-1;k>=0;k--){
+    const trial=clues.slice(0,k).concat(clues.slice(k+1));
+    if(countSolutions(N,C,trial,limit)===1) clues=trial;
+  }
+  const order={at:0,edge:1,middle:2,notAt:3,same:4,diff:5,next:6,imleft:7,left:8};
+  clues.sort((a,b)=>(order[a.type]??9)-(order[b.type]??9));
+  return {sol,clues};
+}
+
+/* ===== антураж ===== */
+const GC=["#e0453c","#ffd76a","#3ddc84","#7fe3ff","#ff7eb0","#b39ddb","#ffb347"];
+for(let i=0;i<17;i++){
+  const b=document.createElement("span");
+  b.className="gbulb"; b.style.color=GC[i%GC.length];
+  b.style.animationDelay=(i*.17)+"s, "+(i*.23)+"s";
+  document.getElementById("garland").appendChild(b);
+}
+for(let i=0;i<12;i++){
+  const f=document.createElement("div");
+  f.className="flake"; f.textContent="❄";
+  f.style.left=Math.random()*100+"vw";
+  f.style.fontSize=8+Math.random()*9+"px";
+  f.style.animationDuration=7+Math.random()*8+"s";
+  f.style.animationDelay=-Math.random()*10+"s";
+  document.body.appendChild(f);
+}
+
+/* ===== служебное ===== */
+const $=id=>document.getElementById(id);
+const q=new URLSearchParams(location.search);
+const now=new Date();
+const PREP = now < new Date(2026, 11, 1, 19, 0, 0); // режим подготовки: замки сняты
+const inDec=now.getFullYear()===2026&&now.getMonth()===11;
+const today=inDec?now.getDate():0;
+const open = q.has("all") || PREP || (inDec && (DAY < today || (DAY === today && now.getHours() >= 19)));
+const past = !q.has("all") && (inDec && DAY < today);
+const daySolved=()=>!!localStorage.getItem("advent_solved_"+DAY);
+const fmt=s=>String((s/60)|0).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+
+/* ===== звук ===== */
+let snd=localStorage.getItem("advent_snd")!=="0";
+let AC=null, live=[];
+function ac(){
+  if(!AC){ const C=window.AudioContext||window.webkitAudioContext; if(C) AC=new C(); }
+  if(AC&&AC.state==="suspended") AC.resume();
+  return AC;
+}
+function tone(freq,ms,delay=0,vol=.12,type="sine"){
+  if(!snd) return; const c=ac(); if(!c) return;
+  const t=c.currentTime+delay/1000, d=ms/1000;
+  const o=c.createOscillator(), g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,t);
+  g.gain.setValueAtTime(.0001,t);
+  g.gain.linearRampToValueAtTime(vol,t+.008);
+  g.gain.setValueAtTime(vol,t+Math.max(.012,d-.03));
+  g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g); g.connect(c.destination);
+  o.start(t); o.stop(t+d+.03);
+  live.push(o); o.onended=()=>{ live=live.filter(x=>x!==o); };
+}
+function sweep(f1,f2,ms,vol=.12,type="triangle"){
+  if(!snd) return; const c=ac(); if(!c) return;
+  const t=c.currentTime,d=ms/1000;
+  const o=c.createOscillator(),g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(f1,t);
+  o.frequency.exponentialRampToValueAtTime(Math.max(30,f2),t+d);
+  g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+d+.02);
+  live.push(o); o.onended=()=>{ live=live.filter(x=>x!==o); };
+}
+function killSound(){ live.forEach(o=>{try{o.stop();}catch(e){}}); live=[]; }
+function paintSnd(){
+  const b=$("snd");
+  b.textContent=snd?"🔊 Звук":"🔇 Тихо";
+  b.classList.toggle("off",!snd);
+}
+$("snd").onclick=()=>{
+  snd=!snd; localStorage.setItem("advent_snd",snd?"1":"0");
+  paintSnd();
+  if(snd){ ac(); tone(880,90,0,.12); } else killSound();
+};
+paintSnd();
+
+/* ===== частицы ===== */
+const fx=$("fx"), fctx=fx.getContext("2d");
+let parts=[], fxRun=false;
+function sizeFx(){
+  const r=Math.min(devicePixelRatio||1,2);
+  fx.width=innerWidth*r; fx.height=innerHeight*r;
+  fx.style.width=innerWidth+"px"; fx.style.height=innerHeight+"px";
+  fctx.setTransform(r,0,0,r,0,0);
+}
+sizeFx(); addEventListener("resize",sizeFx);
+function spawn(p){ parts.push(p); if(!fxRun){ fxRun=true; requestAnimationFrame(stepFx); } }
+function sparks(x,y,n,col){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*6.28, sp=.8+Math.random()*3.6;
+    spawn({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,g:.1,s:1.4+Math.random()*2.8,
+      c:col||"#ffd76a",life:1,dec:.026,round:true});
+  }
+}
+function confetti(){
+  const cols=["#ffd76a","#3ddc84","#ffb347","#7fe3ff","#ff7eb0","#b39ddb","#eef7fa"];
+  for(let i=0;i<190;i++){
+    spawn({x:innerWidth/2+(Math.random()-.5)*230,y:innerHeight*.34,
+      vx:(Math.random()-.5)*8.5,vy:-Math.random()*9.5-2,g:.22,
+      w:4+Math.random()*6,h:3+Math.random()*5,a:Math.random()*Math.PI,va:(Math.random()-.5)*.3,
+      c:cols[(Math.random()*cols.length)|0],life:1,dec:.007});
+  }
+}
+function stepFx(){
+  fctx.clearRect(0,0,innerWidth,innerHeight);
+  parts.forEach(p=>{
+    p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.life-=p.dec;
+    fctx.globalAlpha=Math.max(0,p.life); fctx.fillStyle=p.c;
+    if(p.round){ fctx.beginPath(); fctx.arc(p.x,p.y,p.s,0,6.28); fctx.fill(); }
+    else { p.a+=p.va; fctx.save(); fctx.translate(p.x,p.y); fctx.rotate(p.a);
+      fctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); fctx.restore(); }
+  });
+  fctx.globalAlpha=1;
+  parts=parts.filter(p=>p.life>0&&p.y<innerHeight+50);
+  if(parts.length) requestAnimationFrame(stepFx);
+  else { fxRun=false; fctx.clearRect(0,0,innerWidth,innerHeight); }
+}
+
+/* ===== игра ===== */
+let clock=null, hiTimer=null, genTimer=null;
+function stopAll(){
+  if(clock){ clearInterval(clock); clock=null; }
+  if(hiTimer){ clearTimeout(hiTimer); hiTimer=null; }
+  if(genTimer){ clearTimeout(genTimer); genTimer=null; }
+}
+function showRiddle(fresh,extra){
+  stopAll(); killSound();
+  $("game").innerHTML="";
+  $("riddleCard").hidden=false;
+  $("rTitle").textContent=fresh?"🎉 "+(extra||"Готово!")+" Вот загадка дня:":"Загадка дня:";
+  $("riddle").textContent=RIDDLE;
+}
+
+if(!open){
+  $("game").innerHTML=`<p class="task">День откроется 27 декабря в 19:00 🔒</p>`;
+}
+else if(daySolved()||past){
+  showRiddle(false);
+}
+else {
+  $("game").innerHTML=`
+    <p class="task">На улице Деда Мороза перепутались все жители, питомцы, напитки и подарки. Остались только улики соседей — по ним и рассели всех обратно.</p>
+    <div class="hud">
+      <div class="stat"><i>УЛИЦА</i><b id="lvl">1/5</b></div>
+      <div class="stat b"><i>ВРЕМЯ</i><b id="tm">00:00</b></div>
+      <div class="stat"><i>ЗАПОЛНЕНО</i><b id="fl">0/9</b></div>
+      <div class="stat g"><i>ЗВЁЗДЫ</i><b id="ts">0/15</b></div>
+      <div class="stat m"><i>ПОДСКАЗКИ</i><b id="hc">3</b></div>
+    </div>
+    <div class="levels" id="levels"></div>
+    <div class="stage" id="stage">
+      <div class="sky" id="sky"><div class="moon"></div></div>
+      <div class="street" id="street"></div>
+      <div class="catlegend" id="legend"></div>
+      <div class="clues">
+        <h2>Улики соседей</h2>
+        <div class="clist" id="clist"></div>
+      </div>
+      <div class="picker" id="picker"><div class="pbox">
+        <h3 id="ptitle">Кто здесь?</h3>
+        <p id="psub"></p>
+        <div class="pitems" id="pitems"></div>
+      </div></div>
+      <div class="overlay" id="ov">
+        <h3 id="ovt">Улица расселена!</h3>
+        <div class="stars" id="ovs"><span>★</span><span>★</span><span>★</span></div>
+        <p id="ovp"></p>
+        <div id="ovb"></div>
+        <button class="act pulse" id="ovbtn">Следующая улица →</button>
+      </div>
+      <div class="loader" id="loader"><div class="spin"></div><p>Метель составляет загадку с единственным решением…</p></div>
+    </div>
+    <div class="controls">
+      <button class="act" id="check">Проверить улицу</button>
+      <button class="ghost" id="hint">💡 Подсказка · 3</button>
+      <button class="ghost" id="undo">↶ Отменить</button>
+      <button class="ghost" id="again">↻ Заново</button>
+      <button class="ghost" id="fresh">✨ Новая загадка</button>
+      <button class="ghost on" id="live">✓ Живые улики</button>
+      <button class="ghost" id="wipe">↺ Сброс прогресса</button>
+    </div>
+    <div id="msg"></div>
+    <p class="note">Тап по клетке открывает выбор, тап по улике подсвечивает домики. Кружок справа от улики — отметить её как использованную.</p>`;
+
+  let li=Math.min(prog.unlocked,LEVELS.length-1);
+  let N=3,C=3,sol=[],clues=[],grid=[],slots=[],houses=[],clueEls=[];
+  let secs=0,started=false,done=false,hints=3,hintsUsed=0,fails=0,busy=false;
+  let history=[],usedClues=new Set(),live=true,pick=null;
+
+  const street=$("street"), stage=$("stage"), clist=$("clist");
+  const setMsg=(t,cls)=>{ const m=$("msg"); if(m){ m.textContent=t; m.className=cls||""; } };
+
+  function sky(){
+    const s=$("sky");
+    s.querySelectorAll("s").forEach(e=>e.remove());
+    for(let i=0;i<26;i++){
+      const d=document.createElement("s");
+      d.style.left=Math.random()*100+"%";
+      d.style.top=Math.random()*70+"%";
+      d.style.animationDelay=(Math.random()*3.4)+"s";
+      s.appendChild(d);
+    }
+  }
+  function levelsUI(){
+    const host=$("levels"); host.innerHTML="";
+    LEVELS.forEach((lv,i)=>{
+      const b=document.createElement("button");
+      b.className="lv"; b.dataset.i=i;
+      const st=prog.stars[i]||0;
+      b.innerHTML=`${i+1}<u><s class="${st>0?"f":""}"></s><s class="${st>1?"f":""}"></s><s class="${st>2?"f":""}"></s></u><em>${lv.n}×${lv.c}</em>`;
+      b.disabled=i>prog.unlocked;
+      b.classList.toggle("cur",i===li);
+      b.classList.toggle("done",st>0);
+      b.title=`${lv.name}: ${lv.n} домиков, ${lv.c} категории`;
+      b.onclick=()=>{ if(i<=prog.unlocked&&i!==li&&!busy){ li=i; build(true); tone(620,70,0,.07,"triangle"); } };
+      host.appendChild(b);
+    });
+  }
+  function itemOf(c,i){ return CATS[c].items[i]; }
+  function refHTML(r){
+    const [ic,nm]=itemOf(r.c,r.i);
+    return `<span class="ref" style="--sc:${CATS[r.c].col}">${ic} ${nm}</span>`;
+  }
+  function clueText(cl){
+    const A=refHTML(cl.refs[0]), B=cl.refs[1]?refHTML(cl.refs[1]):"";
+    switch(cl.type){
+      case "at": return `${A} — в домике <b>№${cl.h+1}</b>.`;
+      case "notAt": return `${A} — <b>не</b> в домике №${cl.h+1}.`;
+      case "edge": return `${A} — в самом <b>${cl.side==="left"?"левом":"правом"}</b> домике.`;
+      case "middle": return `${A} — в <b>среднем</b> домике.`;
+      case "same": return `${A} и ${B} — <b>в одном</b> домике.`;
+      case "diff": return `${A} и ${B} — <b>в разных</b> домиках.`;
+      case "next": return `${A} и ${B} — <b>соседи</b>.`;
+      case "imleft": return `${A} стоит <b>сразу слева</b> от ${B}.`;
+      case "left": return `${A} где-то <b>левее</b>, чем ${B}.`;
+    }
+    return "";
+  }
+  function assignNow(){
+    const a=[];
+    for(let c=0;c<C;c++){
+      const row=new Array(N).fill(-1);
+      let full=true;
+      for(let h=0;h<N;h++){
+        const v=grid[c][h];
+        if(v<0){ full=false; break; }
+        row[h]=v;
+      }
+      a.push(full?row:null);
+    }
+    return a;
+  }
+  function partialAssign(){
+    const a=[];
+    for(let c=0;c<C;c++){
+      const row=new Array(N).fill(-1);
+      for(let h=0;h<N;h++) row[h]=grid[c][h];
+      a.push(row);
+    }
+    return a;
+  }
+  function clueStatus(cl){
+    const a=partialAssign();
+    for(const r of cl.refs) if(a[r.c][r.i]===undefined) return null;
+    const pos=(c,i)=>a[c].indexOf(i);
+    for(const r of cl.refs) if(pos(r.c,r.i)<0) return null;
+    const p=r=>pos(r.c,r.i);
+    switch(cl.type){
+      case "at": return p(cl.refs[0])===cl.h;
+      case "notAt": return p(cl.refs[0])!==cl.h;
+      case "edge": return p(cl.refs[0])===(cl.side==="left"?0:N-1);
+      case "middle": return p(cl.refs[0])===((N-1)/2);
+      case "same": return p(cl.refs[0])===p(cl.refs[1]);
+      case "diff": return p(cl.refs[0])!==p(cl.refs[1]);
+      case "next": return Math.abs(p(cl.refs[0])-p(cl.refs[1]))===1;
+      case "imleft": return p(cl.refs[1])-p(cl.refs[0])===1;
+      case "left": return p(cl.refs[0])<p(cl.refs[1]);
+    }
+    return null;
+  }
+  function renderClues(){
+    clist.innerHTML=""; clueEls=[];
+    clues.forEach((cl,idx)=>{
+      const row=document.createElement("div");
+      row.className="clue";
+      const dot=document.createElement("span"); dot.className="cdot";
+      const txt=document.createElement("button");
+      txt.type="button"; txt.className="ctext"; txt.innerHTML=clueText(cl);
+      txt.onclick=()=>highlight(cl);
+      const mark=document.createElement("button");
+      mark.type="button"; mark.className="cmark"; mark.textContent="✓";
+      mark.title="Отметить улику как использованную";
+      mark.onclick=()=>{
+        if(usedClues.has(idx)) usedClues.delete(idx); else usedClues.add(idx);
+        row.classList.toggle("used",usedClues.has(idx));
+        tone(usedClues.has(idx)?760:420,55,0,.06,"triangle");
+      };
+      row.append(dot,txt,mark);
+      clist.appendChild(row);
+      clueEls.push(row);
+    });
+    refreshClues();
+  }
+  function refreshClues(){
+    clues.forEach((cl,i)=>{
+      const row=clueEls[i]; if(!row) return;
+      row.classList.remove("ok","bad");
+      if(!live||done) return;
+      const st=clueStatus(cl);
+      if(st===true) row.classList.add("ok");
+      else if(st===false) row.classList.add("bad");
+    });
+  }
+  function highlight(cl){
+    ac();
+    houses.forEach((h,i)=>h.classList.remove("hi"));
+    slots.flat().forEach(s=>s.classList.remove("hi"));
+    const hs=new Set();
+    cl.refs.forEach(r=>{
+      const h=partialAssign()[r.c].indexOf(r.i);
+      if(h>=0){ hs.add(h); slots[r.c][h].classList.add("hi"); }
+      if(cl.type==="at"||cl.type==="notAt") hs.add(cl.h);
+      if(cl.type==="edge") hs.add(cl.side==="left"?0:N-1);
+      if(cl.type==="middle") hs.add((N-1)/2);
+    });
+    if(cl.type==="at") slots[cl.refs[0].c][cl.h].classList.add("hi");
+    hs.forEach(h=>houses[h]&&houses[h].classList.add("hi"));
+    tone(880,70,0,.07,"triangle");
+    if(hiTimer) clearTimeout(hiTimer);
+    hiTimer=setTimeout(()=>{
+      houses.forEach(h=>h.classList.remove("hi"));
+      slots.flat().forEach(s=>s.classList.remove("hi"));
+      hiTimer=null;
+    },2100);
+    setMsg("Подсвечено то, о чём говорит улика.");
+  }
+  function renderStreet(){
+    street.innerHTML=""; houses=[]; slots=[];
+    for(let c=0;c<C;c++) slots.push([]);
+    for(let h=0;h<N;h++){
+      const el=document.createElement("div");
+      el.className="house";
+      el.style.setProperty("--hc",HOUSE_COL[h%HOUSE_COL.length]);
+      el.innerHTML=`<div class="roof"></div><div class="snowcap"></div><div class="num">${h+1}</div><div class="win"></div>`;
+      for(let c=0;c<C;c++){
+        const b=document.createElement("button");
+        b.type="button"; b.className="slot";
+        b.style.setProperty("--sc",CATS[c].col);
+        b.innerHTML=`<span class="ic">·</span><span class="tx">${CATS[c].name}</span>`;
+        b.onclick=()=>openPicker(c,h);
+        el.appendChild(b);
+        slots[c].push(b);
+      }
+      street.appendChild(el);
+      houses.push(el);
+    }
+    const lg=$("legend"); lg.innerHTML="";
+    for(let c=0;c<C;c++){
+      const d=document.createElement("span");
+      d.className="cl"; d.style.setProperty("--sc",CATS[c].col);
+      d.innerHTML=`<s></s>${CATS[c].name}`;
+      lg.appendChild(d);
+    }
+    paintSlots();
+  }
+  function paintSlots(){
+    for(let c=0;c<C;c++){
+      const counts={};
+      for(let h=0;h<N;h++){ const v=grid[c][h]; if(v>=0) counts[v]=(counts[v]||0)+1; }
+      for(let h=0;h<N;h++){
+        const v=grid[c][h], el=slots[c][h];
+        el.classList.toggle("filled",v>=0);
+        el.classList.toggle("dup",v>=0&&counts[v]>1);
+        if(v>=0){
+          const [ic,nm]=itemOf(c,v);
+          el.innerHTML=`<span class="ic">${ic}</span><span class="tx">${nm}</span>`;
+        } else {
+          el.innerHTML=`<span class="ic">·</span><span class="tx">${CATS[c].name}</span>`;
+        }
+      }
+    }
+    houses.forEach((el,h)=>{
+      let full=true;
+      for(let c=0;c<C;c++) if(grid[c][h]<0) full=false;
+      el.classList.toggle("lit",full);
+    });
+  }
+  function filledCount(){ let k=0; for(let c=0;c<C;c++) for(let h=0;h<N;h++) if(grid[c][h]>=0) k++; return k; }
+  function hud(){
+    $("lvl").textContent=(li+1)+"/"+LEVELS.length;
+    $("fl").textContent=filledCount()+"/"+(N*C);
+    $("ts").textContent=totalStars()+"/"+(LEVELS.length*3);
+    $("hc").textContent=hints;
+    $("hint").textContent="💡 Подсказка · "+hints;
+    $("hint").disabled=hints<=0||done||busy;
+    $("undo").disabled=!history.length||done||busy;
+    $("check").disabled=done||busy;
+    $("live").classList.toggle("on",live);
+    $("live").textContent=live?"✓ Живые улики":"✓ Улики молчат";
+  }
+  function startClock(){
+    if(started||done) return;
+    started=true;
+    clock=setInterval(()=>{ if(!done){ secs++; $("tm").textContent=fmt(secs); } },1000);
+  }
+  function openPicker(c,h){
+    if(done||busy) return;
+    ac(); startClock();
+    pick={c,h};
+    $("ptitle").textContent=`Домик №${h+1} · ${CATS[c].name}`;
+    $("psub").textContent="Выбери, кто здесь. Повторы подсветятся красным.";
+    const host=$("pitems"); host.innerHTML="";
+    for(let i=0;i<N;i++){
+      const [ic,nm]=itemOf(c,i);
+      const at=grid[c].indexOf(i);
+      const b=document.createElement("button");
+      b.type="button"; b.className="pit"+(at>=0&&at!==h?" taken":"");
+      b.innerHTML=`<span class="ic">${ic}</span><span>${nm}</span>`+
+        (at>=0?`<span class="at">${at===h?"здесь":"домик №"+(at+1)}</span>`:"");
+      b.onclick=()=>assign(c,h,i);
+      host.appendChild(b);
+    }
+    const clr=document.createElement("button");
+    clr.type="button"; clr.className="pit clear"; clr.textContent="Очистить клетку";
+    clr.onclick=()=>assign(c,h,-1);
+    host.appendChild(clr);
+    $("picker").classList.add("on");
+    tone(660,60,0,.06,"triangle");
+  }
+  function closePicker(){ $("picker").classList.remove("on"); pick=null; }
+  function assign(c,h,v){
+    if(pick==null) return;
+    const prev=grid[c][h];
+    if(prev===v){ closePicker(); return; }
+    history.push({c,h,prev});
+    grid[c][h]=v;
+    closePicker();
+    paintSlots(); refreshClues(); hud();
+    const el=slots[c][h];
+    el.classList.add("pop"); setTimeout(()=>el&&el.classList.remove("pop"),360);
+    if(v>=0){
+      const r=el.getBoundingClientRect();
+      sparks(r.left+r.width/2,r.top+r.height/2,8,CATS[c].col);
+      tone(520+c*70,80,0,.09,"triangle");
+      const dup=grid[c].filter(x=>x===v).length>1;
+      setMsg(dup?`${itemOf(c,v)[1]} уже где-то есть — повторы быть не должно.`:`${itemOf(c,v)[1]} → домик №${h+1}.`,dup?"warn":"");
+    } else {
+      tone(320,60,0,.06,"triangle");
+      setMsg("Клетка очищена.");
+    }
+    if(filledCount()===N*C) autoCheckWin();
+  }
+  function autoCheckWin(){
+    for(let c=0;c<C;c++) for(let h=0;h<N;h++) if(grid[c][h]!==sol[c][h]) return;
+    win();
+  }
+  function overlay(on,title,text,btn,extra,handler,stars){
+    const ov=$("ov");
+    ov.classList.toggle("on",on);
+    if(on){
+      $("ovt").textContent=title;
+      $("ovp").textContent=text;
+      $("ovb").innerHTML=extra||"";
+      $("ovbtn").textContent=btn;
+      $("ovbtn").onclick=handler;
+      const s=$("ovs").children;
+      if(typeof stars==="number"){
+        $("ovs").style.display="flex";
+        for(let k=0;k<3;k++){
+          s[k].classList.remove("f");
+          setTimeout(()=>{ if(k<stars){ s[k].classList.add("f"); tone(880+k*220,120,0,.12,"triangle"); } },260+k*230);
+        }
+      } else $("ovs").style.display="none";
+    }
+  }
+  function starsFor(){
+    if(hintsUsed===0&&fails===0) return 3;
+    if(hintsUsed<=1&&fails<=2) return 2;
+    return 1;
+  }
+  function win(){
+    done=true; stopAll(); killSound();
+    houses.forEach((el,h)=>{
+      el.classList.add("solved","lit");
+      setTimeout(()=>{
+        const r=el.getBoundingClientRect();
+        sparks(r.left+r.width/2,r.top+22,14,HOUSE_COL[h%HOUSE_COL.length]);
+      },h*110);
+    });
+    stage.classList.add("good"); setTimeout(()=>stage.classList.remove("good"),820);
+    const st=starsFor();
+    prog.stars[li]=Math.max(prog.stars[li]||0,st);
+    if(!prog.best[li]||secs<prog.best[li]) prog.best[li]=secs;
+    if(li+1>prog.unlocked) prog.unlocked=Math.min(li+1,LEVELS.length-1);
+    saveProg(); levelsUI(); hud(); refreshClues();
+    tone(660,140,0,.15); tone(880,140,.14,.15); tone(1174,190,.28,.15);
+    const last=li===LEVELS.length-1;
+    setTimeout(()=>{
+      if(last){
+        localStorage.setItem("advent_solved_"+DAY,new Date().toISOString());
+        confetti(); tone(1568,340,.1,.14);
+        overlay(true,"🎄 Вся улица расселена!",
+          `Пять улиц разгаданы, звёзд ${totalStars()}/15. Последняя — за ${fmt(secs)}. Дед Мороз отдаёт загадку дня.`,
+          "🎁 Открыть загадку",
+          hintsUsed===0&&fails===0?`<div class="badge">Без подсказок и ошибок</div>`:"",
+          ()=>showRiddle(true,`все улицы, звёзд ${totalStars()}/15`), st);
+        setMsg("✨ Все жители на своих местах!","ok");
+      } else {
+        overlay(true,`«${LEVELS[li].name}» расселён!`,
+          `Время ${fmt(secs)} · подсказок ${hintsUsed} · проверок с ошибкой ${fails}${prog.best[li]?` · лучшее ${fmt(prog.best[li])}`:""}. Дальше домиков и категорий больше.`,
+          "Следующая улица →",
+          hintsUsed===0&&fails===0?`<div class="badge">Чистая дедукция</div>`:"",
+          ()=>{ li++; build(true); }, st);
+        setMsg("✨ Улица расселена верно!","ok");
+      }
+    },780);
+  }
+
+  function build(newPuzzle){
+    stopAll(); killSound();
+    busy=true; done=false;
+    $("loader").classList.add("on");
+    $("ov").classList.remove("on");
+    closePicker();
+    hud();
+    genTimer=setTimeout(()=>{
+      genTimer=null;
+      const lv=LEVELS[li];
+      N=lv.n; C=lv.c;
+      const g=generate(N,C,lv.direct);
+      sol=g.sol; clues=g.clues;
+      grid=Array.from({length:C},()=>new Array(N).fill(-1));
+      secs=0; started=false; hints=3; hintsUsed=0; fails=0; history=[]; usedClues=new Set();
+      $("tm").textContent="00:00";
+      sky(); renderStreet(); renderClues(); levelsUI();
+      busy=false; hud();
+      $("loader").classList.remove("on");
+      setMsg(`«${lv.name}»: ${N} домиков, ${C} категории, ${clues.length} улик. Решение единственное.`);
+      tone(520,90,0,.08,"triangle"); tone(760,110,.09,.07,"triangle");
+    },40);
+  }
+
+  $("check").onclick=()=>{
+    if(done||busy) return;
+    ac();
+    if(filledCount()<N*C){
+      setMsg(`Заполнено ${filledCount()} из ${N*C}. Рассели всех, потом проверяй.`,"warn");
+      tone(240,90,0,.07,"square");
+      return;
+    }
+    let bad=0;
+    clues.forEach((cl,i)=>{ if(clueStatus(cl)===false){ bad++; clueEls[i].classList.add("bad"); } });
+    let wrong=0;
+    for(let c=0;c<C;c++) for(let h=0;h<N;h++) if(grid[c][h]!==sol[c][h]) wrong++;
+    if(wrong===0){ win(); return; }
+    fails++;
+    stage.classList.add("shake"); setTimeout(()=>stage.classList.remove("shake"),420);
+    sweep(300,90,260,.13,"sawtooth");
+    setMsg(`Не сходится: нарушено улик — ${bad}. Перечитай подсвеченные красным.`,"err");
+    hud();
+  };
+  $("hint").onclick=()=>{
+    if(hints<=0||done||busy) return;
+    const cand=[];
+    for(let c=0;c<C;c++) for(let h=0;h<N;h++) if(grid[c][h]!==sol[c][h]) cand.push([c,h]);
+    if(!cand.length){ setMsg("Всё уже верно ✨"); return; }
+    const [c,h]=cand[(Math.random()*cand.length)|0];
+    history.push({c,h,prev:grid[c][h]});
+    grid[c][h]=sol[c][h];
+    hints--; hintsUsed++;
+    startClock(); paintSlots(); refreshClues(); hud();
+    const el=slots[c][h];
+    el.classList.add("hi","pop");
+    setTimeout(()=>{ if(el){ el.classList.remove("hi","pop"); } },1900);
+    const r=el.getBoundingClientRect();
+    sparks(r.left+r.width/2,r.top+r.height/2,12,"#4dd0e1");
+    tone(1320,110,0,.1,"triangle"); tone(1760,130,.1,.08,"sine");
+    setMsg(`Подсказка: домик №${h+1}, ${CATS[c].name.toLowerCase()} — ${itemOf(c,sol[c][h])[1]} 💡`);
+    if(filledCount()===N*C) autoCheckWin();
+  };
+  $("undo").onclick=()=>{
+    if(!history.length||done||busy) return;
+    const a=history.pop();
+    grid[a.c][a.h]=a.prev;
+    paintSlots(); refreshClues(); hud();
+    sweep(520,320,150,.08,"triangle");
+    setMsg("Ход отменён ↶");
+  };
+  $("again").onclick=()=>{
+    if(busy) return;
+    stopAll(); killSound();
+    grid=Array.from({length:C},()=>new Array(N).fill(-1));
+    secs=0; started=false; hints=3; hintsUsed=0; fails=0; history=[]; usedClues=new Set(); done=false;
+    $("tm").textContent="00:00";
+    $("ov").classList.remove("on");
+    paintSlots(); renderClues(); hud();
+    sweep(420,640,170,.09,"triangle");
+    setMsg("Улица очищена — та же загадка, начни заново.");
+  };
+  $("fresh").onclick=()=>{ if(!busy) build(true); };
+  $("live").onclick=()=>{
+    live=!live; hud(); refreshClues();
+    tone(live?760:420,60,0,.07,"square");
+    setMsg(live?"Улики подсвечиваются по мере заполнения.":"Улики молчат — проверяй сам.");
+  };
+  $("wipe").onclick=()=>{
+    prog={unlocked:0,stars:{},best:{}}; saveProg();
+    li=0; build(true);
+    sweep(600,240,220,.1,"triangle");
+    setMsg("Прогресс сброшен. Начинаем с переулка.");
+  };
+  $("picker").addEventListener("click",e=>{ if(e.target===$("picker")) closePicker(); });
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape"){ closePicker(); return; }
+    if(done&&e.key==="Enter"){ e.preventDefault(); $("ovbtn").click(); return; }
+    if(e.key==="h"||e.key==="H"||e.key==="р"||e.key==="Р"){ e.preventDefault(); $("hint").click(); }
+    if(e.key==="z"||e.key==="Z"||e.key==="я"||e.key==="Я"){ e.preventDefault(); $("undo").click(); }
+    if(e.key==="Enter"&&!$("picker").classList.contains("on")&&!done){ e.preventDefault(); $("check").click(); }
+  });
+
+  build(true);
+}
+</script>
+</body>
+</html>

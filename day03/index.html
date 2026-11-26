@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>День 3 — пятнашки</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1410;--card:#13241b;--gold:#e8c37a;--green:#3ddc84;--dim:#6f8f7d;--line:#24402f;--line2:#3a5a46;--ink:#eaf5ee}
+*{box-sizing:border-box}
+body{margin:0;padding:0 14px 46px;background:var(--bg);color:var(--ink);font:16px/1.5 Manrope,sans-serif;overflow-x:hidden}
+.wrap{max-width:560px;margin:0 auto;position:relative;z-index:1}
+.garland{display:flex;justify-content:center;gap:14px;border-top:2px solid var(--line2);overflow:hidden}
+.bulb{width:9px;height:13px;border-radius:50% 50% 45% 45%;position:relative;margin-top:7px;flex:none;
+ background:currentColor;transform-origin:top center;animation:sway 3s ease-in-out infinite alternate,glowblink 2s infinite}
+.bulb::before{content:"";position:absolute;top:-7px;left:3.5px;width:2px;height:7px;background:var(--line2)}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+@keyframes glowblink{0%,100%{filter:brightness(1);box-shadow:0 0 8px currentColor}50%{filter:brightness(.5);box-shadow:0 0 2px currentColor}}
+.flake{position:fixed;top:-14px;color:#cfe8da;opacity:.5;pointer-events:none;z-index:0;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(106vh) rotate(360deg)}}
+.back{color:var(--dim);font-size:13px;text-decoration:none}
+h1{font-family:Unbounded,sans-serif;font-size:22px;margin:12px 0 12px}
+h1 .gold{color:var(--gold)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+.rules{border-color:var(--line2);background:#10241a}
+.rules b{color:var(--gold)}
+.rules ul{margin:6px 0 0;padding-left:18px;color:#bcd8c6;font-size:13.5px}
+.rules li{margin-bottom:3px}
+.task{color:#bcd8c6;font-size:14px;margin:0 0 12px}
+.note{color:var(--dim);font-size:13px;text-align:center}
+
+.pwrap{position:relative;max-width:330px;margin:0 auto}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.ptile{aspect-ratio:1;border-radius:12px;border:1px solid var(--line);background:#1d5c38;
+ display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;
+ color:var(--gold);cursor:pointer;transition:transform .1s;user-select:none}
+.ptile:active{transform:scale(.96)}
+.ptile.empty{background:transparent;border-style:dashed;cursor:default}
+.ptile.img{background-size:300% 300%;background-repeat:no-repeat;color:transparent;border-color:var(--line2);
+ box-shadow:inset 0 0 0 1px #ffffff14}
+.peekimg{position:absolute;inset:0;border-radius:12px;background-size:cover;background-position:center;
+ opacity:0;transition:opacity .18s;pointer-events:none;box-shadow:0 0 0 2px #e8c37a88,0 10px 26px #000a}
+.peekimg.on{opacity:.96}
+.btns{text-align:center;margin-top:12px}
+button.act{margin:4px 5px;padding:10px 18px;border-radius:999px;border:none;cursor:pointer;font:800 14px Manrope,sans-serif;
+ background:linear-gradient(90deg,var(--gold),#f6dfae);color:#20180a;box-shadow:0 4px 16px #e8c37a2e;transition:.15s}
+button.act:hover{transform:translateY(-1px)}
+button.ghost{margin:4px 5px;padding:9px 15px;border-radius:999px;border:1px solid var(--line);background:none;
+ color:var(--dim);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+button.ghost:hover{border-color:var(--gold);color:var(--gold)}
+#riddle{font-size:16px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="garland" id="garland"></div>
+<div class="wrap">
+<a class="back" href="../">← календарь</a>
+<h1>День <span class="gold">3</span> · пятнашки</h1>
+
+<div class="card rules">
+  📜 <b>Как играть:</b> цель — разгадать головоломку и добыть загадку, а ответ принести боту: он выдаст подарок и фото тайника.
+  <ul>
+    <li>Метель разрезала наше фото на девять кусочков и перепутала их.</li>
+    <li>Нажимай на плитку рядом с пустой клеткой — она скользит на её место.</li>
+    <li>Удерживай «👁 Подсмотреть», чтобы увидеть целую картинку. Соберёшь фото — день откроет загадку 🎁</li>
+  </ul>
+</div>
+
+<div id="game" class="card"></div>
+<div id="riddleCard" class="card" hidden>
+  <h3 id="rTitle" style="margin:0 0 8px;font-size:16px;color:var(--gold)"></h3>
+  <p id="riddle"></p>
+  <p class="note">Отправь ответ боту в Telegram 🤖 Застрянешь — кнопка 💡 Подсказка у бота (раз в 2 минуты).</p>
+</div>
+</div>
+
+<script>
+/* ====== НАСТРОЙКИ ДНЯ ====== */
+const DAY = 3;
+const PHOTO = "photo.jpg";   // наше фото лежит рядом с этим файлом; поставь "" для плиток с цифрами
+const RIDDLE = "Соседи говорят что у нас такая weather";
+
+/* ====== антураж ====== */
+const GC = ["#e74c3c","#f1c40f","#3498db","#e67e22","#9b59b6","#2ecc71","#ff7eb0"];
+for (let i = 0; i < 17; i++){
+  const b = document.createElement("span");
+  b.className = "bulb"; b.style.color = GC[i % GC.length];
+  b.style.animationDelay = (i*.17)+"s, "+(i*.23)+"s";
+  document.getElementById("garland").appendChild(b);
+}
+for (let i = 0; i < 12; i++){
+  const f = document.createElement("div");
+  f.className = "flake"; f.textContent = "❄";
+  f.style.left = Math.random()*100+"vw";
+  f.style.fontSize = 8+Math.random()*9+"px";
+  f.style.animationDuration = 7+Math.random()*8+"s";
+  f.style.animationDelay = -Math.random()*10+"s";
+  document.body.appendChild(f);
+}
+
+/* ====== служебное ====== */
+const $ = id => document.getElementById(id);
+const q = new URLSearchParams(location.search);
+const now = new Date();
+const PREP = now < new Date(2026, 11, 1, 19, 0, 0); // режим подготовки: замки сняты
+const inDec = now.getFullYear() === 2026 && now.getMonth() === 11;
+const today = inDec ? now.getDate() : 0;
+const PREP = now < new Date(2026, 11, 1, 19, 0, 0); // режим подготовки: замки сняты
+const open = q.has("all") || PREP || (inDec && (DAY < today || (DAY === today && now.getHours() >= 19)));
+const past = !q.has("all") && (inDec && DAY < today);
+const solved = () => !!localStorage.getItem("advent_solved_" + DAY);
+
+function showRiddle(fresh, extra){
+  $("game").innerHTML = "";
+  $("riddleCard").hidden = false;
+  $("rTitle").textContent = (fresh ? "🎉 " + (extra || "Готово!") + " Вот загадка дня:" : "Загадка дня:");
+  $("riddle").textContent = RIDDLE;
+}
+
+if (!open){
+  $("game").innerHTML = `<p class="task">День откроется 3 декабря в 19:00 🔒</p>`;
+}
+else if (!q.has("all") && (solved() || past)){
+  showRiddle(false);
+}
+else {
+  const SOLVED = [1,2,3,4,5,6,7,8,0];
+  let arr = [...SOLVED], steps = 0, done = false;
+
+  /* перемешиваем случайными ХОДАМИ — такая позиция всегда решаема */
+  const shuffle = () => {
+    arr = [...SOLVED];
+    for (let k = 0; k < 160; k++){
+      const e = arr.indexOf(0), ex = e % 3, ey = (e / 3) | 0, opts = [];
+      if (ey > 0) opts.push(e - 3);
+      if (ey < 2) opts.push(e + 3);
+      if (ex > 0) opts.push(e - 1);
+      if (ex < 2) opts.push(e + 1);
+      const t = opts[(Math.random() * opts.length) | 0];
+      [arr[e], arr[t]] = [arr[t], arr[e]];
+    }
+    if (arr.join() === SOLVED.join()) shuffle();
+  };
+
+  $("game").innerHTML = `<p class="task">Девять кусочков нашего неба. Верни каждый на своё место — и облака сложатся обратно.</p>
+    <div class="pwrap">
+      <div class="pgrid" id="pg"></div>
+      <div class="peekimg" id="peek"></div>
+    </div>
+    <p class="note" id="st"></p>
+    <div class="btns">
+      <button class="act" id="resh">Перемешать заново</button>
+      <button class="ghost" id="peekbtn">👁 Подсмотреть</button>
+    </div>`;
+  if (PHOTO) $("peek").style.backgroundImage = `url(${PHOTO})`;
+
+  const render = () => {
+    const pg = $("pg"); pg.innerHTML = "";
+    arr.forEach((v, i) => {
+      const t = document.createElement("div");
+      t.className = "ptile" + (v === 0 ? " empty" : "") + (PHOTO && v ? " img" : "");
+      if (v && PHOTO){
+        const col = (v - 1) % 3, row = ((v - 1) / 3) | 0;
+        t.style.backgroundImage = `url(${PHOTO})`;
+        t.style.backgroundPosition = `${col * 50}% ${row * 50}%`;
+      } else if (v){
+        t.textContent = v;
+      }
+      t.onclick = () => click(i);
+      pg.appendChild(t);
+    });
+    $("st").textContent = "Ходов: " + steps;
+  };
+
+  const click = i => {
+    if (done) return;
+    const e = arr.indexOf(0), ix = i % 3, iy = (i / 3) | 0, ex = e % 3, ey = (e / 3) | 0;
+    const near = (ix === ex && Math.abs(iy - ey) === 1) || (iy === ey && Math.abs(ix - ex) === 1);
+    if (!near) return;
+    [arr[e], arr[i]] = [arr[i], arr[e]];
+    steps++;
+    render();
+    if (arr.join() === SOLVED.join()){
+      done = true;
+      localStorage.setItem("advent_solved_" + DAY, new Date().toISOString());
+      setTimeout(() => showRiddle(true, `Фото собрано за ${steps} ходов!`), 500);
+    }
+  };
+
+  $("resh").onclick = () => { shuffle(); steps = 0; done = false; render(); };
+
+  const pb = $("peekbtn");
+  const on = () => $("peek").classList.add("on");
+  const off = () => $("peek").classList.remove("on");
+  pb.addEventListener("pointerdown", e => { e.preventDefault(); on(); });
+  pb.addEventListener("pointerup", off);
+  pb.addEventListener("pointerleave", off);
+  pb.addEventListener("pointercancel", off);
+
+  shuffle();
+  render();
+}
+</script>
+</body>
+</html>

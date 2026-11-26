@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>День 24 — мороз против оттепели</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08151a; --card:#0f2530; --card2:#0b1c25; --line:#1d3d4a; --line2:#2e5f70;
+  --ice:#7fe3ff; --ice2:#3aa9d6; --frost:#dff6ff; --gold:#e8c37a;
+  --ember:#ff9d3d; --ember2:#ff5a3c; --green:#3ddc84; --red:#ff6b6b;
+  --magenta:#ff7eb0; --violet:#b39ddb; --ink:#e9f7ff; --dim:#7fa8b8;
+  --pane1:#123240; --pane2:#08181f;
+}
+*{box-sizing:border-box}
+html{scrollbar-color:var(--line2) #08151a;scrollbar-width:thin}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#08151a;border-radius:9px}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:9px;border:2px solid #08151a}
+::-webkit-scrollbar-thumb:hover{background:#3d7f95}
+body{margin:0;padding:0 14px 54px;color:var(--ink);overflow-x:hidden;
+  background:radial-gradient(1200px 600px at 50% -16%,#12414f55,transparent 70%),var(--bg);
+  font:16px/1.5 Manrope,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:620px;margin:0 auto;position:relative;z-index:1}
+
+.aurora{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.aurora i{position:absolute;width:70vw;height:70vw;border-radius:50%;filter:blur(100px);opacity:.16}
+.aurora i:nth-child(1){background:#1f8fb0;top:-24vw;left:-18vw;animation:dr1 28s ease-in-out infinite alternate}
+.aurora i:nth-child(2){background:#ff7a3c;bottom:-30vw;right:-20vw;opacity:.1;animation:dr2 34s ease-in-out infinite alternate}
+@keyframes dr1{to{transform:translate(14vw,10vw)}}
+@keyframes dr2{to{transform:translate(-12vw,-8vw)}}
+.garland{display:flex;justify-content:center;gap:14px;border-top:2px solid var(--line2);overflow:hidden}
+.gbulb{width:9px;height:13px;border-radius:50% 50% 45% 45%;position:relative;margin-top:7px;flex:none;
+ background:currentColor;transform-origin:top center;animation:sway 3s ease-in-out infinite alternate,glowblink 2s infinite}
+.gbulb::before{content:"";position:absolute;top:-7px;left:3.5px;width:2px;height:7px;background:var(--line2)}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+@keyframes glowblink{0%,100%{filter:brightness(1);box-shadow:0 0 8px currentColor}50%{filter:brightness(.5);box-shadow:0 0 2px currentColor}}
+.flake{position:fixed;top:-14px;color:#cfeaf7;opacity:.5;pointer-events:none;z-index:0;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(106vh) rotate(360deg)}}
+
+.back{color:var(--dim);font-size:13px;text-decoration:none}
+.back:hover{color:var(--ice)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0}
+h1{font-family:Unbounded,sans-serif;font-size:clamp(17px,4.4vw,22px);margin:0;line-height:1.25}
+h1 .gold{color:var(--ice)}
+.sndbtn{flex:none;padding:9px 13px;border-radius:999px;border:1px solid var(--line2);background:var(--card);
+ color:var(--ink);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+.sndbtn:hover{border-color:var(--ice);color:var(--ice)}
+.sndbtn.off{color:var(--dim);border-color:var(--line)}
+
+.card{background:linear-gradient(165deg,var(--card),var(--card2));border:1px solid var(--line);
+ border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 10px 30px #0006}
+.rules{border-color:var(--line2);background:linear-gradient(165deg,#0d2a36,#0a1e27)}
+.rules b{color:var(--ice)}
+.rules ul{margin:6px 0 0;padding-left:18px;color:#b6d9e6;font-size:13.5px}
+.rules li{margin-bottom:3px}
+.task{color:#b6d9e6;font-size:14px;margin:0 0 12px}
+.note{color:var(--dim);font-size:12.5px;margin:10px 0 0}
+
+.hud{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.stat{display:flex;flex-direction:column;gap:1px;padding:7px 12px;border-radius:12px;
+ border:1px solid var(--line);background:#0b1e28;min-width:72px}
+.stat i{font:700 10px/1 Manrope,sans-serif;letter-spacing:.12em;color:var(--dim);font-style:normal}
+.stat b{font:800 16px/1.2 Manrope,sans-serif;color:var(--ice)}
+.stat.g b{color:var(--green)} .stat.d b{color:var(--red)} .stat.e b{color:var(--ember)} .stat.m b{color:var(--magenta)}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-left:auto}
+.seg button{padding:9px 11px;border:none;background:none;color:var(--dim);font:700 12px Manrope,sans-serif;cursor:pointer;transition:.15s}
+.seg button:hover{color:var(--ink)}
+.seg button.on{background:#14465a;color:#e9f7ff}
+
+.rounds{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.rd{position:relative;min-width:48px;height:48px;padding:0 9px;border-radius:12px;border:1px solid var(--line);
+ background:#0b1e28;color:var(--dim);cursor:pointer;font:800 13px/1 Manrope,sans-serif;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:.15s}
+.rd:hover:not(:disabled){border-color:var(--ice);color:var(--ice);transform:translateY(-2px)}
+.rd.cur{border-color:var(--ice);background:#123c4c;color:var(--ice);box-shadow:0 0 0 2px #7fe3ff22,0 0 16px #7fe3ff33}
+.rd.done{border-color:var(--green);color:var(--green);background:#0f2e22}
+.rd:disabled{opacity:.35;cursor:not-allowed}
+.rd u{display:flex;gap:1.5px;text-decoration:none}
+.rd u s{width:4px;height:4px;border-radius:50%;background:#254a58;text-decoration:none}
+.rd u s.f{background:var(--gold);box-shadow:0 0 5px #e8c37a99}
+.rd em{font-style:normal;font-size:9px;letter-spacing:.06em;opacity:.8}
+
+.pane{position:relative;border-radius:18px;padding:14px;border:1px solid var(--line2);
+ background:radial-gradient(120% 100% at 30% 0%,var(--pane1),var(--pane2) 72%);
+ box-shadow:0 16px 36px #000a,inset 0 1px 0 #ffffff12;transition:box-shadow .4s}
+.pane.warm{box-shadow:0 16px 36px #000a,inset 0 0 70px #ff5a3c33,0 0 34px #ff5a3c22}
+.pane.cold{box-shadow:0 16px 40px #000a,inset 0 0 70px #7fe3ff44,0 0 40px #7fe3ff33}
+.pane.shake{animation:shk .42s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shk{10%,90%{transform:translateX(-3px)}20%,80%{transform:translateX(5px)}30%,50%,70%{transform:translateX(-8px)}40%,60%{transform:translateX(8px)}}
+
+.duel{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.fighter{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:12px;border:1px solid var(--line);
+ background:#0b1e28;font:700 12.5px Manrope,sans-serif;transition:.25s}
+.fighter .av{width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.fighter.me{color:var(--ice)} .fighter.ai{color:var(--ember)}
+.fighter.active{border-color:currentColor;box-shadow:0 0 16px #ffffff14}
+.fighter.active .av{animation:bob 1.2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-3px) scale(1.12)}}
+.vs{font-family:Unbounded,sans-serif;font-size:11px;color:var(--dim);letter-spacing:.14em}
+
+.boardwrap{position:relative;display:flex;justify-content:center}
+.board{position:relative;display:grid;gap:6px;touch-action:manipulation}
+.cell{position:relative;border-radius:12px;border:1px solid #1f4655;padding:0;cursor:pointer;outline:none;
+ background:linear-gradient(160deg,#153845,#0d2530);
+ box-shadow:inset 0 1px 0 #ffffff10,0 3px 8px #0006;transition:transform .13s,box-shadow .18s,background .2s}
+.cell::before{content:"";position:absolute;inset:0;border-radius:12px;pointer-events:none;opacity:.35;
+ background:radial-gradient(circle at 30% 22%,#ffffff18,transparent 55%)}
+.cell:hover:not(.taken){transform:translateY(-2px);background:linear-gradient(160deg,#1b4657,#10303c);
+ box-shadow:inset 0 1px 0 #ffffff1c,0 8px 16px #0008,0 0 0 1px #7fe3ff44}
+.cell:focus-visible{box-shadow:0 0 0 3px var(--ice),0 3px 8px #0006}
+.cell.taken{cursor:default}
+.cell svg{position:absolute;inset:12%;width:76%;height:76%;overflow:visible}
+.cell .mark{animation:markin .34s cubic-bezier(.2,1.3,.4,1) backwards}
+@keyframes markin{from{transform:scale(.2) rotate(-40deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+.cell.x{background:linear-gradient(160deg,#17475a,#0d2c3a);box-shadow:inset 0 0 22px #7fe3ff33,0 3px 8px #0006}
+.cell.o{background:linear-gradient(160deg,#4a2a17,#2a1409);box-shadow:inset 0 0 22px #ff9d3d33,0 3px 8px #0006}
+.cell.winline{animation:winpulse 1s ease-in-out infinite}
+@keyframes winpulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.55)}}
+.cell.melt svg{animation:melt .8s ease-in forwards}
+@keyframes melt{to{transform:translateY(14%) scaleY(.55);opacity:.25;filter:blur(2px)}}
+.cell.hintz{animation:hz 1s ease-out 2}
+@keyframes hz{0%,100%{box-shadow:inset 0 1px 0 #ffffff10,0 3px 8px #0006}50%{box-shadow:0 0 0 3px #4dd0e188,0 0 24px #4dd0e1aa}}
+.beam{position:absolute;inset:0;pointer-events:none;z-index:3}
+
+.status{text-align:center;margin-top:12px;min-height:24px;font:700 13.5px Manrope,sans-serif;color:var(--dim)}
+.status.me{color:var(--ice)} .status.ai{color:var(--ember)} .status.ok{color:var(--green)} .status.err{color:var(--red)}
+.dots::after{content:"";animation:dots 1.1s steps(4,end) infinite}
+@keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+button.act{padding:11px 18px;border-radius:999px;border:none;cursor:pointer;font:800 14px Manrope,sans-serif;
+ background:linear-gradient(90deg,var(--ice),#c9f4ff);color:#062029;box-shadow:0 4px 16px #7fe3ff2e;transition:.15s}
+button.act:hover{transform:translateY(-1px);box-shadow:0 7px 20px #7fe3ff44}
+button.act:active{transform:translateY(0)}
+button.act.pulse{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 4px 16px #7fe3ff2e}50%{box-shadow:0 0 0 7px #7fe3ff22,0 4px 22px #7fe3ff66}}
+button.ghost{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:none;
+ color:var(--dim);font:600 13px Manrope,sans-serif;cursor:pointer;transition:.15s}
+button.ghost:hover:not(:disabled){border-color:var(--ice);color:var(--ice)}
+button.ghost:disabled{opacity:.4;cursor:not-allowed}
+#msg{min-height:22px;margin-top:10px;font-size:13.5px;text-align:center;color:var(--dim)}
+#msg.ok{color:var(--green)} #msg.err{color:var(--red)} #msg.warn{color:var(--ember)}
+
+.overlay{position:absolute;inset:0;z-index:8;display:none;flex-direction:column;align-items:center;justify-content:center;
+ gap:10px;padding:22px;text-align:center;background:#04121aee;backdrop-filter:blur(5px);border-radius:18px}
+.overlay.on{display:flex;animation:fadein .35s ease-out}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.overlay h3{font-family:Unbounded,sans-serif;font-size:19px;margin:0;color:var(--ice)}
+.overlay p{margin:0;font-size:13.5px;color:#b6d9e6;max-width:350px}
+.stars{display:flex;gap:8px;font-size:30px;line-height:1}
+.stars span{opacity:.22;transform:scale(.7);transition:.3s}
+.stars span.f{opacity:1;transform:scale(1);text-shadow:0 0 16px #e8c37a}
+.badge{padding:5px 12px;border-radius:999px;border:1px solid var(--green);color:var(--green);
+ background:#0f2e22;font:700 12px Manrope,sans-serif}
+#riddle{font-size:16px;white-space:pre-wrap}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:40}
+@media (max-width:430px){
+  .stat{min-width:62px;padding:6px 9px}
+  .stat b{font-size:15px}
+  .seg{margin-left:0;width:100%;justify-content:center}
+  .rd{min-width:42px;height:42px;font-size:12px}
+  .fighter{padding:6px 9px;font-size:11.5px}
+}
+</style>
+</head>
+<body>
+<div class="aurora"><i></i><i></i></div>
+<div class="garland" id="garland"></div>
+<div class="wrap">
+  <a class="back" href="../">← календарь</a>
+  <div class="top">
+    <h1>День <span class="gold">24</span> · мороз против оттепели</h1>
+    <button class="sndbtn" id="snd">🔊 Звук</button>
+  </div>
+
+  <div class="card rules">
+    📜 <b>Как играть:</b> цель — разгадать головоломку и добыть загадку, а ответ принести боту: он выдаст подарок и фото тайника.
+    <ul>
+      <li>Ты — Мороз ❄, соперник — Оттепель 🔥. Ставь знак в свободную клетку и собери линию раньше соперника.</li>
+      <li>Пять дуэлей: три на стекле 3×3, затем 4×4 и 5×5 — там линия из четырёх.</li>
+      <li>Победа открывает следующую дуэль, поражение тратит жизнь, ничья — переигровка. Подсказка покажет сильнейший ход.</li>
+      <li>Выиграй все пять — день откроет загадку 🎁</li>
+    </ul>
+  </div>
+
+  <div id="game" class="card"></div>
+
+  <div id="riddleCard" class="card" hidden>
+    <h3 id="rTitle" style="margin:0 0 8px;font-size:16px;color:var(--ice)"></h3>
+    <p id="riddle"></p>
+    <p class="note">Отправь ответ боту в Telegram 🤖 Застрянешь — кнопка 💡 Подсказка у бота (раз в 2 минуты).</p>
+  </div>
+</div>
+<canvas id="fx"></canvas>
+
+<script>
+/* ===== настройки дня ===== */
+const DAY = 24;
+const RIDDLE = "Дуэт в одной коробке: одна дарит цвет губам, вторая заставляет ванну шипеть и пахнуть. Назови обоих.";
+const ROUNDS = [
+  { n:3, k:3, name:"Снежинка", err:.60 },
+  { n:3, k:3, name:"Сугроб",   err:.32 },
+  { n:3, k:3, name:"Метель",   err:.12 },
+  { n:4, k:4, name:"Пурга",    err:.24 },
+  { n:5, k:4, name:"Дуэль",    err:.10 }
+];
+const MODES = [
+  { key:"calm",    label:"Спокойно", mul:1.7, lives:5, hints:5 },
+  { key:"classic", label:"Классика", mul:1.0, lives:3, hints:3 },
+  { key:"hard",    label:"Метель",   mul:.5,  lives:2, hints:2 }
+];
+const PKEY="advent_duel24_progress";
+function loadProg(){
+  try{
+    const p=JSON.parse(localStorage.getItem(PKEY)||"null");
+    if(p&&typeof p.unlocked==="number") return {unlocked:p.unlocked,stars:p.stars||{}};
+  }catch(e){}
+  return {unlocked:0,stars:{}};
+}
+let prog=loadProg();
+const saveProg=()=>localStorage.setItem(PKEY,JSON.stringify(prog));
+const totalStars=()=>Object.values(prog.stars).reduce((a,b)=>a+b,0);
+
+/* ===== линии ===== */
+const LCACHE={};
+function linesFor(n,k){
+  const key=n+"_"+k;
+  if(LCACHE[key]) return LCACHE[key];
+  const lines=[];
+  const dirs=[[0,1],[1,0],[1,1],[1,-1]];
+  for(let r=0;r<n;r++) for(let c=0;c<n;c++) for(const [dr,dc] of dirs){
+    const er=r+dr*(k-1), ec=c+dc*(k-1);
+    if(er<0||ec<0||er>=n||ec>=n) continue;
+    const L=[];
+    for(let t=0;t<k;t++) L.push((r+dr*t)*n+(c+dc*t));
+    lines.push(L);
+  }
+  const through=Array.from({length:n*n},()=>[]);
+  lines.forEach((L,li)=>L.forEach(i=>through[i].push(li)));
+  return LCACHE[key]={lines,through};
+}
+function winnerOf(b,n,k){
+  const {lines}=linesFor(n,k);
+  for(const L of lines){
+    const v=b[L[0]];
+    if(v&&L.every(i=>b[i]===v)) return {mark:v,line:L};
+  }
+  return b.every(v=>v)?{mark:"draw",line:null}:null;
+}
+
+/* ===== ИИ ===== */
+function empties(b){ const out=[]; for(let i=0;i<b.length;i++) if(!b[i]) out.push(i); return out; }
+function completes(b,i,mark,n,k){
+  const {through}=linesFor(n,k);
+  for(const li of through[i]){
+    const L=linesFor(n,k).lines[li];
+    if(L.every(j=>j===i||b[j]===mark)) return true;
+  }
+  return false;
+}
+function threatCount(b,mark,n,k){
+  const {lines}=linesFor(n,k);
+  let c=0;
+  for(const L of lines){
+    let m=0,e=0;
+    for(const j of L){ if(b[j]===mark) m++; else if(!b[j]) e++; }
+    if(m===k-1&&e===1) c++;
+  }
+  return c;
+}
+function minimax(b,isMe,me,opp,n,k,depth,alpha,beta){
+  const w=winnerOf(b,n,k);
+  if(w){
+    if(w.mark===me) return 100-depth;
+    if(w.mark===opp) return depth-100;
+    return 0;
+  }
+  const list=empties(b);
+  if(isMe){
+    let best=-1e9;
+    for(const i of list){
+      b[i]=me;
+      const v=minimax(b,false,me,opp,n,k,depth+1,alpha,beta);
+      b[i]="";
+      if(v>best) best=v;
+      if(best>alpha) alpha=best;
+      if(beta<=alpha) break;
+    }
+    return best;
+  }
+  let best=1e9;
+  for(const i of list){
+    b[i]=opp;
+    const v=minimax(b,true,me,opp,n,k,depth+1,alpha,beta);
+    b[i]="";
+    if(v<best) best=v;
+    if(best<beta) beta=best;
+    if(beta<=alpha) break;
+  }
+  return best;
+}
+function bestMove(b,me,opp,n,k){
+  const list=empties(b);
+  if(!list.length) return -1;
+  for(const i of list) if(completes(b,i,me,n,k)) return i;
+  for(const i of list) if(completes(b,i,opp,n,k)) return i;
+  if(n===3&&k===3){
+    let best=-1e9, pick=list[0];
+    for(const i of list){
+      b[i]=me;
+      const v=minimax(b,false,me,opp,n,k,1,-1e9,1e9);
+      b[i]="";
+      if(v>best){ best=v; pick=i; }
+    }
+    return pick;
+  }
+  const {lines,through}=linesFor(n,k);
+  let best=-1e9, pick=list[0];
+  const mid=(n-1)/2;
+  for(const i of list){
+    b[i]=me;
+    let s=0;
+    const myT=threatCount(b,me,n,k);
+    s+=myT*myT*90;
+    for(const li of through[i]){
+      const L=lines[li];
+      let mine=0,theirs=0;
+      for(const j of L){ if(b[j]===me) mine++; else if(b[j]===opp) theirs++; }
+      if(theirs===0) s+=Math.pow(5,mine);
+      if(mine===0) s+=Math.pow(5,theirs)*.9;
+    }
+    b[i]=opp;
+    const opT=threatCount(b,opp,n,k);
+    s+=opT*opT*70;
+    b[i]="";
+    const r=(i/n)|0, c=i%n;
+    s+=(n-Math.abs(r-mid)-Math.abs(c-mid))*2.2;
+    s+=Math.random()*3;
+    if(s>best){ best=s; pick=i; }
+  }
+  return pick;
+}
+
+/* ===== антураж ===== */
+const GC=["#7fe3ff","#ff9d3d","#3ddc84","#ff7eb0","#e8c37a","#b39ddb","#4dd0e1"];
+for(let i=0;i<17;i++){
+  const b=document.createElement("span");
+  b.className="gbulb"; b.style.color=GC[i%GC.length];
+  b.style.animationDelay=(i*.17)+"s, "+(i*.23)+"s";
+  document.getElementById("garland").appendChild(b);
+}
+for(let i=0;i<12;i++){
+  const f=document.createElement("div");
+  f.className="flake"; f.textContent="❄";
+  f.style.left=Math.random()*100+"vw";
+  f.style.fontSize=8+Math.random()*9+"px";
+  f.style.animationDuration=7+Math.random()*8+"s";
+  f.style.animationDelay=-Math.random()*10+"s";
+  document.body.appendChild(f);
+}
+
+/* ===== служебное ===== */
+const $=id=>document.getElementById(id);
+const q=new URLSearchParams(location.search);
+const now=new Date();
+const PREP = now < new Date(2026, 11, 1, 19, 0, 0); // режим подготовки: замки сняты
+const inDec=now.getFullYear()===2026&&now.getMonth()===11;
+const today=inDec?now.getDate():0;
+const open = q.has("all") || PREP || (inDec && (DAY < today || (DAY === today && now.getHours() >= 19)));
+const past = !q.has("all") && (inDec && DAY < today);
+const daySolved=()=>!!localStorage.getItem("advent_solved_"+DAY);
+
+/* ===== звук ===== */
+let snd=localStorage.getItem("advent_snd")!=="0";
+let AC=null, live=[];
+function ac(){
+  if(!AC){ const C=window.AudioContext||window.webkitAudioContext; if(C) AC=new C(); }
+  if(AC&&AC.state==="suspended") AC.resume();
+  return AC;
+}
+function tone(freq,ms,delay=0,vol=.13,type="sine"){
+  if(!snd) return; const c=ac(); if(!c) return;
+  const t=c.currentTime+delay/1000, d=ms/1000;
+  const o=c.createOscillator(), g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,t);
+  g.gain.setValueAtTime(.0001,t);
+  g.gain.linearRampToValueAtTime(vol,t+.01);
+  g.gain.setValueAtTime(vol,t+Math.max(.015,d-.04));
+  g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g); g.connect(c.destination);
+  o.start(t); o.stop(t+d+.03);
+  live.push(o); o.onended=()=>{ live=live.filter(x=>x!==o); };
+}
+function sweep(f1,f2,ms,vol=.12,type="triangle"){
+  if(!snd) return; const c=ac(); if(!c) return;
+  const t=c.currentTime,d=ms/1000;
+  const o=c.createOscillator(),g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(f1,t);
+  o.frequency.exponentialRampToValueAtTime(Math.max(30,f2),t+d);
+  g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+d+.02);
+  live.push(o); o.onended=()=>{ live=live.filter(x=>x!==o); };
+}
+function killSound(){ live.forEach(o=>{try{o.stop();}catch(e){}}); live=[]; }
+function paintSnd(){
+  const b=$("snd");
+  b.textContent=snd?"🔊 Звук":"🔇 Тихо";
+  b.classList.toggle("off",!snd);
+}
+$("snd").onclick=()=>{
+  snd=!snd; localStorage.setItem("advent_snd",snd?"1":"0");
+  paintSnd();
+  if(snd){ ac(); tone(880,90,0,.12); } else killSound();
+};
+paintSnd();
+
+/* ===== частицы ===== */
+const fx=$("fx"), fctx=fx.getContext("2d");
+let parts=[], fxRun=false;
+function sizeFx(){
+  const r=Math.min(devicePixelRatio||1,2);
+  fx.width=innerWidth*r; fx.height=innerHeight*r;
+  fx.style.width=innerWidth+"px"; fx.style.height=innerHeight+"px";
+  fctx.setTransform(r,0,0,r,0,0);
+}
+sizeFx(); addEventListener("resize",sizeFx);
+function spawn(p){ parts.push(p); if(!fxRun){ fxRun=true; requestAnimationFrame(stepFx); } }
+function shards(x,y,n,col,sharp){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2, sp=.8+Math.random()*4.2;
+    spawn({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1.2,g:.14,
+      w:sharp?2+Math.random()*5:0,h:sharp?1.5+Math.random()*3:0,s:1.4+Math.random()*2.8,
+      a:Math.random()*Math.PI,va:(Math.random()-.5)*.35,
+      c:col||"#dff6ff",life:1,dec:.024,round:!sharp});
+  }
+}
+function confetti(){
+  const cols=["#7fe3ff","#3ddc84","#e8c37a","#ff7eb0","#b39ddb","#4dd0e1","#dff6ff"];
+  for(let i=0;i<180;i++){
+    spawn({x:innerWidth/2+(Math.random()-.5)*220,y:innerHeight*.34,
+      vx:(Math.random()-.5)*8.5,vy:-Math.random()*9.5-2,g:.22,
+      w:4+Math.random()*6,h:3+Math.random()*5,a:Math.random()*Math.PI,va:(Math.random()-.5)*.3,
+      c:cols[(Math.random()*cols.length)|0],life:1,dec:.007,round:false});
+  }
+}
+function stepFx(){
+  fctx.clearRect(0,0,innerWidth,innerHeight);
+  parts.forEach(p=>{
+    p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.life-=p.dec;
+    fctx.globalAlpha=Math.max(0,p.life); fctx.fillStyle=p.c;
+    if(p.round){ fctx.beginPath(); fctx.arc(p.x,p.y,p.s,0,7); fctx.fill(); }
+    else { p.a+=p.va; fctx.save(); fctx.translate(p.x,p.y); fctx.rotate(p.a);
+      fctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); fctx.restore(); }
+  });
+  fctx.globalAlpha=1;
+  parts=parts.filter(p=>p.life>0&&p.y<innerHeight+50);
+  if(parts.length) requestAnimationFrame(stepFx);
+  else { fxRun=false; fctx.clearRect(0,0,innerWidth,innerHeight); }
+}
+
+/* ===== игра ===== */
+let timers=[];
+function later(fn,ms){ const id=setTimeout(fn,ms); timers.push(id); return id; }
+function clearTimers(){ timers.forEach(clearTimeout); timers=[]; }
+function showRiddle(fresh,extra){
+  clearTimers(); killSound();
+  $("game").innerHTML="";
+  $("riddleCard").hidden=false;
+  $("rTitle").textContent=fresh?"🎉 "+(extra||"Готово!")+" Вот загадка дня:":"Загадка дня:";
+  $("riddle").textContent=RIDDLE;
+}
+
+if(!open){
+  $("game").innerHTML=`<p class="task">День откроется 24 декабря в 19:00 🔒</p>`;
+}
+else if(daySolved()||past){
+  showRiddle(false);
+}
+else {
+  $("game").innerHTML=`
+    <p class="task">Оттепель хочет растопить морозные узоры на стекле. Ставь снежинки в линию быстрее, чем она поставит угольки — и стекло останется твоим.</p>
+    <div class="hud">
+      <div class="stat"><i>ДУЭЛЬ</i><b id="rd">1/5</b></div>
+      <div class="stat d"><i>ЖИЗНИ</i><b id="lv">❄❄❄</b></div>
+      <div class="stat g"><i>ЗВЁЗДЫ</i><b id="ts">0/15</b></div>
+      <div class="stat m"><i>ПОДСКАЗКИ</i><b id="hc">3</b></div>
+      <div class="stat e"><i>ПОЛЕ</i><b id="sz">3×3</b></div>
+      <div class="seg" id="seg"></div>
+    </div>
+    <div class="rounds" id="rounds"></div>
+    <div class="pane" id="pane">
+      <div class="duel">
+        <div class="fighter me" id="fme"><span class="av">❄</span><span>Мороз · ты</span></div>
+        <span class="vs">ПРОТИВ</span>
+        <div class="fighter ai" id="fai"><span class="av">🔥</span><span>Оттепель</span></div>
+      </div>
+      <div class="boardwrap"><div class="board" id="board"></div><svg class="beam" id="beam"></svg></div>
+      <div class="status" id="status">Твой ход — ставь снежинку</div>
+      <div class="overlay" id="ov">
+        <h3 id="ovt">Мороз против Оттепели</h3>
+        <div class="stars" id="ovs" style="display:none"><span>★</span><span>★</span><span>★</span></div>
+        <p id="ovp"></p>
+        <div id="ovb"></div>
+        <button class="act pulse" id="ovbtn">▶ Начать дуэль</button>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="ghost" id="hint">💡 Подсказка · 3</button>
+      <button class="ghost" id="again">↻ Переиграть дуэль</button>
+      <button class="ghost" id="wipe">↺ Сбросить прогресс</button>
+    </div>
+    <div id="msg"></div>
+    <p class="note">Клавиатура: стрелки — выбор клетки, Enter или пробел — ход, H — подсказка, R — переиграть дуэль.</p>`;
+
+  let M=1, mode=MODES[1];
+  let ri=Math.min(prog.unlocked,ROUNDS.length-1);
+  let n=3,k=3,board=[],cells=[],turn="idle",over=false;
+  let lives=3,hints=3,hintsUsed=0,myMoves=0,focus=0,started=false;
+
+  const boardEl=$("board"), beam=$("beam"), pane=$("pane");
+  const setMsg=(t,cls)=>{ const m=$("msg"); if(m){ m.textContent=t; m.className=cls||""; } };
+  const setStatus=(t,cls)=>{ const s=$("status"); if(s){ s.className="status "+(cls||""); s.innerHTML=t; } };
+
+  MODES.forEach((m,i)=>{
+    const b=document.createElement("button");
+    b.textContent=m.label; b.dataset.i=i;
+    if(i===M) b.classList.add("on");
+    b.onclick=()=>{
+      if(M===i) return;
+      M=i; mode=MODES[i];
+      $("seg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",+x.dataset.i===i));
+      lives=mode.lives; hints=mode.hints;
+      loadRound();
+      tone(620,70,0,.07,"triangle");
+    };
+    $("seg").appendChild(b);
+  });
+
+  function snowSVG(){
+    return `<svg viewBox="0 0 100 100" class="mark"><g stroke="#7fe3ff" stroke-width="7" stroke-linecap="round" fill="none"
+      style="filter:drop-shadow(0 0 6px #7fe3ffaa)">
+      <path d="M50 12 V88 M17 31 L83 69 M83 31 L17 69"/>
+      <path d="M50 24 l-9 -9 M50 24 l9 -9 M50 76 l-9 9 M50 76 l9 9" stroke-width="5"/>
+      <path d="M26 37 l-12 -2 M26 37 l-2 -12 M74 63 l12 2 M74 63 l2 12" stroke-width="5"/>
+      <path d="M74 37 l12 -2 M74 37 l2 -12 M26 63 l-12 2 M26 63 l-2 12" stroke-width="5"/>
+      </g><circle cx="50" cy="50" r="6" fill="#dff6ff"/></svg>`;
+  }
+  function emberSVG(){
+    return `<svg viewBox="0 0 100 100" class="mark">
+      <defs><radialGradient id="eg" cx="38%" cy="34%"><stop offset="0%" stop-color="#fff0c8"/>
+      <stop offset="55%" stop-color="#ff9d3d"/><stop offset="100%" stop-color="#d63a1e"/></radialGradient></defs>
+      <circle cx="50" cy="50" r="34" fill="url(#eg)" style="filter:drop-shadow(0 0 8px #ff7a3caa)"/>
+      <circle cx="50" cy="50" r="34" fill="none" stroke="#ffd9a0" stroke-width="4" opacity=".7"/>
+      <circle cx="39" cy="38" r="8" fill="#fff6dd" opacity=".65"/></svg>`;
+  }
+
+  function roundsUI(){
+    const host=$("rounds"); host.innerHTML="";
+    ROUNDS.forEach((r,i)=>{
+      const b=document.createElement("button");
+      b.className="rd"; b.dataset.i=i;
+      const s=prog.stars[i]||0;
+      b.innerHTML=`${i+1}<u><s class="${s>0?"f":""}"></s><s class="${s>1?"f":""}"></s><s class="${s>2?"f":""}"></s></u><em>${r.n}×${r.n}</em>`;
+      b.disabled=i>prog.unlocked;
+      b.classList.toggle("cur",i===ri);
+      b.classList.toggle("done",s>0);
+      b.title=`${r.name} · ${r.n}×${r.n}, линия ${r.k}`;
+      b.onclick=()=>{ if(i<=prog.unlocked&&i!==ri){ ri=i; loadRound(); tone(620,70,0,.07,"triangle"); } };
+      host.appendChild(b);
+    });
+  }
+  function hud(){
+    $("rd").textContent=(ri+1)+"/"+ROUNDS.length;
+    $("lv").textContent="❄".repeat(Math.max(0,lives))+"·".repeat(Math.max(0,mode.lives-lives));
+    $("ts").textContent=totalStars()+"/"+(ROUNDS.length*3);
+    $("hc").textContent=hints;
+    $("sz").textContent=n+"×"+n;
+    $("hint").textContent="💡 Подсказка · "+hints;
+    $("hint").disabled=hints<=0||turn!=="me"||over;
+    $("fme").classList.toggle("active",turn==="me");
+    $("fai").classList.toggle("active",turn==="ai");
+  }
+  function layout(){
+    const avail=Math.min(pane.clientWidth-28,420);
+    const gap=n>=5?5:6;
+    const cell=Math.max(44,Math.floor((avail-gap*(n-1))/n));
+    boardEl.style.gridTemplateColumns=`repeat(${n}, ${cell}px)`;
+    boardEl.style.gridTemplateRows=`repeat(${n}, ${cell}px)`;
+    boardEl.style.gap=gap+"px";
+    const w=cell*n+gap*(n-1);
+    beam.setAttribute("viewBox",`0 0 ${w} ${w}`);
+    beam.style.width=w+"px"; beam.style.height=w+"px";
+    beam.style.left="50%"; beam.style.transform="translateX(-50%)";
+    beam.style.top="0";
+  }
+  function cellCenter(i){
+    const br=boardEl.getBoundingClientRect(), r=cells[i].getBoundingClientRect();
+    return { x:r.left-br.left+r.width/2, y:r.top-br.top+r.height/2,
+             vx:r.left+r.width/2, vy:r.top+r.height/2 };
+  }
+  function paintCell(i){
+    const el=cells[i], v=board[i];
+    el.classList.toggle("taken",!!v);
+    el.classList.toggle("x",v==="X");
+    el.classList.toggle("o",v==="O");
+    el.innerHTML = v==="X"?snowSVG() : v==="O"?emberSVG() : "";
+    el.setAttribute("aria-label",`строка ${((i/n)|0)+1}, столбец ${i%n+1}: ${v==="X"?"мороз":v==="O"?"оттепель":"пусто"}`);
+  }
+  function drawBeam(line){
+    const a=cellCenter(line[0]), b=cellCenter(line[line.length-1]);
+    const col="#7fe3ff";
+    beam.innerHTML=`
+      <line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${col}" stroke-opacity=".28" stroke-width="16" stroke-linecap="round"/>
+      <line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#dff6ff" stroke-width="4" stroke-linecap="round"
+        stroke-dasharray="600" stroke-dashoffset="600">
+        <animate attributeName="stroke-dashoffset" from="600" to="0" dur="0.45s" fill="freeze"/>
+      </line>`;
+  }
+  function overlay(on,title,text,btn,extra,handler,stars){
+    const ov=$("ov");
+    ov.classList.toggle("on",on);
+    if(on){
+      $("ovt").textContent=title;
+      $("ovp").textContent=text;
+      $("ovb").innerHTML=extra||"";
+      $("ovbtn").textContent=btn;
+      $("ovbtn").onclick=handler;
+      const s=$("ovs");
+      if(typeof stars==="number"){
+        s.style.display="flex";
+        [...s.children].forEach((el,i)=>{
+          el.classList.remove("f");
+          later(()=>{ if(i<stars){ el.classList.add("f"); tone(880+i*220,120,0,.12,"triangle"); } },260+i*230);
+        });
+      } else s.style.display="none";
+    }
+  }
+
+  function loadRound(){
+    clearTimers(); killSound();
+    const r=ROUNDS[ri];
+    n=r.n; k=r.k;
+    board=new Array(n*n).fill("");
+    cells=[]; turn="me"; over=false; hintsUsed=0; myMoves=0; focus=0; started=true;
+    beam.innerHTML="";
+    pane.classList.remove("warm","cold");
+    boardEl.innerHTML="";
+    for(let i=0;i<n*n;i++){
+      const b=document.createElement("button");
+      b.type="button"; b.className="cell"; b.dataset.i=i; b.tabIndex=i===0?0:-1;
+      b.addEventListener("click",()=>play(i));
+      b.addEventListener("focus",()=>{ focus=i; });
+      boardEl.appendChild(b); cells.push(b);
+    }
+    layout(); roundsUI(); hud();
+    overlay(false);
+    setStatus("Твой ход — ставь снежинку","me");
+    setMsg(`«${r.name}»: поле ${n}×${n}, линия из ${k}. Оттепель ошибается примерно в ${Math.round(Math.min(.85,r.err*mode.mul)*100)}% ходов.`);
+    tone(520,90,0,.08,"triangle"); tone(760,110,.09,.07,"triangle");
+  }
+
+  function place(i,mark){
+    board[i]=mark;
+    paintCell(i);
+    const c=cellCenter(i);
+    if(mark==="X"){
+      shards(c.vx,c.vy,14,"#dff6ff",true);
+      tone(880+myMoves*40,110,0,.12,"triangle");
+      tone(1320,80,.05,.07,"sine");
+    } else {
+      shards(c.vx,c.vy,12,"#ff9d3d",false);
+      tone(300,140,0,.12,"sine");
+      tone(180,180,.04,.09,"triangle");
+    }
+  }
+  function play(i){
+    if(turn!=="me"||over||board[i]) return;
+    ac();
+    myMoves++;
+    place(i,"X");
+    const w=winnerOf(board,n,k);
+    if(w){ finish(w); return; }
+    turn="ai"; hud();
+    setStatus('Оттепель думает<span class="dots"></span>',"ai");
+    later(aiTurn, 420+Math.random()*380);
+  }
+  function aiTurn(){
+    if(over) return;
+    const r=ROUNDS[ri];
+    const errRate=Math.min(.85,r.err*mode.mul);
+    const list=empties(board);
+    let move;
+    if(Math.random()<errRate){
+      move=list[(Math.random()*list.length)|0];
+    } else {
+      move=bestMove(board,"O","X",n,k);
+    }
+    if(move==null||move<0) move=list[0];
+    place(move,"O");
+    const w=winnerOf(board,n,k);
+    if(w){ finish(w); return; }
+    turn="me"; hud();
+    setStatus("Твой ход — ставь снежинку","me");
+  }
+
+  function finish(w){
+    over=true; turn="idle"; clearTimers(); hud();
+    if(w.mark==="X"){
+      w.line.forEach(i=>cells[i].classList.add("winline"));
+      drawBeam(w.line);
+      pane.classList.add("cold");
+      w.line.forEach((i,t)=>later(()=>{ const c=cellCenter(i); shards(c.vx,c.vy,16,"#7fe3ff",true); },t*90));
+      killSound();
+      tone(660,140,0,.15); tone(880,140,.14,.15); tone(1174,190,.28,.15);
+      const stars = hintsUsed===0?3:(hintsUsed===1?2:1);
+      prog.stars[ri]=Math.max(prog.stars[ri]||0,stars);
+      if(ri+1>prog.unlocked) prog.unlocked=Math.min(ri+1,ROUNDS.length-1);
+      saveProg(); roundsUI(); hud();
+      setStatus("❄ Мороз забрал стекло!","ok");
+      const last=ri===ROUNDS.length-1;
+      later(()=>{
+        if(last){
+          localStorage.setItem("advent_solved_"+DAY,new Date().toISOString());
+          confetti(); tone(1568,340,.1,.14);
+          overlay(true,"🎄 Все дуэли выиграны!",
+            `Оттепель отступила на всех пяти полях. Звёзд собрано ${totalStars()}/15. Стекло отдаёт загадку дня.`,
+            "🎁 Открыть загадку",
+            hintsUsed===0?`<div class="badge">Без подсказок</div>`:"",
+            ()=>showRiddle(true,`пять дуэлей, звёзд ${totalStars()}/15`), stars);
+          setMsg("✨ Мороз победил во всех дуэлях!","ok");
+        } else {
+          overlay(true,`«${ROUNDS[ri].name}» — победа!`,
+            `Линия собрана за ${myMoves} ${myMoves===1?"ход":myMoves<5?"хода":"ходов"}. Дальше поле больше, а Оттепель — злее.`,
+            "Следующая дуэль →",
+            hintsUsed===0?`<div class="badge">Без подсказок</div>`:"",
+            ()=>{ ri++; loadRound(); }, stars);
+          setMsg("✨ Дуэль выиграна!","ok");
+        }
+      },760);
+    } else if(w.mark==="O"){
+      w.line.forEach(i=>cells[i].classList.add("winline"));
+      cells.forEach((el,i)=>{ if(board[i]==="X") el.classList.add("melt"); });
+      pane.classList.add("warm","shake");
+      later(()=>pane.classList.remove("shake"),440);
+      killSound();
+      sweep(420,80,600,.15,"triangle");
+      lives--; hud();
+      setStatus("🔥 Оттепель растопила узор","err");
+      later(()=>{
+        if(lives<=0){
+          overlay(true,"Стекло растаяло",
+            `Жизни закончились на дуэли «${ROUNDS[ri].name}». Пройденные дуэли сохранены — начни заново с текущей и попробуй спокойнее.`,
+            "↻ Ещё раз","",()=>{ lives=mode.lives; hints=mode.hints; loadRound(); });
+          setMsg("Жизни закончились.","err");
+        } else {
+          overlay(true,"Оттепель взяла это поле",
+            `Осталось жизней: ${lives}. Переиграй дуэль — раскладка каждый раз новая.`,
+            "↻ Переиграть","",()=>loadRound());
+          setMsg(`Поражение. Осталось жизней: ${lives}.`,"err");
+        }
+      },700);
+    } else {
+      killSound();
+      tone(440,160,0,.1,"triangle"); tone(440,160,.18,.09,"triangle");
+      setStatus("Ничья — стекло удержано обеими сторонами","");
+      later(()=>{
+        overlay(true,"Ничья",
+          "Ни мороз, ни оттепель не собрали линию. Дуэль не засчитана — переиграй её без потери жизни.",
+          "↻ Переиграть","",()=>loadRound());
+        setMsg("Ничья. Переиграй дуэль.","warn");
+      },520);
+    }
+  }
+
+  $("hint").onclick=()=>{
+    if(hints<=0||turn!=="me"||over) return;
+    const i=bestMove(board,"X","O",n,k);
+    if(i==null||i<0) return;
+    hints--; hintsUsed++; hud();
+    cells[i].classList.add("hintz");
+    const c=cellCenter(i);
+    shards(c.vx,c.vy,12,"#4dd0e1",true);
+    tone(1320,110,0,.1,"triangle"); tone(1760,130,.1,.08,"sine");
+    later(()=>{ if(cells[i]) cells[i].classList.remove("hintz"); },2000);
+    setMsg(`Подсказка: сильный ход — строка ${((i/n)|0)+1}, столбец ${i%n+1} 💡`);
+  };
+  $("again").onclick=()=>{ loadRound(); sweep(420,640,170,.09,"triangle"); };
+  $("wipe").onclick=()=>{
+    prog={unlocked:0,stars:{}}; saveProg();
+    ri=0; lives=mode.lives; hints=mode.hints;
+    loadRound();
+    sweep(600,240,220,.1,"triangle");
+    setMsg("Прогресс сброшен. Начинаем со «Снежинки».");
+  };
+
+  document.addEventListener("keydown",e=>{
+    if(over){ if(e.key==="Enter"){ e.preventDefault(); $("ovbtn").click(); } return; }
+    if(turn!=="me") return;
+    const r=(focus/n)|0, c=focus%n;
+    let nr=r,nc=c,handled=true;
+    switch(e.key){
+      case "ArrowLeft": nc=Math.max(0,c-1); break;
+      case "ArrowRight": nc=Math.min(n-1,c+1); break;
+      case "ArrowUp": nr=Math.max(0,r-1); break;
+      case "ArrowDown": nr=Math.min(n-1,r+1); break;
+      case "Enter": case " ": play(focus); break;
+      case "h": case "H": case "р": case "Р": $("hint").click(); break;
+      case "r": case "R": case "к": case "К": $("again").click(); break;
+      default: handled=false;
+    }
+    if(!handled) return;
+    e.preventDefault();
+    const ni=nr*n+nc;
+    if(ni!==focus){
+      cells[focus].tabIndex=-1; focus=ni;
+      cells[ni].tabIndex=0; cells[ni].focus();
+    }
+  });
+  addEventListener("resize",()=>{
+    if(!cells.length) return;
+    layout();
+    const w=winnerOf(board,n,k);
+    if(w&&w.line&&w.mark==="X") drawBeam(w.line);
+  });
+
+  lives=mode.lives; hints=mode.hints;
+  loadRound();
+  overlay(true,"Мороз против Оттепели",
+    `Режим «${mode.label}»: ${mode.lives} жизни, ${mode.hints} подсказки. Пять дуэлей — от 3×3 до 5×5. Ты ходишь первым.`,
+    "▶ Начать дуэль","",()=>{ overlay(false); ac(); setStatus("Твой ход — ставь снежинку","me"); });
+}
+</script>
+</body>
+</html>
