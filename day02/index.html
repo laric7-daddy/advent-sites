@@ -97,8 +97,9 @@ const q = new URLSearchParams(location.search);
 const now = new Date();
 const inDec = now.getFullYear() === 2026 && now.getMonth() === 11;
 const today = inDec ? now.getDate() : 0;
-const open = q.has("all") || (inDec && (DAY < today || (DAY === today && now.getHours() >= 19)));
-const past = q.has("all") || (inDec && DAY < today);
+const PREP = now < new Date(2026, 11, 1, 19, 0, 0);      // режим подготовки: замки сняты
+const open = q.has("all") || PREP || (inDec && (DAY < today || (DAY === today && now.getHours() >= 19)));
+const past = !q.has("all") && (inDec && DAY < today);
 const solved = () => !!localStorage.getItem("advent_solved_" + DAY);
 
 function showRiddle(fresh, extra){
