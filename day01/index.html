@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>День 1 — ёлка из огоньков</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1410;--card:#13241b;--gold:#e8c37a;--green:#3ddc84;--dim:#6f8f7d;--line:#24402f;--line2:#3a5a46;--ink:#eaf5ee}
+*{box-sizing:border-box}
+body{margin:0;padding:0 14px 46px;background:var(--bg);color:var(--ink);font:16px/1.5 Manrope,sans-serif;overflow-x:hidden}
+.wrap{max-width:560px;margin:0 auto;position:relative;z-index:1}
+.garland{display:flex;justify-content:center;gap:14px;border-top:2px solid var(--line2);overflow:hidden}
+.bulb{width:9px;height:13px;border-radius:50% 50% 45% 45%;position:relative;margin-top:7px;flex:none;background:currentColor;transform-origin:top center;animation:sway 3s ease-in-out infinite alternate,glowblink 2s infinite}
+.bulb::before{content:"";position:absolute;top:-7px;left:3.5px;width:2px;height:7px;background:var(--line2)}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+@keyframes glowblink{0%,100%{filter:brightness(1);box-shadow:0 0 8px currentColor}50%{filter:brightness(.5);box-shadow:0 0 2px currentColor}}
+.flake{position:fixed;top:-12px;color:#cfe8da;opacity:.6;pointer-events:none;z-index:0;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(105vh) rotate(360deg)}}
+.back{color:var(--dim);font-size:13px;text-decoration:none}
+h1{font-family:Unbounded,sans-serif;font-size:22px;margin:12px 0 12px}
+h1 .gold{color:var(--gold)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+.rules{border-color:var(--line2);background:#10241a}
+.rules b{color:var(--gold)}
+.rules ul{margin:6px 0 0;padding-left:18px;color:#bcd8c6;font-size:13.5px}
+.rules li{margin-bottom:3px}
+.task{color:#bcd8c6;font-size:14px;margin:0 0 10px}
+.note{color:var(--dim);font-size:13px;text-align:center}
+#lsvg{width:100%;max-width:340px;display:block;margin:0 auto}
+.bulb31{fill:#5b7280;cursor:pointer;transition:fill .3s}
+.bulb31.on{fill:#ffd76a;filter:drop-shadow(0 0 6px #ffd76a)}
+.comp{font-size:15px;color:#fff3d6;text-align:center;min-height:44px}
+#riddle{font-size:16px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="garland" id="garland"></div>
+<div class="wrap">
+<a class="back" href="../">← календарь</a>
+<h1>День <span class="gold">1</span> · ёлка из огоньков</h1>
+<div class="card rules">
+  📜 <b>Как играть:</b> цель — разгадать головоломку и добыть загадку, а ответ принести боту: он выдаст подарок и фото тайника.
+  <ul>
+    <li>Ёлка спит под снегом: нажимай на огоньки — в каждом спрятан комплимент для тебя.</li>
+    <li>Повторный тап по огоньку — перечитать комплимент.</li>
+    <li>Зажги все 31 — и день откроет загадку 🎁</li>
+  </ul>
+</div>
+<div id="game" class="card"></div>
+<div id="riddleCard" class="card" hidden>
+  <h3 id="rTitle" style="margin:0 0 8px;font-size:16px;color:var(--gold)"></h3>
+  <p id="riddle"></p>
+  <p class="note">Отправь ответ боту в Telegram 🤖 Застрянешь — кнопка 💡 Подсказка у бота (раз в 2 минуты).</p>
+</div>
+</div>
+<script>
+const DAY=1;
+const RIDDLE="У меня 31 окошко, и в каждом — не буква, а сладость. Открывай по одному в день — и декабрь станет вкуснее.";
+const COMPLIMENTS=[
+"Твоя улыбка делает мой день лучше любого кофе.",
+"Ты смеёшься так заразительно, что я смеюсь раньше, чем понимаю шутку.",
+"Ты веришь в меня даже тогда, когда я сам не верю.",
+"Твои объятия — самое уютное место на земле.",
+"Ты замечаешь красоту в мелочах и учишь меня её видеть.",
+"С тобой даже молчать — легко и тепло.",
+"Твои глаза горят, когда ты говоришь о любимом, — невозможно отвести взгляд.",
+"Ты — мой любимый человек, с которым хочется делиться любыми новостями.",
+"Ты готовишь так, что это похоже на маленькое чудо.",
+"Твоя доброта — это суперсила.",
+"Ты умеешь делать меня лучше просто тем, что ты есть.",
+"Ты помнишь мелочи, которые важнее больших вещей.",
+"Твой голос успокаивает лучше любого плейлиста.",
+"Ты смелая там, где я бы опустил руки.",
+"У тебя лучший вкус во всём, за что ты берёшься.",
+"Рядом с тобой дом — это где угодно, лишь бы вместе.",
+"Ты смешная по-своему, и это самый лучший юмор.",
+"Твои советы — самые честные и самые тёплые.",
+"Твоё любопытство делает мир вокруг интереснее.",
+"Ты красивая даже когда только проснулась и ворчишь.",
+"Ты умеешь превратить обычный вечер в маленький праздник.",
+"Обожаю, как ты подпеваешь, когда думаешь, что никто не слышит.",
+"Ты — лучшая команда во всём, что мы делаем вместе.",
+"Твоё терпение меня восхищает.",
+"Ты умеешь слушать так, что чувствуешь себя услышанной.",
+"Твои идеи — самые смелые и самые родные.",
+"Ты — причина, по которой я улыбаюсь телефону.",
+"У тебя самые нежные руки на свете.",
+"Ты создаёшь уют из ничего: свечка, плед — и уже волшебно.",
+"Ты единственная и неповторимая, и мне повезло, что ты моя.",
+"Я люблю тебя больше, чем вчера, но меньше, чем завтра."];
+const GC=["#e74c3c","#f1c40f","#3498db","#e67e22","#9b59b6","#2ecc71","#ff7eb0"];
+for(let i=0;i<17;i++){const b=document.createElement("span");b.className="bulb";b.style.color=GC[i%GC.length];b.style.animationDelay=(i*.17)+"s, "+(i*.23)+"s";document.getElementById("garland").appendChild(b);}
+for(let i=0;i<12;i++){const f=document.createElement("div");f.className="flake";f.textContent="❄";f.style.left=Math.random()*100+"vw";f.style.fontSize=8+Math.random()*9+"px";f.style.animationDuration=7+Math.random()*8+"s";f.style.animationDelay=-Math.random()*10+"s";document.body.appendChild(f);}
+const $=id=>document.getElementById(id);
+const q=new URLSearchParams(location.search);
+const now=new Date();
+const inDec=now.getFullYear()===2026&&now.getMonth()===11;
+const today=inDec?now.getDate():0;
+const open=q.has("all")||(inDec&&(DAY<today||(DAY===today&&now.getHours()>=19)));
+const past=q.has("all")||(inDec&&DAY<today);
+const solved=()=>!!localStorage.getItem("advent_solved_"+DAY);
+function showRiddle(fresh,extra){
+  $("game").innerHTML="";$("riddleCard").hidden=false;
+  $("rTitle").textContent=fresh?"🎉 "+(extra||"Готово!")+" Вот загадка дня:":"Загадка дня:";
+  $("riddle").textContent=RIDDLE;
+}
+if(!open){$("game").innerHTML=`<p class="task">День откроется 1 декабря в 19:00 🔒</p>`;}
+else if(solved()||past){showRiddle(false);}
+else{
+  const key="advent_lights_"+DAY;
+  const lit=new Set(JSON.parse(localStorage.getItem(key)||"[]"));
+  const NS="http://www.w3.org/2000/svg",APEX=30,BASE=215,HW=78,N=31;
+  const halfW=y=>HW*(y-APEX)/(BASE-APEX);
+  $("game").innerHTML=`<p class="task">Тап по огоньку зажигает его и открывает комплимент. Собери все ${N} — и ёлка отдаст загадку дня.</p>
+    <svg id="lsvg" viewBox="0 0 200 240"></svg>
+    <p class="note" id="lCnt"></p>
+    <div class="card comp" id="lComp" style="margin-top:10px" hidden></div>`;
+  const svg=$("lsvg");
+  for(let i=0;i<5;i++){
+    const bY=BASE-i*34,tY=Math.max(APEX,bY-80),hw=halfW(bY);
+    const p=document.createElementNS(NS,"polygon");
+    p.setAttribute("points",`${100-hw},${bY} ${100+hw},${bY} 100,${tY}`);
+    p.setAttribute("fill",i%2?"#1d5c38":"#227047");
+    svg.appendChild(p);
+  }
+  const tr=document.createElementNS(NS,"rect");
+  tr.setAttribute("x",94);tr.setAttribute("y",BASE-4);tr.setAttribute("width",12);tr.setAttribute("height",12);tr.setAttribute("fill","#6d4426");
+  svg.appendChild(tr);
+  const cnt=()=>$("lCnt").textContent=`Зажжено: ${lit.size} / ${N}`;
+  const showComp=i=>{const c=$("lComp");c.hidden=false;c.innerHTML=`✨ <b>${i+1}.</b> ${COMPLIMENTS[i]}`;};
+  for(let i=0;i<N;i++){
+    const t=(i+.5)/N,y=BASE-8-t*(BASE-APEX-20);
+    const off=(((i*37)%100)/100-.5)*1.35;
+    const x=100+off*halfW(y)*.85;
+    const c=document.createElementNS(NS,"circle");
+    c.setAttribute("cx",x.toFixed(1));c.setAttribute("cy",y.toFixed(1));c.setAttribute("r",6.5);
+    c.setAttribute("class","bulb31"+(lit.has(i)?" on":""));
+    c.addEventListener("click",()=>{
+      if(lit.has(i)){showComp(i);return;}
+      lit.add(i);localStorage.setItem(key,JSON.stringify([...lit]));
+      c.classList.add("on");showComp(i);cnt();
+      if(lit.size===N){
+        localStorage.setItem("advent_solved_"+DAY,new Date().toISOString());
+        setTimeout(()=>showRiddle(true,"Все 31 огонёк горят!"),700);
+      }
+    });
+    svg.appendChild(c);
+  }
+  cnt();
+  if(lit.size===N)showComp(N-1);
+}
+</script>
+</body>
+</html>
