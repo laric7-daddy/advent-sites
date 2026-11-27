@@ -27,9 +27,20 @@ h1 .gold{color:var(--gold)}
 .rules li{margin-bottom:3px}
 .task{color:#bcd8c6;font-size:14px;margin:0 0 10px}
 .note{color:var(--dim);font-size:13px;text-align:center}
-#lsvg{width:100%;max-width:340px;display:block;margin:0 auto}
-.bulb31{fill:#5b7280;cursor:pointer;transition:fill .3s}
-.bulb31.on{fill:#ffd76a;filter:drop-shadow(0 0 6px #ffd76a)}
+#lsvg{width:100%;max-width:340px;display:block;margin:0 auto;overflow:visible}
+.tier{transform-box:view-box;transform-origin:50% 88%;animation:grow .55s cubic-bezier(.2,1.2,.4,1) backwards}
+@keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.hang{transform-box:view-box;cursor:pointer}
+.hang .glass{transition:fill .35s}
+.hang:hover .glass{filter:brightness(1.25)}
+.hang.lit{animation:hangsway 3.4s ease-in-out infinite alternate}
+@keyframes hangsway{from{transform:rotate(-2.4deg)}to{transform:rotate(2.4deg)}}
+.hang.pop{animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{0%{transform:scale(.4)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+.light{animation:blink 1.7s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.star{transform-box:view-box;transform-origin:120px 38px;animation:starpulse 2.6s ease-in-out infinite}
+@keyframes starpulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 6px #ffd76a)}50%{transform:scale(1.08);filter:drop-shadow(0 0 14px #ffd76a)}}
 .comp{font-size:15px;color:#fff3d6;text-align:center;min-height:44px}
 #riddle{font-size:16px;white-space:pre-wrap}
 </style>
@@ -42,9 +53,9 @@ h1 .gold{color:var(--gold)}
 <div class="card rules">
   📜 <b>Как играть:</b> цель — разгадать головоломку и добыть загадку, а ответ принести боту: он выдаст подарок и фото тайника.
   <ul>
-    <li>Ёлка спит под снегом: нажимай на огоньки — в каждом спрятан комплимент для тебя.</li>
-    <li>Повторный тап по огоньку — перечитать комплимент.</li>
-    <li>Зажги все 31 — и день откроет загадку 🎁</li>
+    <li>Ёлка спит под снегом: нажимай на игрушки — в каждой спрятан комплимент для тебя.</li>
+    <li>Повторный тап по игрушке — перечитать комплимент.</li>
+    <li>Зажги все 31 — и на макушке вспыхнет звезда, а день откроет загадку 🎁</li>
   </ul>
 </div>
 <div id="game" class="card"></div>
@@ -89,7 +100,7 @@ const COMPLIMENTS=[
 "Ты создаёшь уют из ничего: свечка, плед — и уже волшебно.",
 "Ты единственная и неповторимая, и мне повезло, что ты моя.",
 "Я люблю тебя больше, чем вчера, но меньше, чем завтра."];
-const GC=["#e74c3c","#f1c40f","#3498db","#e67e22","#9b59b6","#2ecc71","#ff7eb0"];
+const GC=["#ff5f5f","#ffb347","#ffd76a","#3ddc84","#4dd0e1","#7fb4ff","#ff7eb0","#b39ddb"];
 for(let i=0;i<17;i++){const b=document.createElement("span");b.className="bulb";b.style.color=GC[i%GC.length];b.style.animationDelay=(i*.17)+"s, "+(i*.23)+"s";document.getElementById("garland").appendChild(b);}
 for(let i=0;i<12;i++){const f=document.createElement("div");f.className="flake";f.textContent="❄";f.style.left=Math.random()*100+"vw";f.style.fontSize=8+Math.random()*9+"px";f.style.animationDuration=7+Math.random()*8+"s";f.style.animationDelay=-Math.random()*10+"s";document.body.appendChild(f);}
 const $=id=>document.getElementById(id);
@@ -97,9 +108,9 @@ const q=new URLSearchParams(location.search);
 const now=new Date();
 const inDec=now.getFullYear()===2026&&now.getMonth()===11;
 const today=inDec?now.getDate():0;
-const PREP = now < new Date(2026, 11, 1, 19, 0, 0);      // режим подготовки: замки сняты
-const open = q.has("all") || PREP || (inDec && (DAY < today || (DAY === today && now.getHours() >= 19)));
-const past = !q.has("all") && (inDec && DAY < today);
+const PREP=now<new Date(2026,11,1,19,0,0);
+const open=q.has("all")||PREP||(inDec&&(DAY<today||(DAY===today&&now.getHours()>=19)));
+const past=!q.has("all")&&(inDec&&DAY<today);
 const solved=()=>!!localStorage.getItem("advent_solved_"+DAY);
 function showRiddle(fresh,extra){
   $("game").innerHTML="";$("riddleCard").hidden=false;
@@ -107,47 +118,143 @@ function showRiddle(fresh,extra){
   $("riddle").textContent=RIDDLE;
 }
 if(!open){$("game").innerHTML=`<p class="task">День откроется 1 декабря в 19:00 🔒</p>`;}
-else if (!q.has("all") && (solved() || past)){ showRiddle(false); }
+else if(!q.has("all")&&(solved()||past)){showRiddle(false);}
 else{
   const key="advent_lights_"+DAY;
   const lit=new Set(JSON.parse(localStorage.getItem(key)||"[]"));
-  const NS="http://www.w3.org/2000/svg",APEX=30,BASE=215,HW=78,N=31;
-  const halfW=y=>HW*(y-APEX)/(BASE-APEX);
-  $("game").innerHTML=`<p class="task">Тап по огоньку зажигает его и открывает комплимент. Собери все ${N} — и ёлка отдаст загадку дня.</p>
-    <svg id="lsvg" viewBox="0 0 200 240"></svg>
+  const NS="http://www.w3.org/2000/svg";
+  const CX=120,APEX=46,BASE=238,HB=88,TIERS=6;
+  const halfW=y=>HB*(y-APEX)/(BASE-APEX);
+  const N=31;
+  $("game").innerHTML=`<p class="task">Тап по игрушке зажигает её и открывает комплимент. Собери все ${N} — и ёлка отдаст загадку дня.</p>
+    <svg id="lsvg" viewBox="0 0 240 320"></svg>
     <p class="note" id="lCnt"></p>
     <div class="card comp" id="lComp" style="margin-top:10px" hidden></div>`;
   const svg=$("lsvg");
-  for(let i=0;i<5;i++){
-    const bY=BASE-i*34,tY=Math.max(APEX,bY-80),hw=halfW(bY);
-    const p=document.createElementNS(NS,"polygon");
-    p.setAttribute("points",`${100-hw},${bY} ${100+hw},${bY} 100,${tY}`);
-    p.setAttribute("fill",i%2?"#1d5c38":"#227047");
-    svg.appendChild(p);
+  function shade(hex,amt){const n=parseInt(hex.slice(1),16);const r=Math.max(0,Math.min(255,(n>>16)+amt)),g=Math.max(0,Math.min(255,(n>>8&255)+amt)),b=Math.max(0,Math.min(255,(n&255)+amt));return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);}
+  function mk(tag,attrs,parent,cls){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(cls)e.setAttribute("class",cls);(parent||svg).appendChild(e);return e;}
+  const defs=mk("defs",{});
+  const ng=mk("linearGradient",{id:"needleG",x1:0,y1:0,x2:0,y2:1},defs);
+  mk("stop",{offset:"0%","stop-color":"#37a065"},ng);mk("stop",{offset:"45%","stop-color":"#1d5c38"},ng);mk("stop",{offset:"100%","stop-color":"#0f3520"},ng);
+  GC.forEach((h,i)=>{const g=mk("radialGradient",{id:"b"+i,cx:"35%",cy:"30%",r:"75%"},defs);
+    mk("stop",{offset:"0%","stop-color":shade(h,110)},g);mk("stop",{offset:"38%","stop-color":h},g);mk("stop",{offset:"100%","stop-color":shade(h,-85)},g);});
+  const dim=mk("radialGradient",{id:"dimG",cx:"35%",cy:"30%",r:"75%"},defs);
+  mk("stop",{offset:"0%","stop-color":"#93a7b1"},dim);mk("stop",{offset:"45%","stop-color":"#4d6069"},dim);mk("stop",{offset:"100%","stop-color":"#26343b"},dim);
+  const cap=mk("linearGradient",{id:"capG",x1:0,y1:0,x2:0,y2:1},defs);
+  mk("stop",{offset:"0%","stop-color":"#f6dfae"},cap);mk("stop",{offset:"100%","stop-color":"#8a6a2a"},cap);
+  const sn=mk("radialGradient",{id:"snowG",cx:"40%",cy:"30%",r:"80%"},defs);
+  mk("stop",{offset:"0%","stop-color":"#ffffff"},sn);mk("stop",{offset:"100%","stop-color":"#a9c9d8"},sn);
+  const st=mk("radialGradient",{id:"starG",cx:"40%",cy:"35%",r:"80%"},defs);
+  mk("stop",{offset:"0%","stop-color":"#fff8dc"},st);mk("stop",{offset:"55%","stop-color":"#ffd76a"},st);mk("stop",{offset:"100%","stop-color":"#e0a12a"},st);
+  const gl=mk("radialGradient",{id:"glowG"},defs);
+  mk("stop",{offset:"0%","stop-color":"#ffd76a","stop-opacity":".5"},gl);mk("stop",{offset:"100%","stop-color":"#ffd76a","stop-opacity":"0"},gl);
+  const pot=mk("linearGradient",{id:"potG",x1:0,y1:0,x2:0,y2:1},defs);
+  mk("stop",{offset:"0%","stop-color":"#d24a3c"},pot);mk("stop",{offset:"100%","stop-color":"#7d1f18"},pot);
+  const rim=mk("linearGradient",{id:"rimG",x1:0,y1:0,x2:0,y2:1},defs);
+  mk("stop",{offset:"0%","stop-color":"#ffe9a8"},rim);mk("stop",{offset:"100%","stop-color":"#b8860b"},rim);
+  const tr=mk("linearGradient",{id:"trunkG",x1:0,y1:0,x2:1,y2:0},defs);
+  mk("stop",{offset:"0%","stop-color":"#8a5a33"},tr);mk("stop",{offset:"100%","stop-color":"#4a2f16"},tr);
+  const f=mk("filter",{id:"soft",x:"-80%",y:"-80%",width:"260%",height:"260%"},defs);
+  mk("feGaussianBlur",{stdDeviation:"2.2",result:"b"},f);
+  const m=mk("feMerge",{},f);mk("feMergeNode",{in:"b"},m);mk("feMergeNode",{in:"SourceGraphic"},m);
+  function tierPath(topY,baseY,hw,k){
+    const dip=Math.max(4,hw*.13);
+    let d=`M ${CX} ${topY}`;
+    d+=` C ${CX-hw*.30} ${topY+(baseY-topY)*.42}, ${CX-hw*.74} ${baseY-(baseY-topY)*.30}, ${CX-hw} ${baseY}`;
+    for(let j=0;j<k;j++){
+      const x0=CX-hw+(2*hw)*j/k,x1=CX-hw+(2*hw)*(j+1)/k,xm=(x0+x1)/2;
+      const yEnd=baseY+(j===k-1?0:(j%2?-1.6:1.6));
+      d+=` Q ${xm} ${baseY+dip}, ${x1} ${yEnd}`;
+    }
+    d+=` C ${CX+hw*.74} ${baseY-(baseY-topY)*.30}, ${CX+hw*.30} ${topY+(baseY-topY)*.42}, ${CX} ${topY} Z`;
+    return d;
   }
-  const tr=document.createElementNS(NS,"rect");
-  tr.setAttribute("x",94);tr.setAttribute("y",BASE-4);tr.setAttribute("width",12);tr.setAttribute("height",12);tr.setAttribute("fill","#6d4426");
-  svg.appendChild(tr);
+  mk("ellipse",{cx:CX,cy:BASE+34,rx:78,ry:9,fill:"url(#snowG)",opacity:.35});
+  mk("ellipse",{cx:CX,cy:BASE+30,rx:34,ry:6,fill:"#000",opacity:.4});
+  mk("rect",{x:CX-5,y:BASE-4,width:10,height:12,fill:"url(#trunkG)"});
+  const tierY=[];
+  for(let i=0;i<TIERS;i++){
+    const bY=BASE-i*31,tY=Math.max(APEX,bY-66),hw=halfW(bY),k=Math.max(3,6-i);
+    tierY.push({bY,hw,k});
+    const p=tierPath(tY,bY,hw,k);
+    mk("path",{d:p,fill:"#06180e",opacity:.55,transform:"translate(0 5)"});
+    const t=mk("path",{d:p,fill:"url(#needleG)"},null,"tier");
+    t.style.animationDelay=(i*.08)+"s";
+    mk("path",{d:`M ${CX} ${tY} C ${CX-hw*.30} ${tY+(bY-tY)*.42}, ${CX-hw*.74} ${bY-(bY-tY)*.30}, ${CX-hw} ${bY}`,stroke:"#7fd6a0","stroke-width":1.4,fill:"none",opacity:.3});
+    for(let n=0;n<8;n++){const nx=CX-hw*.8+n*(hw*1.6/7);
+      mk("line",{x1:nx,y1:bY-2,x2:nx*.92+CX*.08,y2:bY-10,stroke:"#0a2416","stroke-width":1,opacity:.3});}
+    const dip=Math.max(4,hw*.13);
+    for(let j=0;j<k;j++){const xm=CX-hw+(2*hw)*(j+.5)/k,yy=bY+dip*.52;
+      mk("path",{d:`M ${xm-7} ${yy} Q ${xm} ${yy+4.5} ${xm+7} ${yy} Q ${xm} ${yy-3.5} ${xm-7} ${yy} Z`,fill:"url(#snowG)",opacity:.92});}
+    mk("ellipse",{cx:CX-hw,cy:bY,rx:5,ry:3,fill:"url(#snowG)",opacity:.9});
+    mk("ellipse",{cx:CX+hw,cy:bY,rx:5,ry:3,fill:"url(#snowG)",opacity:.9});
+  }
+  /* гирлянда */
+  [1,3,5].forEach((ti,si)=>{
+    const y=BASE-ti*31-8,hw=halfW(y)*.92;
+    mk("path",{d:`M ${CX-hw} ${y} Q ${CX} ${y+16} ${CX+hw} ${y}`,stroke:"#e8c37a","stroke-width":1.1,fill:"none",opacity:.5});
+    for(let t=.12;t<.95;t+=.14){
+      const x=(1-t)*(1-t)*(CX-hw)+2*t*(1-t)*CX+t*t*(CX+hw);
+      const yy=(1-t)*(1-t)*y+2*t*(1-t)*(y+16)+t*t*y;
+      const c=mk("circle",{cx:x,cy:yy+1.5,r:1.8,fill:"#ffe9a8",filter:"url(#soft)"},null,"light");
+      c.style.animationDelay=((si*3+t*7)%1.7)+"s";
+    }
+  });
+  /* горшок */
+  mk("path",{d:`M ${CX-26} ${BASE+8} L ${CX+26} ${BASE+8} L ${CX+20} ${BASE+30} L ${CX-20} ${BASE+30} Z`,fill:"url(#potG)"});
+  mk("rect",{x:CX-28,y:BASE+4,width:56,height:7,rx:3,fill:"url(#rimG)"});
+  mk("path",{d:`M ${CX-28} ${BASE+5} Q ${CX} ${BASE+1} ${CX+28} ${BASE+5} Q ${CX} ${BASE+8} ${CX-28} ${BASE+5} Z`,fill:"url(#snowG)",opacity:.9});
+  /* 31 игрушка по ярусам */
+  const per=[6,6,5,5,5,4];
   const cnt=()=>$("lCnt").textContent=`Зажжено: ${lit.size} / ${N}`;
   const showComp=i=>{const c=$("lComp");c.hidden=false;c.innerHTML=`✨ <b>${i+1}.</b> ${COMPLIMENTS[i]}`;};
-  for(let i=0;i<N;i++){
-    const t=(i+.5)/N,y=BASE-8-t*(BASE-APEX-20);
-    const off=(((i*37)%100)/100-.5)*1.35;
-    const x=100+off*halfW(y)*.85;
-    const c=document.createElementNS(NS,"circle");
-    c.setAttribute("cx",x.toFixed(1));c.setAttribute("cy",y.toFixed(1));c.setAttribute("r",6.5);
-    c.setAttribute("class","bulb31"+(lit.has(i)?" on":""));
-    c.addEventListener("click",()=>{
-      if(lit.has(i)){showComp(i);return;}
-      lit.add(i);localStorage.setItem(key,JSON.stringify([...lit]));
-      c.classList.add("on");showComp(i);cnt();
-      if(lit.size===N){
-        localStorage.setItem("advent_solved_"+DAY,new Date().toISOString());
-        setTimeout(()=>showRiddle(true,"Все 31 огонёк горят!"),700);
-      }
-    });
-    svg.appendChild(c);
+  let starG=null;
+  function makeStar(){
+    if(starG)return;
+    starG=mk("g",{},null,"star");
+    let pts="";
+    for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?5:13;pts+=`${CX+Math.cos(a)*r},${38+Math.sin(a)*r} `;}
+    mk("circle",{cx:CX,cy:38,r:16,fill:"url(#glowG)"},starG);
+    mk("polygon",{points:pts.trim(),fill:"url(#starG)",filter:"url(#soft)"},starG);
   }
+  let idx=0;
+  per.forEach((count,ti)=>{
+    const {bY,hw,k}=tierY[ti];
+    const dip=Math.max(4,hw*.13);
+    for(let j=0;j<count;j++){
+      const i=idx++;
+      const x=CX-hw*.78+(hw*1.56)*(count===1?.5:j/(count-1));
+      const y=bY+dip*.5+6;
+      const hue=i%GC.length;
+      const g=mk("g",{},null,"hang"+(lit.has(i)?" lit":""));
+      g.style.transformOrigin=`${x}px ${y-11}px`;
+      g.style.animationDelay=((i*.11)%1.4)+"s";
+      mk("path",{d:`M ${x} ${y-10} q 3 -3 0 -5`,stroke:"#d9b45a","stroke-width":1,fill:"none"},g);
+      mk("rect",{x:x-2.6,y:y-9.4,width:5.2,height:3.4,rx:1,fill:"url(#capG)"},g);
+      const glow=mk("circle",{cx:x,cy:y,r:11,fill:"url(#glowG)",opacity:lit.has(i)?1:0},g);
+      const shape=i%3;
+      let glass;
+      if(shape===0)glass=mk("circle",{cx:x,cy:y,r:6.2,fill:lit.has(i)?`url(#b${hue})`:"url(#dimG)"},g,"glass");
+      else if(shape===1)glass=mk("path",{d:`M ${x} ${y-6.6} C ${x+6} ${y-2} ${x+6} ${y+3.4} ${x} ${y+7} C ${x-6} ${y+3.4} ${x-6} ${y-2} ${x} ${y-6.6} Z`,fill:lit.has(i)?`url(#b${hue})`:"url(#dimG)"},g,"glass");
+      else glass=mk("ellipse",{cx:x,cy:y,rx:4.2,ry:6.6,fill:lit.has(i)?`url(#b${hue})`:"url(#dimG)"},g,"glass");
+      mk("ellipse",{cx:x-2,cy:y-2.2,rx:1.8,ry:1.2,fill:"#fff",opacity:.6,transform:`rotate(-25 ${x-2} ${y-2.2})`},g);
+      g.addEventListener("click",()=>{
+        if(lit.has(i)){showComp(i);return;}
+        lit.add(i);localStorage.setItem(key,JSON.stringify([...lit]));
+        glass.setAttribute("fill",`url(#b${hue})`);
+        glow.setAttribute("opacity",1);
+        g.classList.add("lit","pop");
+        setTimeout(()=>g.classList.remove("pop"),500);
+        showComp(i);cnt();
+        if(lit.size===N){
+          makeStar();
+          localStorage.setItem("advent_solved_"+DAY,new Date().toISOString());
+          setTimeout(()=>showRiddle(true,"Все 31 огонёк горят!"),800);
+        }
+      });
+    }
+  });
+  if(lit.size===N)makeStar();
   cnt();
   if(lit.size===N)showComp(N-1);
 }
